@@ -134,7 +134,7 @@ or:
 
 ## Contact and discuss
 
-Discuss and ask questions on the `pydvbcss google group <https://groups.google.com/forum/#!forum/pydvbcss>`_.
+Discuss and ask questions on the [pydvbcss google group](<https://groups.google.com/forum/#!forum/pydvbcss>).
 
 The original author is Matt Hammond 'at' bbc.co.uk
 
