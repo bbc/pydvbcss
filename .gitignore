@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Eclipse
+.project
+.settings
+.externalToolBuilders
+.pydevproject
+
+# svn
+.svn
+
+# Mac OS X
+.DS_STORE
+.DS_Store
+
+# sphinx-doc
+build
+docs/_build
+docs/_static
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
