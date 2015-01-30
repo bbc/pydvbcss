@@ -16,7 +16,7 @@ import sys
 
 sys.path.insert(0,"../")
 
-GITHUB_MASTER_URL = "https://github.com/BBC/pydvbcss/blob/master"
+GITHUB_MASTER_URL = "https://github.com/BBC/pydvbcss/tree/master"
 
 extlinks= { 'repo': (GITHUB_MASTER_URL+"%s", None)}
 
