@@ -5,6 +5,7 @@ CSS-WC protocol
 .. toctree::
     :maxdepth: 2
     
+    wc-overview.rst
     wc-messages.rst
     wc-client.rst
     wc-server.rst

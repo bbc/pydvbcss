@@ -1,7 +1,24 @@
-CSS-TS Protocol overview
-------------------------
+CSS-TS Protocol introduction
+----------------------------
 
 **Here is a quick introduction to the CSS-TS protocol. For full details, refer to the** `DVB specification <https://www.dvb.org/search/results/keywords/A167>`_.
+
+The CSS-TS protocol is for *Timeline Synchronisation*. Via this protocol,
+the server (e.g. TV) pushes timestamps to the client (e.g. companion) to keep
+it up-to-date on the progress of a particular timeline (chosen by the client).
+
+A client can also report its own timing and what range of timings it can
+cope with. This allows the client to negotiate a mutually achievable
+timing with the server.
+
+It is a WebSockets based protocol and messages are in JSON format.
+
+.. contents::
+    :local:
+    :depth: 1
+
+Sequence of interaction
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The client is assumed to already know the WebSocket URL for the CSS-TS server
 (usually from the information received via the :doc:`CSS-CII protocol <cii>`).
@@ -41,11 +58,22 @@ While the above is true, the timeline is "available". While it is not true, it i
 The CSS-TS connection is kept open irrespective of timeline availability. The server indicates
 changes in availability via the :class:`~dvbcss.protocol.ts.ControlTimestamp` messages it sends.
 
+Example :class:`~dvbcss.protocol.ts.SetupData` message; requesting a PTS timeline for
+a particular DVB broadcast channel, but not being specific about which event (programme in the EPG):
+
+.. code-block:: json
+
+	{
+		"contentIdStem"    : "dvb://233a.1004.1044",
+		"timelineSelector" : "urn:dvb:css:timeline:pts"
+	}
+
 
 What does a timestamp convey?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It represents a relationship between Wall Clock time and the timeline of the content being presented by the TV Device.
+It is sometimes referred to as a *(point of) correlation* between the wall clock and the timeline.
 
 This relationship can be visualised as a line that maps from wall clock time (on one axis) to timeline time (on the other axis).
 The (content-time, wall-clock-time) correlation is a point on the line. The timelineSpeedMultiplier represents the slope.
@@ -63,6 +91,47 @@ to represent each of these three aspects.
 Earliest and Latest correlations are allowed to have -infinity and +infinity for the wall clock time to indicate that the client
 has no limits on how early, or late, it can present.
 
+An example :class:`~dvbcss.protocol.ts.ControlTimestamp` indicating the timeline is unavailable:
 
+.. code-block:: json
+
+	{
+		"contentTime"             : null,
+		"wallClockTime"           : "116012000000",
+		"timelineSpeedMultiplier" : null
+	}
+
+An example :class:`~dvbcss.protocol.ts.ControlTimestamp` providing a correlation
+for an available timeline:
+
+.. code-block:: json
+
+
+	{
+		"contentTime"             : "834188",
+		"wallClockTime"           : "116012000000",
+		"timelineSpeedMultiplier" : 1.0
+	}
+
+An example of an :class:`~dvbcss.protocol.ts.AptEptLpt` message, indicating
+the current presentation timing being used by the client; a limit on how early
+it can present; but no limit on how long it can delay (buffer):
+
+.. code-block:: json
+
+	{
+		"actual" : {
+			"contentTime"   : "834190",
+			"wallClockTime" : "115992000000"
+		},
+		"earliest" : {
+			"contentTime"   : "834190",
+			"wallClockTime" : "115984000000"
+		},
+		"latest" : {
+			"contentTime"   : "834190",
+			"wallClockTime" : "plusinfinity"
+		}
+	}
 
 

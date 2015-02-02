@@ -5,6 +5,7 @@ CSS-CII protocol
 .. toctree::
     :maxdepth: 2
     
+    cii-overview.rst
     cii-messages.rst
     cii-client.rst
     cii-server.rst
