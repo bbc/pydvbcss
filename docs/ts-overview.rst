@@ -5,11 +5,13 @@ CSS-TS Protocol introduction
 
 The CSS-TS protocol is for *Timeline Synchronisation*. Via this protocol,
 the server (e.g. TV) pushes timestamps to the client (e.g. companion) to keep
-it up-to-date on the progress of a particular timeline (chosen by the client).
+it up-to-date on the progress of a particular timeline. The timeline to use
+is requested by the client at the beginning of the interaction.
 
 A client can also report its own timing and what range of timings it can
 cope with. This allows the client to negotiate a mutually achievable
-timing with the server.
+timing with the server, although the server is under no obligation and can
+choose to ignore this information.
 
 It is a WebSockets based protocol and messages are in JSON format.
 
