@@ -1,0 +1,6 @@
+The latest build of this documentation can be read online at:
+
+ https://BBC.github.io/pydvbcss/docs/latest/
+
+The documentation is built using the sphinx documentation build system.
+To build it yourself, see README.md in the parent directory.
