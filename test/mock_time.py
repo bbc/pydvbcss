@@ -14,15 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dvbcss.monotonic_time as time
+import unittest
 
+import _useDvbCssUninstalled
+
+import dvbcss.monotonic_time as monotonic_time
 import threading
+
 
 class MockTime(object):
     """\
-    Object that provides mocks for time.time() and time.sleep()
+    Object that provides mocks for :func:`monotonic_time.time` and
+    :func:`dvbcss.monotonic_time.sleep`
     
     Use :func:`install` and :func:`uninstall` to plug the mock in.
+    
+    It works by replacing the time() and sleep() function in the
+    :mod:`dvbcss.monotonic_time` module (or alternative module that you specify
+    when calling :func:`install`).
+    It therefore will mock the monotonic_time module in any module that has
+    already imported it, or that imports it in the future, with only one
+    call to :func:`install`.
     """
 
     def __init__(self):
@@ -35,6 +47,13 @@ class MockTime(object):
         
     @property
     def timeNow(self):
+        """\
+        Get/set this property to set the value that the mock time() function will return.
+        
+        If setting this property mean that the time has passed the point at which
+        a call to the mocked :func:`sleep` function is due to wake (unblock)
+        and return then this will take place.
+        """
         return self._timeNow
         
     @timeNow.setter
@@ -52,7 +71,17 @@ class MockTime(object):
             else:
                 i=i+1
     
-    def install(self, module=time):
+    def flush(self):
+        """\
+        Flushes any calls blocked on the mock :func:`sleep` function by causing
+        them to all wake (unblock) and return.
+        """
+        while len(self.sleepEvents):
+            wakeUpTime, event = self.sleepEvents[0]
+            event.set()
+            del self.sleepEvents[0]
+    
+    def install(self, module=monotonic_time):
         """\
         Plugs the mock in (or does nothing if already plugged into something.
         
@@ -85,8 +114,12 @@ class MockTime(object):
     def uninstall(self):
         """\
         Unplugs the mock (or does nothing if already unplugged.
+        
+        Also causes a :func:`flush` to happen.
         """
         if self.doctoredTimeModule is not None:
+        
+            self.flush()
         
             setattr(self.doctoredTimeModule,"time", self.oldTimeFunc)
             self.oldTimeFunc=None
@@ -98,3 +131,208 @@ class MockTime(object):
         else:
             raise Exception("MockTime is not already plugged in. Cannot be unplugged.")
             
+
+
+class SleepThread(threading.Thread):
+    def __init__(self, sleepArg):
+        super(SleepThread,self).__init__()
+        self.sleepReturned=False
+        self.sleepArg = sleepArg
+    def run(self):
+        monotonic_time.sleep(self.sleepArg)
+        self.sleepReturned=True
+
+
+class Test_mock_time(unittest.TestCase):
+    """\
+    Tests for the MockTime class.
+    
+    Turtles all the way down.
+    """
+
+    
+    def testInstallUninstall(self):
+        """\
+        Check if the mock appears to replace (when installing) and
+        restore (when uninstalling) the monotonic_module time() and sleep() functions.
+        """
+        import dvbcss.monotonic_time as monotonic_time
+        
+        oldTime = monotonic_time.time
+        oldSleep = monotonic_time.sleep
+        
+        mockUnderTest = MockTime()
+
+        self.assertEquals(oldTime, monotonic_time.time)
+        self.assertEquals(oldSleep, monotonic_time.sleep)
+
+        mockUnderTest.install(monotonic_time)
+        try:
+            self.assertNotEquals(oldTime, monotonic_time.time)
+            self.assertNotEquals(oldSleep, monotonic_time.sleep)
+        finally:
+            mockUnderTest.uninstall()
+        
+        self.assertEquals(oldTime, monotonic_time.time)
+        self.assertEquals(oldSleep, monotonic_time.sleep)
+        
+        
+    def testTime(self):
+        import dvbcss.monotonic_time as monotonic_time
+    
+        mockUnderTest = MockTime()
+        mockUnderTest.install(monotonic_time)
+        try:
+            mockUnderTest.timeNow = 1234
+            self.assertEquals(monotonic_time.time(), 1234)
+            
+            mockUnderTest.timeNow = -485.2701
+            self.assertEquals(monotonic_time.time(), -485.2701)
+        finally:
+            mockUnderTest.uninstall()
+
+
+    def testSleep(self):
+        import dvbcss.monotonic_time as monotonic_time
+    
+        mockUnderTest = MockTime()
+        mockUnderTest.install(monotonic_time)
+        
+        try:
+            a = SleepThread(5.0)
+            b = SleepThread(2.0)
+            c = SleepThread(7.0)
+            
+            mockUnderTest.timeNow = 1000.0
+            a.start()  # will happen at t > 1005
+            
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            
+            mockUnderTest.timeNow = 1001.0
+            b.start()   # will happen at t >= 1003
+            c.start()   # will happen at t >= 1008
+            
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+
+            mockUnderTest.timeNow = 1002.99
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+             
+            mockUnderTest.timeNow = 1003.1
+            c.join(1.0)
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            self.assertTrue(b.sleepReturned)
+             
+            mockUnderTest.timeNow = 1004.99
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+
+            mockUnderTest.timeNow = 1005.7
+            a.join(1.0)
+            self.assertTrue(a.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            
+            mockUnderTest.timeNow = 1007.8
+            self.assertFalse(c.sleepReturned)
+
+            mockUnderTest.timeNow = 1008.0
+            c.join(1.0)
+            self.assertTrue(c.sleepReturned)
+
+        finally:
+            mockUnderTest.uninstall()
+
+
+    def testSleepFlush(self):
+        """\
+        Check that sleeps that have not triggered are unblocked and return when
+        the flush method is called.
+        """
+        import dvbcss.monotonic_time as monotonic_time
+    
+        mockUnderTest = MockTime()
+        mockUnderTest.install(monotonic_time)
+        
+        try:
+            a = SleepThread(5.0)
+            b = SleepThread(2.0)
+            c = SleepThread(7.0)
+            
+            mockUnderTest.timeNow = 1000.0
+            a.start()  # will happen at t > 1005
+            
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            
+            mockUnderTest.timeNow = 1001.0
+            b.start()   # will happen at t >= 1003
+            c.start()   # will happen at t >= 1008
+         
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            
+            mockUnderTest.flush()
+            a.join(1.0)         
+            b.join(1.0)         
+            c.join(1.0)     
+            
+            self.assertTrue(a.sleepReturned)    
+            self.assertTrue(b.sleepReturned)    
+            self.assertTrue(c.sleepReturned)
+        finally:
+            mockUnderTest.uninstall()
+
+    def testSleepUninstallFlush(self):
+        """\
+        Check that sleeps that have not triggered are unblocked and return when
+        the flush method is called.
+        """
+        import dvbcss.monotonic_time as monotonic_time
+    
+        mockUnderTest = MockTime()
+        mockUnderTest.install(monotonic_time)
+        
+        try:
+            a = SleepThread(5.0)
+            b = SleepThread(2.0)
+            c = SleepThread(7.0)
+            
+            mockUnderTest.timeNow = 1000.0
+            a.start()  # will happen at t > 1005
+            
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            
+            mockUnderTest.timeNow = 1001.0
+            b.start()   # will happen at t >= 1003
+            c.start()   # will happen at t >= 1008
+         
+            self.assertFalse(a.sleepReturned)
+            self.assertFalse(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
+            
+        finally:
+            mockUnderTest.uninstall()
+
+        a.join(1.0)         
+        b.join(1.0)         
+        c.join(1.0)     
+        
+        self.assertTrue(a.sleepReturned)    
+        self.assertTrue(b.sleepReturned)    
+        self.assertTrue(c.sleepReturned)
+            
+
+            
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
