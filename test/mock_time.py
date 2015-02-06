@@ -138,6 +138,7 @@ class SleepThread(threading.Thread):
         super(SleepThread,self).__init__()
         self.sleepReturned=False
         self.sleepArg = sleepArg
+        self.daemon = True
     def run(self):
         monotonic_time.sleep(self.sleepArg)
         self.sleepReturned=True
@@ -224,10 +225,10 @@ class Test_mock_time(unittest.TestCase):
             self.assertFalse(c.sleepReturned)
              
             mockUnderTest.timeNow = 1003.1
-            c.join(1.0)
+            b.join(1.0)
             self.assertFalse(a.sleepReturned)
-            self.assertFalse(c.sleepReturned)
             self.assertTrue(b.sleepReturned)
+            self.assertFalse(c.sleepReturned)
              
             mockUnderTest.timeNow = 1004.99
             self.assertFalse(a.sleepReturned)
