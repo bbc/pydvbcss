@@ -298,7 +298,7 @@ When doing this, you must decide whether to allow the speed to be adjusted. If y
 
 
 import dvbcss.monotonic_time as time
-
+import dvbcss
 
 class NoCommonClock(Exception):
     """\
@@ -514,6 +514,7 @@ class ClockBase(object):
     
     
         
+@dvbcss._inheritDocs(ClockBase)
 class SysClock(ClockBase):
     """\
     A clock based directly on the standard library timer function :func:`monotonic_time.time`.
@@ -555,6 +556,9 @@ class SysClock(ClockBase):
         return None
     
 
+
+
+@dvbcss._inheritDocs(ClockBase)
 class CorrelatedClock(ClockBase):
     r"""\
     A clock locked to the tick count of the parent clock by a correlation and frequency setting.
@@ -695,6 +699,7 @@ class CorrelatedClock(ClockBase):
     
 
 
+@dvbcss._inheritDocs(ClockBase)
 class TunableClock(ClockBase):
     """\
     A clock whose tick offset and speed can be adjusted on the fly.
@@ -821,6 +826,7 @@ class TunableClock(ClockBase):
     
 
 
+@dvbcss._inheritDocs(ClockBase)
 class RangeCorrelatedClock(ClockBase):
     r"""\
     A clock locked to the tick count of the parent clock by two different points of correlation.
