@@ -29,32 +29,34 @@ def _inheritDocs(parentClass, objType="class"):
     Also suffix inheritance information.
     """
 
+    def processDoc(docString):
+        objPathName = parentClass.__module__ + "." + parentClass.__name__
+        inheritInfo = "\n\n(Documentation inherited from :%s:`~%s`)\n" % (objType, objPathName)
+        docString = docString.replace("|stub-method|","")
+        docString = docString + inheritInfo
+        return docString
+
+
     def decorator(childClass):
     
-        objPathName = parentClass.__module__ + "." + parentClass.__name__
-        inheritInfo = "\n\n(documentation inherited from :%s:`~%s`)\n" % (objType, objPathName)
-    
         for attrName in dir(parentClass):
-            parent = getattr(parentClass, attrName)
-            child  = getattr(childClass,  attrName)
+            parentProp = getattr(parentClass, attrName)
+            childProp  = getattr(childClass,  attrName)
 
             # depending on the kind of attribute, the __doc__ string comes from different places        
-            if type(parent) == types.MethodType:
-                copyDocsFromTo = [ (parent.im_func, child.im_func) ]
+            if type(parentProp) == types.MethodType and childProp.__doc__ is None:
+                try:
+                    childProp.im_func.__doc__ = processDoc(parentProp.im_func.__doc__)
+                except:
+                    pass
         
-            elif type(parent) == property:
-                copyDocsFromTo = [ (parent.fget, child.fget), (parent.fset, child.fset) ]
+            elif type(parentProp) == property and childProp.__doc__ is None:
+                docStr = processDoc(parentProp.__doc__)
+                newProperty = property(fget=childProp.fget, fset=childProp.fset, fdel=childProp.fdel, doc=docStr)
+                setattr(childClass, attrName, newProperty)
         
             else:
-                copyDocsFromTo = []
-
-            for parentWithDoc, childWithDoc in copyDocsFromTo:                    
-                if parentWithDoc.__doc__ is not None and childWithDoc.__doc__ is None:
-                    try:
-                        childWithDoc.__doc__ = parentWithDoc.__doc__ + inheritInfo
-                    except AttributeError:
-                    
-                        pass # raised if it is a method of the class itself, e.g. __repr__
+                pass
 
         return childClass              
 

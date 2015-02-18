@@ -345,7 +345,7 @@ class ClockBase(object):
         """\
         (read only) The tick count for this clock.
         
-        Stub. Implement in your subclass.
+        |stub-method|
         """
         raise NotImplemented
         
@@ -381,7 +381,7 @@ class ClockBase(object):
         """\
         (read only)The tick rate (in ticks per second) of this clock.
         
-        Stub. Implement in your subclass.
+        |stub-method|
         """
         raise NotImplemented
     
@@ -433,13 +433,18 @@ class ClockBase(object):
         """\
         :Return: "when" in terms of the underlying clock behind the root clock implementation (e.g. :func:`monotonic_time.time` in the case of :class:`SysClock`)
         
-        Stub. Implement in your subclass.
+        |stub-method|
         """
         raise NotImplemented
     
     def toOtherClockTicks(self, otherClock, ticks):
         """\
         Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.
+        
+        :param otherClock: A :class:`~dvbcss.clock` object representing another clock.
+        :param ticks: A time (tick value) for this clock
+        
+        :returns: The tick value of the `otherClock` that represents the same moment in time.
         
         :throws NoCommonClock: if there is no common ancestor clock (meaning it is not possible to convert
         """
@@ -482,9 +487,11 @@ class ClockBase(object):
         
     def toParentTicks(self, ticks):
         """\
-        Stub. Implement in your subclass.
+        |stub-method|
 
-        Implementations should use the parent clock's :data:`tickRate` property when performing the conversion.
+        Method to convert from a tick value for this clock to the equivalent tick value (representing the same point in time) for the parent clock.
+        
+        Implementations should use the parent clock's :data:`tickRate` and :data:`speed` properties when performing the conversion.
 
         :returns: The specified tick value of this clock converted to the timescale of the parent clock.
         
@@ -494,9 +501,11 @@ class ClockBase(object):
     
     def fromParentTicks(self, ticks):
         """\
-        Stub. Implement in your subclass.
+        |stub-method|
         
-        Implementations should use the parent clock's :data:`tickRate` property when performing the conversion.
+        Method to convert from a tick value for this clock's parent to the equivalent tick value (representing the same point in time) for this clock.
+
+        Implementations should use the parent clock's :data:`tickRate` and :data:`speed` properties when performing the conversion.
 
         :returns: The specified tick value for the parent clock converted to the timescale of this clock.
         
@@ -506,7 +515,7 @@ class ClockBase(object):
     
     def getParent(self):
         """\
-        Stub. Implement in your subclass.
+        |stub-method|
 
         :returns: :class:`ClockBase` representing the immediate parent of this clock, or None if it is a root clock.
         """

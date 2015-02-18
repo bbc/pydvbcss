@@ -166,23 +166,29 @@ class WSServerBase(object):
     
     def onClientConnect(self, webSock):
         """\
-        Stub method that is called when a new client connects. Implement in subclasses.
+        This method is called when a new client connects.
         
+        |stub-method|
+
         :param webSock:(:class:`WebSocket <ws4py.websocket.WebSocket>`) The object representing the WebSocket connection of the newly connected client
         """
         raise NotImplementedError("onClientConnect not implemented")
     
     def onClientDisconnect(self, webSock):
         """\
-        Stub method that is called when a client disconnects. Implement in subclasses.
-        
+        This method is called when a client disconnects.
+
+        |stub-method|
+
         :param webSock: (:class:`WebSocket <ws4py.websocket.WebSocket>`) The object representing the WebSocket connection of the now-disconnected client
         """
         raise NotImplementedError("onClientDisconnect not implemented")
 
     def onClientMessage(self, webSock, msg):
         """\
-        Stub method that is called when a message is received from a client. Implement in subclasses.
+        This method is called when a message is received from a client.
+        
+        |stub-method|
         
         :param webSock: (:class:`WebSocket <ws4py.websocket.WebSocket>`) The object representing the WebSocket connection from which the message has been received.
         :param msg: (:class:`Message <ws4py.messaging.Message>`) WebSocket message that has been received. Will be either a :class:`Text <ws4py.messaging.TextMessage>` or a :class:`Binary <ws4py.messaging.BinaryMessage>` message.
