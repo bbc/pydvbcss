@@ -28,6 +28,11 @@ def linkcode_resolve(domain, info):
     filename = info['module'].replace('.', '/')
     return "%s/%s.py" % (GITHUB_MASTER_URL, filename)
 
+# add some syntax extensions
+
+rst_epilog = """
+.. |stub-method| replace:: *This is a stub for this method. Sub-classes should implement it.*
+"""
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

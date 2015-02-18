@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+# text editor backups
+*~
+
 # Eclipse
 .project
 .settings

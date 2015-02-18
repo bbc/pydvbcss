@@ -343,7 +343,7 @@ class TSServer(WSServerBase):
         """\
         Called when a client has connected and submitted its SetupData message to provide context for the connection.
         
-        Stub method. Override and implement in your subclasses.
+        |stub-method|
         
         :param webSock: The connection from the client.
         """
@@ -387,9 +387,9 @@ class TSServer(WSServerBase):
     def onClientAptEptLpt(self, webSock, apteptlpt):
         """\
         Called when a client has sent an updated AptEptLpt message
-        
-        Stub method. Override and implement in your subclasses.
-        
+
+        |stub-method|
+
         :param webSock: The connection from the client.
         :param aptEptLpt: (:class:`~dvbcss.protcol.ts.AptEptLpt`) object representing the received timestamp message.
         """

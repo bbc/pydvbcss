@@ -207,8 +207,7 @@ class TSClientConnection(object):
         """\
         This method is called when the connection is closed.
         
-        This is a stub method - override in subclass.
-        
+        |stub-method|
         """
         pass
 
@@ -216,8 +215,7 @@ class TSClientConnection(object):
         """\
         This method is called when the connection is opened and the setup-data message has been sent.
         
-        This is a stub method - override in subclass.
-        
+        |stub-method|
         """
         pass
 
@@ -225,7 +223,7 @@ class TSClientConnection(object):
         """\
         This method is called when a Control Timestamp message is received from the server.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param controlTimestamp: A :class:`~dvbcss.protocol.ts.ControlTimestamp` object representing the received message.
         """
@@ -235,8 +233,8 @@ class TSClientConnection(object):
         """\
         This method is called when there has been an error in the use of the TS protocol - e.g. receiving the wrong kind of message.
            
-        This is a stub method - override in subclass.
-        
+        |stub-method|
+       
         :param msg: A :class:`str` description of the problem.
         """
         pass
@@ -401,7 +399,7 @@ class TSClientClockController(object):
         """\
         This method is called when the connection is opened and the setup-data message has been sent.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         """
         pass
     
@@ -409,7 +407,7 @@ class TSClientClockController(object):
         """\
         This method is called when the connection is closed.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         """
         pass
     
@@ -417,7 +415,7 @@ class TSClientClockController(object):
         """\
         This method is called when the server indicates that the timeline is unavailable.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         """
         pass
     
@@ -425,7 +423,7 @@ class TSClientClockController(object):
         """\
         This method is called when the server indicates that the timeline is available.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         """
         pass
     
@@ -437,8 +435,8 @@ class TSClientClockController(object):
         to the wall clock by the threshold amount or more, or that the speed of the timeline has changed.
         (as indicated by the timelineSpeedMultiplier property of received Control Timestamps).
 
-        This is a stub method - override in subclass.
-        
+        |stub-method|
+
         :param speedChanged: (:class:`bool`) True if the speed of the timeline has changed, otherwise False.
         """
         pass
@@ -447,7 +445,7 @@ class TSClientClockController(object):
         """\
         This method is called when there has been an error in the use of the CII protocol - e.g. receiving the wrong kind of message.
            
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param msg: A :class:`str` description of the problem.
      """

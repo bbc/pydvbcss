@@ -97,9 +97,9 @@ if __name__ == "__main__":
 
 
     dummyContentIds = [
-        "dvb://dvb://233a.1004.1044;363a~20130218T0915Z--PT00H45M",
-        "dvb://dvb://233a.1168.122a;1aa4~20130218T0910Z--PT00H30M",
-        "dvb://dvb://233a.1050.1008;9fd~20130218T0920Z--PT00H50M",
+        "dvb://233a.1004.1044;363a~20130218T0915Z--PT00H45M",
+        "dvb://233a.1168.122a;1aa4~20130218T0910Z--PT00H30M",
+        "dvb://233a.1050.1008;9fd~20130218T0920Z--PT00H50M",
     ]
 
     # we're going to pretend to be hopping channels every few seconds,

@@ -1,5 +1,9 @@
 # Python DVB Companion Screen Synchronisation protocol library
 
+* **[How to install](#install)**
+* **[Read the documentation](https://bbc.github.io/pydvbcss/docs/latest/)**
+* **[Run the examples](#run-examples)**
+
 **pydvbcss** is a set of Python 2.7 libraries that implement some of the
 protocols defined in the DVB CSS specification
 ["Bluebook A167-2"](https://www.dvb.org/search/results/keywords/A167).
@@ -20,7 +24,6 @@ The code does not implement media playback functionality and this is not a plann
 feature.
 
 
-
 ## Getting started
 
 **pydvbcss** requires [ws4py](https://ws4py.readthedocs.org/en/latest/) for
@@ -31,13 +34,13 @@ for server implementations.  The steps below describe how to install these.
 successfully on Microsoft Windows 7 and Ubuntu 14.04.
 
 
-### Documentation (online)
+### Read the Documentation (online)
 
-The latest docs for the library can be read online
-[here](https://BBC.github.io/pydvbcss/docs/latest/).
+The latest docs for the library
+[can be read online here](https://BBC.github.io/pydvbcss/docs/latest/).
 
 
-
+<a name="install"></a>
 ### Install the code ...
 
 The [master branch](https://github.com/BBC/pydvbcss/tree/master) is the latest
@@ -69,7 +72,7 @@ Run it via setup.py:
 This checks some timing sensitive implementation issues, so ensure you are not
 running any CPU intensive tasks at the time.
 
-
+<a name="run-examples"></a>
 ### Run the examples
 
 There is a set of examples demonstrating simple servers and clients for the

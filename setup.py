@@ -17,24 +17,19 @@
 from setuptools import setup
 import os
 
-def is_package(path):
-    return (
-        os.path.isdir(path) and
-        os.path.isfile(os.path.join(path, '__init__.py'))
-        )
 
 def find_packages(path, base="" ):
     """ Find all packages in path """
     packages = {}
+    if "__init__.py" in os.listdir(path):
+        packages[base] = path
+        
     for item in os.listdir(path):
-        itemdir = os.path.join(path, item)
-        if is_package( itemdir ):
-            if base:
-                module_name = "%(base)s.%(item)s" % vars()
-            else:
-                module_name = item
-            packages[module_name] = itemdir
-            packages.update(find_packages(itemdir, module_name))
+        itempath = os.path.join(path,item)
+        if os.path.isdir(itempath):
+            newbase = "%s.%s" % (base, item)
+            packages.update(find_packages(itempath, newbase))
+
     return packages
 
 packages = find_packages("dvbcss","dvbcss")

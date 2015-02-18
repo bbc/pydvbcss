@@ -170,7 +170,7 @@ class CIIClientConnection(object):
         """\
         This method is called when the connection is closed.
         
-        This is a stub method - override in subclass.
+        |stub-method|
 
         :param code:   (:class:`int`) The connection closure code to be sent in the WebSocket disconnect frame
         :param reason: (:class:`str` or :class:`None`) The human readable reason for the closure
@@ -181,7 +181,7 @@ class CIIClientConnection(object):
         """\
         This method is called when the connection is opened.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         """
         pass
 
@@ -189,7 +189,7 @@ class CIIClientConnection(object):
         """\
         This method is called when a CII message is received from the server.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param cii: A :class:`~dvbcss.protocol.cii.CII` object representing the received message.
         """
@@ -199,7 +199,7 @@ class CIIClientConnection(object):
         """\
         This method is called when there has been an error in the use of the CII protocol - e.g. receiving the wrong kind of message.
            
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param msg: A :class:`str` description of the problem.
         """
@@ -320,7 +320,7 @@ class CIIClient(object):
         """\
         This method is called when the connection is opened.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         """
         pass
     
@@ -328,7 +328,7 @@ class CIIClient(object):
         """\
         This method is called when the connection is closed.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param code:   (:class:`int`) The connection closure code to be sent in the WebSocket disconnect frame
         :param reason: (:class:`str` or :class:`None`) The human readable reason for the closure
@@ -347,7 +347,7 @@ class CIIClient(object):
         """\
         This method is called when there has been an error in the use of the CII protocol - e.g. receiving the wrong kind of message.
            
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param msg: A :class:`str` description of the problem.
         """
@@ -361,7 +361,7 @@ class CIIClient(object):
         By preference is recommended to use the 'onXXXXChange()' handlers instead since these will only be called if there
         is an actual change to the value of a property in CII state.
         
-        This is a stub method - override in subclass.
+        |stub-method|
         
         :param cii: A :class:`~dvbcss.protocol.cii.CII` object representing the received message.
         """
@@ -431,7 +431,7 @@ for propertyName in CII.allProperties():
     def f(self, newValue):
         pass
     f.__doc__="Called when the "+propertyName+" property of the CII message has been changed by a state update from the CII Server.\n\n" + \
-              "Stub method - override in subclass.\n\n" + \
+              "|stub-method|\n\n" + \
               ":param newValue: The new value for this property."
     setattr(CIIClient, "on"+propertyName[0].upper() + propertyName[1:]+"Change", f)
 
