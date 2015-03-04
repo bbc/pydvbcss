@@ -38,6 +38,16 @@ class LowestDispersionCandidate(object):
     
     The tick rate of the Clock can be any tick rate (it does not have to be one tick per nanosecond),
     but too low a tick rate will limit clock synchronisation precision.
+    
+    There is a stub callback function provided that you can override (e.g. by subclassing)
+    that will be called whenever the clock is adjusted:
+    
+    * :func:`onClockAdjusted`
+    
+    The arguments to this method provide details of when
+    the adjustment took place and what adjustment was made. It also reports the dispersion
+    before and after the adjustment and gives information needed to extrapolate future
+    dispersions. You can use this, for example, to record the clock dispersion over time. 
     """
     def __init__(self,clock,repeatSecs=1.0,timeoutSecs=0.2,localMaxFreqErrorPpm=500):
         """\
@@ -54,6 +64,23 @@ class LowestDispersionCandidate(object):
         self.repeatSecs = repeatSecs
         self.timeoutSecs = timeoutSecs
         self.dispCalc = DispersionCalculator(clock, measurePrecision(clock), localMaxFreqErrorPpm)
+        
+    def onClockAdjusted(self, timeOfAdjustment, ticksAdjustment, oldDispersionNanos, newDispersionNanos, dispersionGrowthRate):
+        """\
+        This method is called when a clock adjustment has just been made.
+        
+        :param timeOfAdjustment: The wall clock time (in ticks) at which the adjustment took place
+        :param ticksAdjustment: The amount by which the wall clock instaneously changed (in ticks)
+        :param oldDispersionNanos: The dispersion (in nanoseconds) just prior to adjustment
+        :param newDispersionNanos: The dispersion (in nanoseconds) immediately after adjustment
+        :param dispersionGrowthRate: The rate at which dispersion will continue to grow.
+        
+        To calculate a future dispersion at time T:
+            futureDispersion = newDispersionNanos + (t-timeOfAdjustment) * dispersionGrowthRate
+            
+        |stub-method|
+        """
+        pass
         
     def getCurrentDispersion(self):
         """\
@@ -72,14 +99,14 @@ class LowestDispersionCandidate(object):
             update=False
             candidate=(yield self.timeoutSecs)
     
-            bestDispersion = self.getCurrentDispersion()
+            currentDispersion = self.getCurrentDispersion()
     
             if candidate is not None:
                 cn=candidate['nanos']
                 ct=candidate['ticks']
-                dispersion=self.dispCalc.calc(cn)
+                candidateDispersion=self.dispCalc.calc(cn)
                 
-                if bestDispersion >= dispersion:
+                if currentDispersion >= candidateDispersion:
                     self.bestCandidate = candidate
                     update=True
                     self.clock.adjustTicks(ct.offset)
@@ -87,11 +114,15 @@ class LowestDispersionCandidate(object):
                         cumulativeOffset=0
                     else:
                         cumulativeOffset+=ct.offset
+                        
+                    growthRate = self.dispCalc.getGrowthRate(cn)
+                    self.onClockAdjusted(self.clock.ticks, ct.offset, currentDispersion, newDispersion, growthRate)
+                    
                 else:
                     pass
-                self.log.info("Old / New dispersion (millis) is %.5f / %.5f ... offset=%20d  new best candidate? %s\n" % (bestDispersion/1000000.0, dispersion/1000000.0, cumulativeOffset, str(update)))
+                self.log.info("Old / New dispersion (millis) is %.5f / %.5f ... offset=%20d  new best candidate? %s\n" % (currentDispersion/1000000.0, candidateDispersion/1000000.0, cumulativeOffset, str(update)))
             else:
-                self.log.info("Timeout.  Dispersion (millis) is %.5f\n" % (bestDispersion/1000000.0))
+                self.log.info("Timeout.  Dispersion (millis) is %.5f\n" % (currentDispersion/1000000.0))
             # retry more quickly if we didn't get an improved candidate
             if update:
                 time.sleep(self.repeatSecs)
@@ -114,3 +145,6 @@ class DispersionCalculator(object):
                ) / 1000000 + \
                candidate.rtt/2
                
+    def getGrowthRate(self, candidate):
+        return (candidate.maxFreqError+self.maxFreqError) / 1000000.0
+        
