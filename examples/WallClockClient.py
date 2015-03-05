@@ -80,7 +80,12 @@ if __name__ == "__main__":
     wc_client=WallClockClient(bind, dest, wallClock, algorithm)
     wc_client.start()
     
-    
+    n=0
     while True:
         time.sleep(0.2)
         print "Time=%20d microseconds. Dispersion = %15.3f milliseconds" % (wallClock.ticks, wc_client.algorithm.getCurrentDispersion()/1000000.0)
+        n=n+1
+        if n>=25:
+            print "*** Worst dispersion over previous 5 seconds = %15.3f milliseconds" % (wc_client.algorithm.getWorstDispersion()/1000000.0)
+            n=0
+            

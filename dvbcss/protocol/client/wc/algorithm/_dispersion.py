@@ -64,13 +64,15 @@ class LowestDispersionCandidate(object):
         self.repeatSecs = repeatSecs
         self.timeoutSecs = timeoutSecs
         self.dispCalc = DispersionCalculator(clock, measurePrecision(clock), localMaxFreqErrorPpm)
+        self.worstDispersion = (2**64)-1 ## an arbitrary very big number :-)
         
-    def onClockAdjusted(self, timeOfAdjustment, ticksAdjustment, oldDispersionNanos, newDispersionNanos, dispersionGrowthRate):
+    def onClockAdjusted(self, timeAfterAdjustment, adjustment, oldDispersionNanos, newDispersionNanos, dispersionGrowthRate):
         """\
-        This method is called when a clock adjustment has just been made.
+        This method is called immediately after a clock adjustment has been made,
+        and gives details on how the clock was changed and the effect on the dispersion.
         
-        :param timeOfAdjustment: The wall clock time (in ticks) at which the adjustment took place
-        :param ticksAdjustment: The amount by which the wall clock instaneously changed (in ticks)
+        :param timeAfterAdjustment: The wall clock time (in ticks) immedaitely after the adjustment took place
+        :param adjustment: The amount by which the wall clock instaneously changed (in ticks)
         :param oldDispersionNanos: The dispersion (in nanoseconds) just prior to adjustment
         :param newDispersionNanos: The dispersion (in nanoseconds) immediately after adjustment
         :param dispersionGrowthRate: The rate at which dispersion will continue to grow.
@@ -88,7 +90,7 @@ class LowestDispersionCandidate(object):
         """
         x=self.bestCandidate["nanos"]
         if x is None:
-            return (2**64)-1
+            return self.worstDispersion
         else:
             return self.dispCalc.calc(x)
     
@@ -115,11 +117,16 @@ class LowestDispersionCandidate(object):
                     else:
                         cumulativeOffset+=ct.offset
                         
+                    # notify of the change
                     growthRate = self.dispCalc.getGrowthRate(cn)
-                    self.onClockAdjusted(self.clock.ticks, ct.offset, currentDispersion, newDispersion, growthRate)
+                    self.onClockAdjusted(self.clock.ticks, ct.offset, currentDispersion, candidateDispersion, growthRate)
                     
                 else:
                     pass
+
+                # update worst dispersion seen so far
+                self.worstDispersion = max(self.worstDispersion, currentDispersion, candidateDispersion)
+
                 self.log.info("Old / New dispersion (millis) is %.5f / %.5f ... offset=%20d  new best candidate? %s\n" % (currentDispersion/1000000.0, candidateDispersion/1000000.0, cumulativeOffset, str(update)))
             else:
                 self.log.info("Timeout.  Dispersion (millis) is %.5f\n" % (currentDispersion/1000000.0))
@@ -129,7 +136,30 @@ class LowestDispersionCandidate(object):
             else:
                 time.sleep(self.timeoutSecs)
 
-   
+
+    def getWorstDispersion(self):
+        """\
+        Returns the worst (greatest) dispersion encountered since
+        the previous time this method was called.
+        
+        The first time it is called, the value reported will be very large,
+        reflecting the fact that initially dispersion is high because the
+        client is not yet synchronised.
+        
+        :returns: dispersion
+        """
+        dispersionNow = self.getCurrentDispersion()
+        
+        answer = max(self.worstDispersion, dispersionNow)
+        
+        # reset the worst dispersion, so it is measured from now until
+        # next time this method is called
+        self.worstDispersion = dispersionNow
+        
+        return answer
+            
+            
+            
 class DispersionCalculator(object):
     def __init__(self, clock, localPrecisionSecs, localMaxFreqErrorPpm):
         super(DispersionCalculator,self).__init__()
