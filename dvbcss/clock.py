@@ -299,6 +299,7 @@ When doing this, you must decide whether to allow the speed to be adjusted. If y
 
 import dvbcss.monotonic_time as time
 import dvbcss
+import numbers
 
 class NoCommonClock(Exception):
     """\
@@ -539,6 +540,8 @@ class SysClock(ClockBase):
         :param tickRate: (int) tick rate for this clock (in ticks per second)
         """
         super(SysClock,self).__init__(**kwargs)
+        if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
+            raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._freq = tickRate
         
     @property
@@ -625,6 +628,8 @@ class CorrelatedClock(ClockBase):
         :param correlation: (tuple(int, int)) The intial correlation for this clock. A tuple (parent tick value, this clock tick value)
         """
         super(CorrelatedClock,self).__init__(**kwargs)
+        if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
+            raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._freq = tickRate
         self._parent=parentClock
         self._speed = 1.0
@@ -737,6 +742,8 @@ class TunableClock(ClockBase):
         The specified starting tick value applies from the moment this object is initialised.
         """
         super(TunableClock,self).__init__(**kwargs)
+        if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
+            raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._parent = parentClock
         self._freq = tickRate
         self._ticks = ticks
@@ -860,6 +867,8 @@ class RangeCorrelatedClock(ClockBase):
         :param correlation2: (tuple(int, int)) The second point of correlation for this clock. A tuple (parent tick value, this clock tick value)
         """
         super(RangeCorrelatedClock,self).__init__(**kwargs)
+        if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
+            raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._parent=parentClock
         self._freq = tickRate
         if not isinstance(correlation1,tuple) or len(correlation1) != 2:
