@@ -2,7 +2,10 @@
 
 ## latest
 
+## 0.2 : Client dispersion reporting release (17 Mar 2015)
+
 * Added ways to extract dispersion and worst-dispersion information more usefully from wall clock clients.
+* Minor unit test improvements
 
 ## 0.1.1 : Bugfix release (18 Feb 2015)
 
