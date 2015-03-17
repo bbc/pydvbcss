@@ -136,12 +136,10 @@ class MockTime(object):
 class SleepThread(threading.Thread):
     def __init__(self, sleepArg):
         super(SleepThread,self).__init__()
-        self.sleepReturned=False
         self.sleepArg = sleepArg
         self.daemon = True
     def run(self):
         monotonic_time.sleep(self.sleepArg)
-        self.sleepReturned=True
 
 
 class Test_mock_time(unittest.TestCase):
@@ -207,44 +205,42 @@ class Test_mock_time(unittest.TestCase):
             mockUnderTest.timeNow = 1000.0
             a.start()  # will happen at t > 1005
             
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
             
             mockUnderTest.timeNow = 1001.0
             b.start()   # will happen at t >= 1003
             c.start()   # will happen at t >= 1008
             
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
+            self.assertTrue(b.isAlive())
+            self.assertTrue(c.isAlive())
 
             mockUnderTest.timeNow = 1002.99
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
+            self.assertTrue(b.isAlive())
+            self.assertTrue(c.isAlive())
              
             mockUnderTest.timeNow = 1003.1
             b.join(1.0)
-            self.assertFalse(a.sleepReturned)
-            self.assertTrue(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
+            self.assertFalse(b.isAlive())
+            self.assertTrue(c.isAlive())
              
             mockUnderTest.timeNow = 1004.99
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
+            self.assertTrue(c.isAlive())
 
             mockUnderTest.timeNow = 1005.7
             a.join(1.0)
-            self.assertTrue(a.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertFalse(a.isAlive())
+            self.assertTrue(c.isAlive())
             
             mockUnderTest.timeNow = 1007.8
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(c.isAlive())
 
             mockUnderTest.timeNow = 1008.0
             c.join(1.0)
-            self.assertTrue(c.sleepReturned)
+            self.assertFalse(c.isAlive())
 
         finally:
             mockUnderTest.uninstall()
@@ -268,26 +264,24 @@ class Test_mock_time(unittest.TestCase):
             mockUnderTest.timeNow = 1000.0
             a.start()  # will happen at t > 1005
             
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
             
             mockUnderTest.timeNow = 1001.0
             b.start()   # will happen at t >= 1003
             c.start()   # will happen at t >= 1008
          
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
+            self.assertTrue(b.isAlive())
+            self.assertTrue(c.isAlive())
             
             mockUnderTest.flush()
             a.join(1.0)         
             b.join(1.0)         
             c.join(1.0)     
             
-            self.assertTrue(a.sleepReturned)    
-            self.assertTrue(b.sleepReturned)    
-            self.assertTrue(c.sleepReturned)
+            self.assertFalse(a.isAlive())    
+            self.assertFalse(b.isAlive())    
+            self.assertFalse(c.isAlive())
         finally:
             mockUnderTest.uninstall()
 
@@ -309,17 +303,15 @@ class Test_mock_time(unittest.TestCase):
             mockUnderTest.timeNow = 1000.0
             a.start()  # will happen at t > 1005
             
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
             
             mockUnderTest.timeNow = 1001.0
             b.start()   # will happen at t >= 1003
             c.start()   # will happen at t >= 1008
          
-            self.assertFalse(a.sleepReturned)
-            self.assertFalse(b.sleepReturned)
-            self.assertFalse(c.sleepReturned)
+            self.assertTrue(a.isAlive())
+            self.assertTrue(b.isAlive())
+            self.assertTrue(c.isAlive())
             
         finally:
             mockUnderTest.uninstall()
@@ -328,9 +320,9 @@ class Test_mock_time(unittest.TestCase):
         b.join(1.0)         
         c.join(1.0)     
         
-        self.assertTrue(a.sleepReturned)    
-        self.assertTrue(b.sleepReturned)    
-        self.assertTrue(c.sleepReturned)
+        self.assertFalse(a.isAlive())    
+        self.assertFalse(b.isAlive())    
+        self.assertFalse(c.isAlive())
             
 
             
