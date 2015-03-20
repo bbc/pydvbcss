@@ -18,7 +18,8 @@ Make the following checks before performing a release:
    
 The version number is in the [`VERSION`](VERSION) file. This is picked up by the documentation build process.
 
-It consists of two lines. The first carries the version number. The structure is: *major* **.** *minor* **.** *revision*
+It consists of two lines. The first carries the version number. The structure is: *major* **.** *minor* **.** *revision*.
+The *revision* part is *not included* if it is zero '0' (just after a *major* or *minor* increment).
    * *major* = significant incompatible change (e.g. partial or whole rewrite).
    * *minor* = some new functionality or changes that are mostly/wholly backward compatible.
    * *revision* = very minor changes, e.g. bugfixes.
