@@ -5,8 +5,7 @@
 * **[Run the examples](#run-examples)**
 
 **pydvbcss** is a set of Python 2.7 libraries that implement some of the
-protocols defined in the DVB CSS specification
-["Bluebook A167-2"](https://www.dvb.org/search/results/keywords/A167).
+protocols defined in the DVB CSS specification (published as [ETSI 103-286 part 2](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1)).
 These protocols enable synchronisation of media presentation between a TV
 and Companion devices (mobiles, tablets, etc).
 
@@ -23,6 +22,7 @@ integration into consumer products.
 The code does not implement media playback functionality and this is not a planned
 feature.
 
+_The DVB CSS specification was formerly published as ["DVB Bluebook A167-2"](https://www.dvb.org/search/results/keywords/A167). This is deprecated in favour of the [ETSI spec](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1)._
 
 ## Getting started
 
