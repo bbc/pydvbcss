@@ -23,9 +23,8 @@ pydvbcss
 * :ref:`modindex` | :ref:`Full Index <genindex>`
 
 This collection of Python modules provides clients and servers for the network protocols defined in the
-`DVB "Companion Screens and Streams" (CSS) specification <https://www.dvb.org/search/results/keywords/A167>`_.
-There are also supporting classes
-that model clocks (e.g. to represent timelines) and their inter-relationships.
+DVB "Companion Screens and Streams" (CSS) specification `ETSI 103 286 part 2 <http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1>`_.
+There are also supporting classes that model clocks (e.g. to represent timelines) and their inter-relationships.
 
 Use it to build clients and servers for each of the protocols (CSS-WC, CSS-CII and CSS-TS)
 that mock or simulate the roles of TV Devices and Companion Screen Applications
