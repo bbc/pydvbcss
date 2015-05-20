@@ -2,7 +2,7 @@ CSS-CII Protocol introduction
 -----------------------------
 
 **Here is a quick introduction to the CSS-CII protocol. For full details, refer to the**
-`DVB specification <https://www.dvb.org/search/results/keywords/A167>`_.
+DVB specification `ETSI 103 286 part 2 <http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1>`_.
 
 The CSS-CII protocol is for sharing the server's (e.g. TV's) current
 "Content Identifier and other Information" (yes really!) with the client (e.g.

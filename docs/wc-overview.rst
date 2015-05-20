@@ -2,7 +2,7 @@ CSS-WC Protocol Introduction
 ----------------------------
 
 **Here is a quick introduction to the CSS-WC protocol. For full details, refer to the**
-`DVB specification <https://www.dvb.org/search/results/keywords/A167>`_.
+DVB specification `ETSI 103 286 part 2 <http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1>`_.
 
 The CSS-WC protocol is for establishing *Wall clock synchronisation* - meaning
 that there is a common synchronised sense of time (a "wall clock") between the
@@ -51,7 +51,7 @@ an error bound on this (known as dispersion):
     
 Estimated offset = (( *t3* + *t2* ) - ( *t4* + *t1* )) / 2
  
-The `DVB specification <https://www.dvb.org/search/results/keywords/A167>`_
+The `DVB specification (part 2) <http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1>`_
 contains an annex that goes into more detail on the
 theory of how to calculate dispersion and how a client can use this
 as part of a simple algorithm to align its wall clock.

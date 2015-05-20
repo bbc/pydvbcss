@@ -1,7 +1,8 @@
 CSS-TS Protocol introduction
 ----------------------------
 
-**Here is a quick introduction to the CSS-TS protocol. For full details, refer to the** `DVB specification <https://www.dvb.org/search/results/keywords/A167>`_.
+**Here is a quick introduction to the CSS-TS protocol. For full details, refer to the** DVB specification
+`ETSI 103 286 part 2 <http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1>`_.
 
 The CSS-TS protocol is for *Timeline Synchronisation*. Via this protocol,
 the server (e.g. TV) pushes timestamps to the client (e.g. companion) to keep
