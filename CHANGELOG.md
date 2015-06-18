@@ -2,6 +2,9 @@
 
 ## latest
 
+* Modified API for TimelineSource for TS Servers to allow for situations where it takes time to begin extracting a timeline at the server.
+
+
 ## 0.2 : Client dispersion reporting release (17 Mar 2015)
 
 * Added ways to extract dispersion and worst-dispersion information more usefully from wall clock clients.

@@ -34,6 +34,7 @@
     
     * "`urn:dvb:css:timeline:pts`" ... a PTS timeline
     * "`urn:dvb:css:timelime:temi:1:1`" ... a TEMI timeline ticking at 1kHz
+    * "`urn:dvb:css:timelime:temi:1:2`" ... the same, but it takes 10 seconds for the server to begin providing this timeline after a client first requests it
     * "`urn:pydvbcss:sporadic`" ... a meaningless timeline whose availability toggles every 10 seconds.
     
     The PTS and TEMI timelines both pause periodically and have their timing tweaked by a fraction of
@@ -62,7 +63,54 @@ if __name__ == '__main__':
     import logging
 
     import argparse
+    import threading
     import dvbcss.util
+    
+    class SlowToRespondSimpleClockTimelineSource(SimpleClockTimelineSource):
+        """\
+        An example modification to a SimpleClockTimelineSource where
+        after a client first requests the timeline selector, the timeline will not be
+        reported until 10 seconds later. The TS Server is forced to hold off from returning
+        Control Timestsamps until that point.
+        
+        This pattern might be used where it takes time to start extracting a particular
+        timeline after it is first requested.
+        """
+        
+        def __init__(self, *args, **kwargs):
+            self.super = super(SlowToRespondSimpleClockTimelineSource,self)
+            self.super.__init__(*args,**kwargs)
+            self.readyTimer = None
+            self.ready = False
+            
+        def timelineSelectorNeeded(self,timelineSelector):
+            self.super.timelineSelectorNeeded(timelineSelector)
+            # do we care about this requested timeline? if so, then we'll start a timer after which we'll
+            # start to provide control timestamps.
+            if timelineSelector == self._timelineSelector:
+                self.readyTimer = threading.Timer(10, self._onReady)
+                self.readyTimer.start()
+            
+        def timelineSelectorNotNeeded(self,timelineSelector):
+            # if our timeline selector is no longer needed, then switch back to being "not ready"
+            if timelineSelector == self._timelineSelector:
+                self.readyTimer.cancel()
+                self.ready = False
+            self.super.timelineSelectorNotNeeded(timelineSelector)
+        
+        def _onReady(self):
+            # timer has expired ... akin to us having now succeeded to extract the timeline
+            self.ready = True
+            for sink in self.sinks:
+                sink.updateAllClients()
+        
+        def getControlTimestamp(self,timelineSelector):
+            # don't provide control timestamps until we are "ready"
+            if self.ready:
+                return self.super.getControlTimestamp(timelineSelector)
+            else:
+                return None
+                
     
     DEFAULT_TS_BIND=("127.0.0.1",7681)
     DEFAULT_WC_BIND=("0.0.0.0",6677)
@@ -128,11 +176,13 @@ if __name__ == '__main__':
     ptsTimeline  = SimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:pts", wallClock=wallClock, clock=ptsClock)
     temiTimeline = SimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:temi:1:1", wallClock=wallClock, clock=temiClock, speedSource=ptsClock)
     sporadicTimeline = SimpleTimelineSource(timelineSelector="urn:pydvbcss:sporadic", controlTimestamp = ct)
+    slowTemiTimeline = SlowToRespondSimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:temi:1:2", wallClock=wallClock, clock=temiClock, speedSource=ptsClock)
 
     # attach them to the server (thereby making those timelines "available")    
     tsServer.attachTimelineSource(ptsTimeline)
     tsServer.attachTimelineSource(temiTimeline)
     tsServer.attachTimelineSource(sporadicTimeline)
+    tsServer.attachTimelineSource(slowTemiTimeline)
 
     # also start a wallclock server
     precisionSecs=measurePrecision(wallClock)

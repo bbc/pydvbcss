@@ -309,6 +309,7 @@ class TSServer(WSServerBase):
         self.contentId = contentId  #: (read/write :class:`str`) The content ID for all timelines currently being served. Can be changed at runtime.
         self._wallClock = wallClock
         self._timelineSources = {}
+        self._timelineSelectors = {}
     
     def getDefaultConnectionData(self):
         """\
@@ -329,15 +330,29 @@ class TSServer(WSServerBase):
         """
         self.log.info("Client connected"+webSock.id())
     
-    def onClientDisconnect(self, webSock):
+    def onClientDisconnect(self, webSock, connectionData):
         """\
         Called when a client disconnects.
         
         If you override, make sure you call the superclass implementation of this method.
         
         :param webSock: The connection from the client.
+        :param connectionData: A :class:`dict` containing data relating to this (now closed) connection
         """
-        pass
+                
+        # update list of timeline selectors being used
+        # if this one is no longer needed by any clients, then notify sources that this is the case
+        setupData = connectionData["setup"]
+        
+        if setupData is not None:
+            tSel = setupData.timelineSelector
+            self._timelineSelectors[tSel] -= 1
+        
+            if self._timelineSelectors[tSel] == 0:
+                del self._timelineSelectors[tSel]
+                for src in self._timelineSources:
+                    src.timelineSelectorNotNeeded(tSel) 
+    
     
     def onClientSetup(self, webSock):
         """\
@@ -370,6 +385,18 @@ class TSServer(WSServerBase):
                 return
             connection["setup"] = setupData
             connection["webSocket"] = webSock
+            
+            # if no other clients already requesting this timeline selector, then notify sources it is now needed
+            tSel = setupData.timelineSelector
+            if tSel in self._timelineSelectors:
+                self._timelineSelectors[tSel] += 1
+            else:
+                self._timelineSelectors[tSel] = 1
+            if self._timelineSelectors[tSel] == 1:
+                for src in self._timelineSources:
+                    src.timelineSelectorNeeded(tSel)
+            
+            # notify of client now setup, and then try to send first control timestamp to it
             self.onClientSetup(webSock)
             self.updateClient(webSock)
             
@@ -432,8 +459,12 @@ class TSServer(WSServerBase):
         """
         connection = self._connections[webSock]
         setup = connection["setup"]
+        if setup is None:
+            return
+            
         prevCt = connection["prevCt"]
 
+        # default 'timeline is unavailable' control timestamp
         ct = ControlTimestamp(Timestamp(None, self._wallClock.ticks), None)
 
         # check if contentIdStem matches current CI
@@ -441,12 +472,12 @@ class TSServer(WSServerBase):
             
             for source in self._timelineSources:
                 if source.recognisesTimelineSelector(setup.timelineSelector):
-                    newCt = source.getControlTimestamp(setup.timelineSelector)
-                    if newCt is not None:
-                        ct = newCt
-                    break
+                    ct = source.getControlTimestamp(setup.timelineSelector)
 
-        if isControlTimestampChanged(prevCt, ct):
+        # if None, then a timeline source is saying "please don't send a control timestamp yet"
+        # otherwise, check if the Control Timestamp is basically the same as the previous one sent
+        # and only send if it is different
+        if ct is not None and isControlTimestampChanged(prevCt, ct):
             connection["prevCt"] = ct
             webSock.send(ct.pack())
 
@@ -540,14 +571,42 @@ class TimelineSource(object):
     def __init__(self):
         super(TimelineSource,self).__init__()
         self.sinks = {}
+        
+    def timelineSelectorNeeded(self, timelineSelector):
+        """\
+        Called to notify this Timeline Source that there is a need to provide a timeline for the specified
+        timeline selector.
+        
+        @param timelineSelector  (:class:`str`) A timeline selector supplied by a CSS-TS client that has not been specified by any other currently connected clients.
+        
+        This is useful to, for example, initiate processes needed to extract the timeline for the specified
+        timeline selector. You will not receive repeats of the same notification.
+        
+        If the timeline is no longer needed then the :func:`timelineSelectorNotNeeded`
+        function will be called to notify of this. After this, then you might be notified again in future if
+        a timeline for the timeline selector becomes needed again.
+
+        NOTE: If you override this in your subclass, ensure you still call this implementation in the base class.
+        """
+                
+    def timelineSelectorNotNeeded(self, timelineSelector):
+        """\
+        Called to notify this Timeline Source that there is no longer a need to provide a timeline for the specified
+        timeline selector.
+        
+        @param timelineSelector  (:class:`str`) A timeline selector that was previously needed by one or more CSS-TS client(s) but which is no longer needed by any.
+        
+        NOTE: If you override this in your subclass, ensure you still call this implementation in the base class.
+        """
                 
     def recognisesTimelineSelector(self, timelineSelector):
         """\
+        |stub-method|
+
         :param timelineSelector: (:class:`str`) A timeline selector supplied by a CSS-TS client
         
         :returns: True if this Timeline Source can provide a Control Timestamp given the specified timeline selector
 
-        This is an unimplemented sub method - subclass and implement.
         """        
         raise NotImplementedError("Subclass and implement this method. Return True or False")
     
@@ -555,11 +614,25 @@ class TimelineSource(object):
         """\
         Get the Control Timestamp from this Timeline Source given the supplied timeline selector.
         
+        This method
+        will only be called with timelineSelectors for which the :func:`recognisesTimelineSelector` method
+        returned True.
+
+        |stub-method|
+
+        The return value should be a :class:`~dvbcss.protocol.ts.ControlTimestamp` object. If the timeline
+        is known to be unavailable, then the contentTime and speed properties of that Control Timestamp must
+        be None.
+        
+        If, however, you want the TS Server to not send any Control Timestamp to clients at all, then return
+        None instead of a Control Timestamp object. Use this when, for example, you are still awaiting an result
+        from code that has only just started to try to extract the timeline and doesn't yet know if there is one
+        available or not.
+        
         :param timelineSelector: (:class:`str`) A timeline selector supplied by a CSS-TS client
 
-        :returns: A :class:`~dvbcss.protocol.ts.ControlTimestamp` object for this timeline source appropriate to the timeline selector, or None if the timleine is recognised but not available.
+        :returns: A :class:`~dvbcss.protocol.ts.ControlTimestamp` object for this timeline source appropriate to the timeline selector, or None if the timleine is recognised no Control Timestamp should yet be provided.
 
-        This is an unimplemented sub method - subclass and implement.
         """
         raise NotImplementedError("Subclass and implement this method. Return a Control Timestamp")
     
@@ -621,8 +694,12 @@ class SimpleClockTimelineSource(TimelineSource):
     The Control Timestamp returned by the :func:`~dvbcss.protocol.server.ts.SimpleClockTimelineSource.getControlTimestamp` method
     reflects the state of the clock.
     
-    Note that this does **not** result in a new Control Timestamp being pushed to clients. You still
-    have to call :func:`~TSServer.updateClients` manually yourself to cause that to happen.
+    Note that this does **not** result in a new Control Timestamp being pushed to clients, unless you set the auto update
+    parameter to True when initialising this object. By default (with no auto-updating), you still
+    have to call :func:`~TSServer.updateAllClients` manually yourself to cause that to happen.
+    
+    Use auto-updating with caution: if you have multiple Timeline Sources driven by a common clock, then a change to that clock
+    will cause each Timeline Source to call :func:`~TSServer.updateAllClients`, resulting in multiple unnecessary calls.
     
     The tick rate is fixed to that of the supplied clock and timeline selectors are only matched as an exact match.
     
@@ -635,7 +712,7 @@ class SimpleClockTimelineSource(TimelineSource):
     SimpleClockTimelineSource generates its correlation by observing the current tick value of the wallClock and the provided
     clock whenever a ControlTimestamp needs to be provided.
     """
-    def __init__(self, timelineSelector, wallClock, clock, speedSource=None):
+    def __init__(self, timelineSelector, wallClock, clock, speedSource=None, autoUpdateClients=False):
         """\
         **Initialisation takes the following parameters:**
         
@@ -643,6 +720,7 @@ class SimpleClockTimelineSource(TimelineSource):
         :param wallClock: (:class:`~dvbcss.clock.ClockBase`) A clock object representing the Wall Clock
         :param clock: (:class:`~dvbcss.clock.ClockBase`) A clock object representing the flow of ticks of the timeline.
         :param speedSource: (None or :class:`~dvbcss.clock.ClockBase`) A different clock object from which the timelineSpeedMultiplier is determined (from the clock's speed property), or None if the clock for this is not different.
+        :param autoUpdateClients: (:class:`bool`) Automatically call updateAllClients() if there is a change in the clock or wallClock
         """
         super(SimpleClockTimelineSource,self).__init__()
         self._timelineSelector = timelineSelector
@@ -654,6 +732,7 @@ class SimpleClockTimelineSource(TimelineSource):
             self._speedSource = clock
         else:
             self._speedSource = speedSource
+        self.autoUpdateClients = autoUpdateClients
         
     def attachSink(self, sink):
         super(SimpleClockTimelineSource,self).attachSink(sink)
@@ -662,6 +741,8 @@ class SimpleClockTimelineSource(TimelineSource):
         if len(self.sinks) == 1:
             self._clock.bind(self)
             self._wallClock.bind(self)
+            if self._clock != self._speedSource:
+                self._speedSource.bind(self)
         
     def removeSink(self, sink):
         super(SimpleClockTimelineSource,self).removeSink(sink)
@@ -669,10 +750,19 @@ class SimpleClockTimelineSource(TimelineSource):
         if len(self.sinks) == 0:
             self._clock.unbind(self)
             self._wallClock.unbind(self)
+            if self._clock != self._speedSource:
+                self._speedSource.unbind(self)
         
     def notify(self,cause):
-        """Called by clocks to notify of changes (because this class binds itself to the clock object)"""
+        """\
+        Called by clocks to notify of changes (because this class binds itself to the clock object).
+        
+        If auto-updating is enabled then this will result in a call to :func:`updateAllClients` on all sinks.
+        """
         self._changed=True
+        if self.autoUpdateClients:
+            for sink in self.sinks:
+                sink.updateAllClients()
         
     def recognisesTimelineSelector(self, timelineSelector):
         return self._timelineSelector == timelineSelector
@@ -680,7 +770,7 @@ class SimpleClockTimelineSource(TimelineSource):
     def getControlTimestamp(self, timelineSelector):
         if self._changed:
             self._changed=False
-            self._latestCt = ControlTimestamp(Timestamp(self._clock.ticks, self._wallClock.ticks), timelineSpeedMultiplier=self._clock.speed)
+            self._latestCt = ControlTimestamp(Timestamp(self._clock.ticks, self._wallClock.ticks), timelineSpeedMultiplier=self._speedSource.speed)
         return self._latestCt
         
         

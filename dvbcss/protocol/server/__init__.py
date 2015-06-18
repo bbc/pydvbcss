@@ -174,13 +174,14 @@ class WSServerBase(object):
         """
         raise NotImplementedError("onClientConnect not implemented")
     
-    def onClientDisconnect(self, webSock):
+    def onClientDisconnect(self, webSock, connectionData):
         """\
-        This method is called when a client disconnects.
+        This method is called after a client is disconnected.
 
         |stub-method|
 
         :param webSock: (:class:`WebSocket <ws4py.websocket.WebSocket>`) The object representing the WebSocket connection of the now-disconnected client
+        :param connectionData: (:class:`dict`) of connection data relating to this connection.
         """
         raise NotImplementedError("onClientDisconnect not implemented")
 
@@ -250,8 +251,9 @@ class WSServerBase(object):
         """
         self.log.debug("Removing websocket connection "+webSock.id())
         self.connectionsRemaining += 1
+        conn=self._connections[webSock]
         del self._connections[webSock]
-        self.onClientDisconnect(webSock)
+        self.onClientDisconnect(webSock, conn)
     
     def _receivedMessage(self, webSock, message):
         """\
