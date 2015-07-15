@@ -145,7 +145,7 @@ if __name__ == '__main__':
         protocolVersion="1.1",
         contentId=CONTENT_ID,
         contentIdStatus="final",
-        presentationStatus="okay",
+        presentationStatus=["okay"],
         mrsUrl=OMIT,
         tsUrl="ws://" + HOST_IP + ":" + str(WS_PORT) + "/ts",
         wcUrl="udp://" + HOST_IP + ":" + str(UDP_PORT),
