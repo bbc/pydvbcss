@@ -48,10 +48,6 @@
 
 if __name__ == '__main__':
     
-    HOST_IP = "127.0.0.1"
-    WS_PORT = 7681
-    UDP_PORT = 6677
-    
     import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... @UnusedImport
 
     import logging
@@ -120,7 +116,7 @@ if __name__ == '__main__':
     cherrypy.config.update({"server.socket_port":args.ws_port})
     cherrypy.config.update({"engine.autoreload.on":False})
 
-    wcServer = WallClockServer(wallClock, precision, maxFreqError, bindaddr=HOST_IP, bindport=UDP_PORT)
+    wcServer = WallClockServer(wallClock, precision, maxFreqError, bindaddr=args.wc_addr, bindport=args.wc_port)
 
     ciiServer = CIIServer(maxConnectionsAllowed=5, enabled=True)
     tsServer  = TSServer(CONTENT_ID, wallClock, maxConnectionsAllowed=10, enabled=True)
@@ -147,8 +143,8 @@ if __name__ == '__main__':
         contentIdStatus="final",
         presentationStatus=["okay"],
         mrsUrl=OMIT,
-        tsUrl="ws://" + HOST_IP + ":" + str(WS_PORT) + "/ts",
-        wcUrl="udp://" + HOST_IP + ":" + str(UDP_PORT),
+        tsUrl="ws://" + args.ws_addr + ":" + str(args.ws_port) + "/ts",
+        wcUrl="udp://" + args.wc_addr + ":" + str(args.wc_port),
         teUrl=OMIT,
         timelines = [
             TimelineOption("urn:dvb:css:timeline:pts", unitsPerTick=1, unitsPerSecond=90000),
