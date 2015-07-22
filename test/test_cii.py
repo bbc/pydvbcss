@@ -167,6 +167,11 @@ class Test_CII(unittest.TestCase):
             self.assertEquals(OMIT, d.teUrl)
             self.assertEquals(OMIT, d.timelines)
             self.assertEquals(OMIT, d.private)
+
+    def test_pack_presentationStatus_not_a_string(self):
+        c=CII(presentationStatus="okay")
+        with self.assertRaises(ValueError):
+            c.pack()
         
     def test_pack_unpack_mrsUrl(self):
         VALUE="http://blah.com"

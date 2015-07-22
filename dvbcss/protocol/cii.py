@@ -105,6 +105,8 @@ class CIITransformer(object):
                 raise ValueError("Format of presentationStatus not recognised: "+str(value))
         @classmethod
         def encode(cls,value):
+            if isinstance(value,str):
+                raise ValueError("presentationStatus should have been a list of strings, not a single string.")
             try:
                 return " ".join(value)
             except:
