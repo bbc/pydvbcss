@@ -253,7 +253,7 @@ class CIIServer(WSServerBase):
         webSock.send(self.cii.pack())
         self.getConnections()[webSock]["prevCII"] = self.cii.copy()
     
-    def onClientDisconnect(self, webSock):
+    def onClientDisconnect(self, webSock, connectionData):
         """If you override this method you must call the base class implementation."""
         pass
     
