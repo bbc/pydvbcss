@@ -250,7 +250,7 @@ the WallClock to be passed to it. It can serve different tick rates to different
 The base class also has stub methods to support notification of when a sink is attached
 to the timeline source and also methods to notify of when a particular timeline selector
 is being requested by at least one client and when it is no longer required by any clients.
-See the documentation for :class:`Timelinesource` for more details.
+See the documentation for :class:`TimelineSource` for more details.
 """
 
 import cherrypy
