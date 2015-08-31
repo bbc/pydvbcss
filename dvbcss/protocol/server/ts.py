@@ -232,8 +232,11 @@ the WallClock to be passed to it. It can serve different tick rates to different
         
         def getControlTimestamp(self, timelineSelector):
             match = re.match("^urn:pretend-timeline:([0-9]+)$", timelineSelector)
-            if not match or self.correlation is None:
-                return None
+            if not match:
+                raise RuntimeError("This should never happen.")
+            elif self.correlation is None:
+                # timeline not yet available, so return 'null' control timestamp
+                return ControlTimestamp(Timestamp(None, self.wallClock.ticks), None)
             else:
                 tickRate = int(match.group(1))
                 contentTime = tickRate * self.correlation[1]
@@ -244,7 +247,10 @@ the WallClock to be passed to it. It can serve different tick rates to different
         def setTimelinePositionNow(self, timelineSecondsNow):
             self.correlation = (self.wallClock.nanos, timelineSecondsNow)
 
-
+The base class also has stub methods to support notification of when a sink is attached
+to the timeline source and also methods to notify of when a particular timeline selector
+is being requested by at least one client and when it is no longer required by any clients.
+See the documentation for :class:`Timelinesource` for more details.
 """
 
 import cherrypy
@@ -552,6 +558,13 @@ class TimelineSource(object):
     * :func:`recognisesTimelineSelector`
     * :func:`getControlTimestamp`
     
+    If your source needs to be informed of when a timeline is needed and when it becomes
+    no longer needed (e.g. so you can allocate/deallocate resources needed to extract it)
+    then also implement these stub methods:
+        
+    * :func:`timelineSelectorNeeded`
+    * :func:`timelineSelectorNotNeeded`
+    
     You can also optionally override the following methods, provided your
     code still calls through to the base class implementations:
     
@@ -577,7 +590,7 @@ class TimelineSource(object):
         Called to notify this Timeline Source that there is a need to provide a timeline for the specified
         timeline selector.
         
-        @param timelineSelector  (:class:`str`) A timeline selector supplied by a CSS-TS client that has not been specified by any other currently connected clients.
+        :param timelineSelector:  (:class:`str`) A timeline selector supplied by a CSS-TS client that has not been specified by any other currently connected clients.
         
         This is useful to, for example, initiate processes needed to extract the timeline for the specified
         timeline selector. You will not receive repeats of the same notification.
@@ -594,7 +607,7 @@ class TimelineSource(object):
         Called to notify this Timeline Source that there is no longer a need to provide a timeline for the specified
         timeline selector.
         
-        @param timelineSelector  (:class:`str`) A timeline selector that was previously needed by one or more CSS-TS client(s) but which is no longer needed by any.
+        :param timelineSelector:  (:class:`str`) A timeline selector that was previously needed by one or more CSS-TS client(s) but which is no longer needed by any.
         
         NOTE: If you override this in your subclass, ensure you still call this implementation in the base class.
         """
