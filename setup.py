@@ -39,7 +39,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 F=open("VERSION")
-VERSION = F.read().replace("\n","").replace("\r","")
+VERSION = F.readline().replace("\n","").replace("\r","")
 F.close()
 
 setup(
