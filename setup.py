@@ -38,9 +38,13 @@ package_names = packages.keys()
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+F=open("VERSION")
+VERSION = F.read().replace("\n","").replace("\r","")
+F.close()
+
 setup(
     name = "pydvbcss",
-    version = "0.0.1",
+    version = VERSION,
     author = "Matt Hammond (British Broadcasting Corporation)",
     author_email = "matt.hammond@bbc.co.uk",
     description = ("pydvbcss is a library implementing DVB \"CSS\" protocols for Companion Screen Synchronisation."),
