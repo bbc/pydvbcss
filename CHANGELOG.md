@@ -1,9 +1,5 @@
 # Change Log
 
-## Latest
-
-...
-
 ## 0.3.1 : Packaging version fix (01 Sep 2015)
 
 * Completed support for uploading packages to pypi to enable installation using `pip`
