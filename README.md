@@ -43,12 +43,27 @@ The latest docs for the library
 <a name="install"></a>
 ### Install the code ...
 
+*On Mac OS X and Linux you may need to run one or more of the commands as root.*
+
+#### Using PyPi _(core library only, no examples)_
+
+If you ONLY want the library (not the [code examples](#run-examples) ) and
+if you don't require the very latest bugfixes, then you can install a recent
+release snapshot from the Python Package Index using
+[pip](https://pip.pypa.io/en/latest/installing.html):
+
+    $ pip install pydvbcss
+
+#### From Github or a release tarball _(library and examples)_
+
 The [master branch](https://github.com/BBC/pydvbcss/tree/master) is the latest
 state of the code, including any recent bugfixes. It is mostly stable but
-might have occasional small API changes. Alternatively you can download a
-[release snapshot](https://github.com/BBC/pydvbcss/releases).
+might have occasional small API changes.
+[Release snapshots](https://github.com/BBC/pydvbcss/releases) are also available
+but won't contain the very latest bugfixes or new features.
+Both of these options include the full code, including [examples](#run-examples).
 
-*On Mac OS X and Linux you may need to run one or more of the commands as root.*
+First you need to install dependencies...
 
 We recommend using [pip](https://pip.pypa.io/en/latest/installing.html) to install
 dependencies from the Python Package Index [PyPI](https://pypi.python.org/pypi):
