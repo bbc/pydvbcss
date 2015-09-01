@@ -1,6 +1,10 @@
 # Change Log
 
-## latest
+## Latest
+
+...
+
+## 0.3 : Bugfixes and CSS-TS Server API enhancements (01 Sep 2015)
 
 * API change: Modified API for TimelineSource for TS Servers to allow for situations where it takes time to begin extracting a timeline at the server.
 * Docs: Switched to referring to spec as ETSI 103 286 now it is published by ETSI
