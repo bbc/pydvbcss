@@ -6,6 +6,7 @@
 
 ## 0.3.1 : Packaging version fix (01 Sep 2015)
 
+* Completed support for uploading packages to pypi to enable installation using `pip`
 * Bugfix: setup.py was not tracking same version number as in `VERSION` file.
 
 ## 0.3 : Bugfixes and CSS-TS Server API enhancements (01 Sep 2015)
