@@ -4,6 +4,10 @@
 
 ...
 
+## 0.3.1 : Packaging version fix (01 Sep 2015)
+
+* Bugfix: setup.py was not tracking same version number as in `VERSION` file.
+
 ## 0.3 : Bugfixes and CSS-TS Server API enhancements (01 Sep 2015)
 
 * API change: Modified API for TimelineSource for TS Servers to allow for situations where it takes time to begin extracting a timeline at the server.
