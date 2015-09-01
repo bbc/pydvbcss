@@ -1,0 +1,5 @@
+recursive-include dvbcss *.py
+recursive-include test *.py
+include setup.py setup.cfg
+include README.md
+include VERSION
