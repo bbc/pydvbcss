@@ -111,9 +111,9 @@ And push to GitHub:
 
 ### 3. Create release branch
 
-Create new branch (locally, but set to track on origin)
+Create new branch (locally)
 
-    $ git checkout -b 'X.Y.Z' --track 'origin/X.Y.Z'
+    $ git checkout -b 'X.Y.Z'
 
 Update VERSION to mark as "release" within the branch
 
@@ -122,9 +122,9 @@ Update VERSION to mark as "release" within the branch
     $ git add VERSION
     $ git commit -m "Version marked as release."
     
-Push branch up to github:
+Push branch up to github (and set local repository to track the upstream branch on origin):
 
-    $ git push origin 'X.Y.Z'
+    $ git push -u origin 'X.Y.Z'
     
 
 ### 4. Create a new release on GitHub based on the new branch
