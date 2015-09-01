@@ -49,10 +49,12 @@ The latest docs for the library
 
 If you ONLY want the library (not the [code examples](#run-examples) ) and
 if you don't require the very latest bugfixes, then you can install a recent
-release snapshot from the Python Package Index using
+release package from the Python Package Index (PyPI) using
 [pip](https://pip.pypa.io/en/latest/installing.html):
 
     $ pip install pydvbcss
+
+See the [pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss).
 
 #### From Github or a release tarball _(library and examples)_
 
