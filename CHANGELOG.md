@@ -1,9 +1,5 @@
 # Change Log
 
-## Latest
-
-...
-
 ## 0.3 : Bugfixes and CSS-TS Server API enhancements (01 Sep 2015)
 
 * API change: Modified API for TimelineSource for TS Servers to allow for situations where it takes time to begin extracting a timeline at the server.
