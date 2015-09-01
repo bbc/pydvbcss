@@ -64,6 +64,11 @@ Checkout the [gh-pages](https://github.com/bbc/pydvbcss/tree/gh-pages) branch an
 
 Then push the commits up to GitHub.
 
+#### 6. Upload new package to python package index
+
+The process originally followed to register and setup first time was [this one](http://peterdowns.com/posts/first-time-with-pypi.html).
+
+For subsequent releases, do an upload to first *PyPI Test* and only if that succeeds then do an upload to *PyPI Live*.
 
 - - - - -
 
@@ -178,3 +183,13 @@ Push to GitHub:
 
     $ git push origin gh-pages
     
+Upload to PyPI:
+
+... first uploading to the test service to check everything is okay:
+
+    $ git checkout master
+    $ sudo python setup.py sdist upload -r pypitest
+    
+... then going live:
+
+    $ sudo python setup.py sdist upload -r pypi
