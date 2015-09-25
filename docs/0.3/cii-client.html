@@ -1,0 +1,727 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-CII Clients &mdash; pydvbcss 0.3-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pydvbcss 0.3-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-CII protocol" href="cii.html"/>
+        <link rel="next" title="CSS-CII Servers" href="cii-server.html"/>
+        <link rel="prev" title="CSS-CII Message objects" href="cii-messages.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="cii.html">CSS-CII protocol</a> &raquo;</li>
+      
+    <li>CSS-CII Clients</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/cii-client.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <span class="target" id="module-dvbcss.protocol.client.cii"></span><div class="section" id="css-cii-clients">
+<h1>CSS-CII Clients<a class="headerlink" href="#css-cii-clients" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.protocol.client.cii</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#using-ciiclient" id="id1">Using CIIClient</a></li>
+<li><a class="reference internal" href="#using-ciiclientconnection" id="id2">Using CIIClientConnection</a></li>
+<li><a class="reference internal" href="#classes" id="id3">Classes</a><ul>
+<li><a class="reference internal" href="#ciiclient" id="id4"><strong>CIIClient</strong></a></li>
+<li><a class="reference internal" href="#ciiclientconnection" id="id5"><strong>CIIClientConnection</strong></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>There are two classes provided for implementing CSS-CII clients:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient" title="dvbcss.protocol.client.cii.CIIClient"><code class="xref py py-class docutils literal"><span class="pre">CIIClient</span></code></a> connects to a CII server and provides a CII message
+object representing the complete state of the server and notifies you of changes of state.</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection" title="dvbcss.protocol.client.cii.CIIClientConnection"><code class="xref py py-class docutils literal"><span class="pre">CIIClientConnection</span></code></a> provides a lower level connection
+to a CII server and only provides the messages received from the server.
+It does not maintain a model of the server state and does not work out when
+a received message constitutes a change.</li>
+</ul>
+<p>An <a class="reference internal" href="examples.html"><em>example</em></a> client is provided in this package that uses the <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient" title="dvbcss.protocol.client.cii.CIIClient"><code class="xref py py-class docutils literal"><span class="pre">CIIClient</span></code></a> class.</p>
+<div class="section" id="using-ciiclient">
+<h2><a class="toc-backref" href="#id1">Using CIIClient</a><a class="headerlink" href="#using-ciiclient" title="Permalink to this headline">¶</a></h2>
+<p>This is the simplest class to use. Create it, passing the URL of the server to connect to,
+then call <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.connect" title="dvbcss.protocol.client.cii.CIIClient.connect"><code class="xref py py-func docutils literal"><span class="pre">connect()</span></code></a> and <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.disconnect" title="dvbcss.protocol.client.cii.CIIClient.disconnect"><code class="xref py py-func docutils literal"><span class="pre">disconnect()</span></code></a> to connect and disconnect from the server.</p>
+<p>CIIClient maintains a local copy of the state of CII data the <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.cii" title="dvbcss.protocol.client.cii.CIIClient.cii"><code class="xref py py-data docutils literal"><span class="pre">CIIClient.cii</span></code></a> property and the most
+recently received CII message in <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.latestCII" title="dvbcss.protocol.client.cii.CIIClient.latestCII"><code class="xref py py-data docutils literal"><span class="pre">CIIClient.latestCII</span></code></a>.</p>
+<p>You can use the class either by subclassing and overriding the various stub methods
+or by creating an instance and replacing the stub methods with your own function handlers
+dynamically.</p>
+<p>Pass the WebSocket URL of the CII server when creating the <cite>CIIClient</cite> then call the <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.connect" title="dvbcss.protocol.client.cii.CIIClient.connect"><code class="xref py py-func docutils literal"><span class="pre">connect()</span></code></a>
+and <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.disconnect" title="dvbcss.protocol.client.cii.CIIClient.disconnect"><code class="xref py py-func docutils literal"><span class="pre">disconnect()</span></code></a> methods to connect and disconnect from the server. The <cite>onXXX()</cite> methods
+can be overriden to find out when connection or disconnection takes place, if there is a protocol error (e.g.
+a message was received that could not be parsed as CII) or when properties of the CII data change.</p>
+<p>The CII state is kept in the <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.cii" title="dvbcss.protocol.client.cii.CIIClient.cii"><code class="xref py py-data docutils literal"><span class="pre">cii</span></code></a> property of the object. This is updated with properties
+in CII messages that are received. Properties not included in a CII message are left unchanged.</p>
+<p>Properties of the CII state whose value is <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><code class="xref py py-data docutils literal"><span class="pre">dvbcss.protocol.OMIT</span></code></a> have not been defined by the CII server.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">dvbcss.protocol.client.cii</span> <span class="kn">import</span> <span class="n">CIIClient</span>
+
+<span class="k">class</span> <span class="nc">MyCIIClient</span><span class="p">(</span><span class="n">CIIClient</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">onConnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Connected!&quot;</span>
+        
+    <span class="k">def</span> <span class="nf">onDisconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Disconnected :-(&quot;</span>
+        
+    <span class="k">def</span> <span class="nf">onChange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">propertyNames</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;The following CII properties have changed:</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">propertyNames</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cii</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;    &quot;</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s">&quot; is now: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        
+    <span class="c"># one example of a handler for changes to a particular property &#39;contentId&#39; in CII    </span>
+    <span class="k">def</span> <span class="nf">onContentIdChange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;The contentId property has changed to now be: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">newValue</span><span class="p">)</span>
+
+
+        
+<span class="n">client</span> <span class="o">=</span> <span class="n">MyCIIClient</span><span class="p">(</span><span class="s">&quot;ws://127.0.0.1/cii&quot;</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s">&quot;The current contentId is &quot;</span><span class="o">+</span><span class="n">client</span><span class="o">.</span><span class="n">cii</span><span class="o">.</span><span class="n">contentId</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>    <span class="c"># wait only 60 more seconds then disconnect</span>
+
+<span class="n">client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The client runs in a separate thread managed by the websocket client library, so the <cite>onXXX</cite> methods are called while the main thread sleeps.</p>
+</div>
+<div class="section" id="using-ciiclientconnection">
+<h2><a class="toc-backref" href="#id2">Using CIIClientConnection</a><a class="headerlink" href="#using-ciiclientconnection" title="Permalink to this headline">¶</a></h2>
+<p>This is a lower level class, that only implements parsing of the incoming CII messages from the server.
+It does not detect if a message actually constitutes a change of state or not.</p>
+<p>You can use the class either by subclassing and overriding the various stub methods
+or by creating an instance and replacing the stub methods with your own function handlers
+dynamically.</p>
+<p>Pass the WebSocket URL of the CII server when creating the <cite>CIIClientConnection</cite> object then call the <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection.connect" title="dvbcss.protocol.client.cii.CIIClientConnection.connect"><code class="xref py py-func docutils literal"><span class="pre">connect()</span></code></a>
+and <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection.disconnect" title="dvbcss.protocol.client.cii.CIIClientConnection.disconnect"><code class="xref py py-func docutils literal"><span class="pre">disconnect()</span></code></a> methods to connect and disconnect from the server. The <cite>onXXX()</cite> methods
+can be overridden to find out when connection or disconnection takes place, if there is a protocol error (e.g.
+a message was received that could not be parsed as CII) or when a new CII message is received.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">dvbcss.protocol.client.cii</span> <span class="kn">import</span> <span class="n">CIIClientConnection</span>
+
+<span class="k">class</span> <span class="nc">MyCIIClientConnection</span><span class="p">(</span><span class="n">CIIClientConnection</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">onConnected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Connected!&quot;</span>
+        
+    <span class="k">def</span> <span class="nf">onDisconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Disconnected :-(&quot;</span>
+        
+    <span class="k">def</span> <span class="nf">onCii</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cii</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Received a CII message: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cii</span><span class="p">)</span>
+
+
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">MyCIIClientConnection</span><span class="p">(</span><span class="s">&quot;ws://127.0.0.1/cii&quot;</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>      <span class="c"># run only for 60 seconds then disconnect</span>
+
+<span class="n">client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id3">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ciiclient">
+<h3><a class="toc-backref" href="#id4"><strong>CIIClient</strong></a><a class="headerlink" href="#ciiclient" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.cii.CIIClient">
+<em class="property">class </em><code class="descclassname">dvbcss.protocol.client.cii.</code><code class="descname">CIIClient</code><span class="sig-paren">(</span><em>ciiUrl</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages a CSS-CII protocol connection to a CSS-CII Server and notifies of changes to CII state.</p>
+<p>Use by subclassing and overriding the following methods:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.onConnected" title="dvbcss.protocol.client.cii.CIIClient.onConnected"><code class="xref py py-func docutils literal"><span class="pre">onConnected()</span></code></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.onDisconnected" title="dvbcss.protocol.client.cii.CIIClient.onDisconnected"><code class="xref py py-func docutils literal"><span class="pre">onDisconnected()</span></code></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.onChange" title="dvbcss.protocol.client.cii.CIIClient.onChange"><code class="xref py py-func docutils literal"><span class="pre">onChange()</span></code></a></li>
+<li>individual <cite>onXXXXChange()</cite> methods named after each CII property</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.onCiiReceived" title="dvbcss.protocol.client.cii.CIIClient.onCiiReceived"><code class="xref py py-func docutils literal"><span class="pre">onCiiReceived()</span></code></a> (do not use, by preference)</li>
+</ul>
+<p>If you do not wish to subclass, you can instead create an instance of this
+class and replace the methods listed above with your own functions dynamically.</p>
+<p>The <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.connect" title="dvbcss.protocol.client.cii.CIIClient.connect"><code class="xref py py-func docutils literal"><span class="pre">connect()</span></code></a> and <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.disconnect" title="dvbcss.protocol.client.cii.CIIClient.disconnect"><code class="xref py py-func docutils literal"><span class="pre">disconnect()</span></code></a> methods connect and disconnect the connection to the server
+and <code class="xref py py-func docutils literal"><span class="pre">getStatusSummary()</span></code> provides a human readable summary of CII state.</p>
+<p>This object also provides properties you can query:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.cii" title="dvbcss.protocol.client.cii.CIIClient.cii"><code class="xref py py-data docutils literal"><span class="pre">cii</span></code></a> represents the current state of CII at the server</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.latestCII" title="dvbcss.protocol.client.cii.CIIClient.latestCII"><code class="xref py py-data docutils literal"><span class="pre">latestCII</span></code></a> is the most recently CII message received from the server</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.connected" title="dvbcss.protocol.client.cii.CIIClient.connected"><code class="xref py py-data docutils literal"><span class="pre">connected</span></code></a> indicates whether the connection is currently connect</li>
+</ul>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ciiUrl</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) The WebSocket URL of the CSS-CII Server (e.g. &#8220;ws://127.0.0.1/myservice/cii&#8221;)</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.cii.CIIClient.connected">
+<code class="descname">connected</code><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if currently connected to the server, otherwise False.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.cii.CIIClient.cii">
+<code class="descname">cii</code><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.cii" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><code class="xref py py-class docutils literal"><span class="pre">CII</span></code></a>) CII object representing the CII state at the server</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.cii.CIIClient.latestCII">
+<code class="descname">latestCII</code><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.latestCII" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><code class="xref py py-class docutils literal"><span class="pre">CII</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">None</span></code>) The most recent CII message received from the server or None if nothing has yet been received.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the client by trying to open the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ConnectionError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">There was a problem that meant it was not possible to connect.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onChange">
+<code class="descname">onChange</code><span class="sig-paren">(</span><em>changedPropertyNames</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when a CII message is received from the server that causes one or more of the CII properties to change to a different value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>changedPropertyNames</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">list</span></code></a> of <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> names of the properties that have changed. Query the <a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClient.cii" title="dvbcss.protocol.client.cii.CIIClient.cii"><code class="xref py py-data docutils literal"><span class="pre">cii</span></code></a> attribute to find out the new values.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onCiiReceived">
+<code class="descname">onCiiReceived</code><span class="sig-paren">(</span><em>newCii</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onCiiReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when a CII message is received, but before any &#8216;onXXXXChange()&#8217; handlers (if any) are called.
+It is called even if the message does not result in a change to CII state held locally.</p>
+<p>By preference is recommended to use the &#8216;onXXXXChange()&#8217; handlers instead since these will only be called if there
+is an actual change to the value of a property in CII state.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cii</strong> &#8211; A <a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><code class="xref py py-class docutils literal"><span class="pre">CII</span></code></a> object representing the received message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onConnected">
+<code class="descname">onConnected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onConnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is opened.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onContentIdChange">
+<code class="descname">onContentIdChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onContentIdChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the contentId property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onContentIdStatusChange">
+<code class="descname">onContentIdStatusChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onContentIdStatusChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the contentIdStatus property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onDisconnected">
+<code class="descname">onDisconnected</code><span class="sig-paren">(</span><em>code</em>, <em>reason=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onDisconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is closed.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>code</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) The connection closure code to be sent in the WebSocket disconnect frame</li>
+<li><strong>reason</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">None</span></code>) The human readable reason for the closure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onMrsUrlChange">
+<code class="descname">onMrsUrlChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onMrsUrlChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mrsUrl property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onPresentationStatusChange">
+<code class="descname">onPresentationStatusChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onPresentationStatusChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the presentationStatus property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onPrivateChange">
+<code class="descname">onPrivateChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onPrivateChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the private property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onProtocolError">
+<code class="descname">onProtocolError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onProtocolError" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when there has been an error in the use of the CII protocol - e.g. receiving the wrong kind of message.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> description of the problem.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onProtocolVersionChange">
+<code class="descname">onProtocolVersionChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onProtocolVersionChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the protocolVersion property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onTeUrlChange">
+<code class="descname">onTeUrlChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onTeUrlChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the teUrl property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onTimelinesChange">
+<code class="descname">onTimelinesChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onTimelinesChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the timelines property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onTsUrlChange">
+<code class="descname">onTsUrlChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onTsUrlChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the tsUrl property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClient.onWcUrlChange">
+<code class="descname">onWcUrlChange</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClient.onWcUrlChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the wcUrl property of the CII message has been changed by a state update from the CII Server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newValue</strong> &#8211; The new value for this property.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ciiclientconnection">
+<h3><a class="toc-backref" href="#id5"><strong>CIIClientConnection</strong></a><a class="headerlink" href="#ciiclientconnection" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection">
+<em class="property">class </em><code class="descclassname">dvbcss.protocol.client.cii.</code><code class="descname">CIIClientConnection</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple object for connecting to a CSS-CII server and handling the connection.</p>
+<p>Use by subclassing and overriding the following methods:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection.onConnected" title="dvbcss.protocol.client.cii.CIIClientConnection.onConnected"><code class="xref py py-func docutils literal"><span class="pre">onConnected()</span></code></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection.onDisconnected" title="dvbcss.protocol.client.cii.CIIClientConnection.onDisconnected"><code class="xref py py-func docutils literal"><span class="pre">onDisconnected()</span></code></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection.onCII" title="dvbcss.protocol.client.cii.CIIClientConnection.onCII"><code class="xref py py-func docutils literal"><span class="pre">onCII()</span></code></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.cii.CIIClientConnection.onProtocolError" title="dvbcss.protocol.client.cii.CIIClientConnection.onProtocolError"><code class="xref py py-func docutils literal"><span class="pre">onProtocolError()</span></code></a></li>
+</ul>
+<p>If you do not wish to subclass, you can instead create an instance of this
+class and replace the methods listed above with your own functions dynamically.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">url (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) The WebSocket URL of the CII Server to connect to. E.g. &#8220;ws://127.0.0.1/mysystem/cii&#8221;</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the connection.</p>
+<p>:throws <code class="xref py py-class docutils literal"><span class="pre">ConnectionError</span></code> if there was a problem and the connection could not be opened.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.connected">
+<code class="descname">connected</code><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the connection is connect, otherwise False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><em>code=1001</em>, <em>reason=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>code</strong> &#8211; (optional <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) The connection closure code to be sent in the WebSocket disconnect frame</li>
+<li><strong>reason</strong> &#8211; (optional <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) The human readable reason for the closure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.onCII">
+<code class="descname">onCII</code><span class="sig-paren">(</span><em>cii</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.onCII" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when a CII message is received from the server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cii</strong> &#8211; A <a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><code class="xref py py-class docutils literal"><span class="pre">CII</span></code></a> object representing the received message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.onConnected">
+<code class="descname">onConnected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.onConnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is opened.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.onDisconnected">
+<code class="descname">onDisconnected</code><span class="sig-paren">(</span><em>code</em>, <em>reason=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.onDisconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is closed.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>code</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) The connection closure code to be sent in the WebSocket disconnect frame</li>
+<li><strong>reason</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">None</span></code>) The human readable reason for the closure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.cii.CIIClientConnection.onProtocolError">
+<code class="descname">onProtocolError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.cii.CIIClientConnection.onProtocolError" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when there has been an error in the use of the CII protocol - e.g. receiving the wrong kind of message.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> description of the problem.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cii-server.html" class="btn btn-neutral float-right" title="CSS-CII Servers">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cii-messages.html" class="btn btn-neutral" title="CSS-CII Message objects"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Sep 01, 2015.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.3-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

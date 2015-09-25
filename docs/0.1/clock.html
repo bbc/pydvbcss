@@ -1,0 +1,1214 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Synthesised clocks (dvbcss.clock) &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="Clocks, Time and Scheduling modules" href="timing.html"/>
+        <link rel="next" title="Task scheduling for clocks" href="Task.html"/>
+        <link rel="prev" title="Montonic time functions" href="monotonic_time.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="timing.html">Clocks, Time and Scheduling modules</a> &raquo;</li>
+      
+    <li>Synthesised clocks (dvbcss.clock)</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/clock.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.clock"></span><div class="section" id="synthesised-clocks-dvbcss-clock">
+<h1>Synthesised clocks (dvbcss.clock)<a class="headerlink" href="#synthesised-clocks-dvbcss-clock" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.clock</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#limitations-on-tick-resolution-precision" id="id2">Limitations on tick resolution (precision)</a></li>
+<li><a class="reference internal" href="#timers-and-sleep-functions" id="id3">Timers and Sleep functions</a></li>
+<li><a class="reference internal" href="#usage-examples" id="id4">Usage examples</a><ul>
+<li><a class="reference internal" href="#simple-hierarchies-of-clocks" id="id5">Simple hierarchies of clocks</a></li>
+<li><a class="reference internal" href="#clock-speed-adjustment" id="id6">Clock speed adjustment</a></li>
+<li><a class="reference internal" href="#translating-tick-values-between-clocks" id="id7">Translating tick values between clocks</a></li>
+<li><a class="reference internal" href="#implementing-new-clocks" id="id8">Implementing new clocks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functions" id="id9">Functions</a><ul>
+<li><a class="reference internal" href="#measureprecision-estimate-measurement-precision-of-a-clock" id="id10"><strong>measurePrecision</strong> - estimate measurement precision of a clock</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes" id="id11">Classes</a><ul>
+<li><a class="reference internal" href="#clockbase-base-class-for-clocks" id="id12"><strong>ClockBase</strong> - base class for clocks</a></li>
+<li><a class="reference internal" href="#sysclock-clock-based-on-time-module" id="id13"><strong>SysClock</strong> - Clock based on time module</a></li>
+<li><a class="reference internal" href="#correlatedclock-clock-correlated-to-another-clock" id="id14"><strong>CorrelatedClock</strong> - Clock correlated to another clock</a></li>
+<li><a class="reference internal" href="#tunableclock-clock-with-dynamically-adjustable-frequency-and-tick-offset" id="id15"><strong>TunableClock</strong> - Clock with dynamically adjustable frequency and tick offset</a></li>
+<li><a class="reference internal" href="#rangecorrelatedclock-clock-correlated-to-another-clock" id="id16"><strong>RangeCorrelatedClock</strong> - Clock correlated to another clock</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The dvbcss.clock module provides software synthesised clock objects that can be chained together into dependent hierarchies.
+Use in conjunction with <a class="reference internal" href="Task.html#module-dvbcss.task" title="dvbcss.task"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.task</span></tt></a> to sleep and run code at set times on these clocks.</p>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The classes in this module implement software synthesised clocks
+from which you can query a current time value.
+A clock counts in whole numbers of ticks (unlike the standard library <a class="reference external" href="http://docs.python.org/library/time.html#time.time" title="(in Python v2.7)"><tt class="xref py py-func docutils literal"><span class="pre">time.time()</span></tt></a> function which
+counts in seconds and fractions of a second) and has a tick rate (expresed in ticks per second).</p>
+<p>To use clocks as timers or to schedule code to run later, you must use them with the functions of the <a class="reference internal" href="Task.html#module-dvbcss.task" title="dvbcss.task"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.task</span></tt></a> module.</p>
+<p>To use clocks begin with a root clock that is based on a underlying timing source.
+The following root clocks are provided:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.clock.SysClock" title="dvbcss.clock.SysClock"><tt class="xref py py-class docutils literal"><span class="pre">SysClock</span></tt></a> <strong>is an root clock based on the</strong> <a class="reference internal" href="monotonic_time.html#dvbcss.monotonic_time.time" title="dvbcss.monotonic_time.time"><tt class="xref py py-func docutils literal"><span class="pre">dvbcss.monotonic_time.time()</span></tt></a> <strong>function as the underlying time source</strong></li>
+</ul>
+<p>Other dependent clocks can then be created that have the underlying clock as their parent. 
+and further dependent clocks can be created with those dependents as their parents, creating
+chains of clocks, each based on their parent and leading back to an underlying clock.
+The following dependent clocks are provided:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> <strong>is a fixed tick rate clock where you define the point of correlation between it and its parent.</strong></li>
+<li><a class="reference internal" href="#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> <strong>is a clock that can have its tick count tweaked and its frequency slewed on the fly.</strong></li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">RangleCorrelatedClock</span></tt> <strong>is a clock where the relationship to the parent is determined from two points of correlation.</strong></li>
+</ul>
+<p>Dependent clocks can have a different tick rate to their parent and count their ticks from a
+different starting point.</p>
+<p>Dependent clocks allow their relationship to its parent clock
+to be changed dynamically - e.g. the absolute value, or the rate at which
+the clock ticks. If your code needs to be notified of such a change, it
+can bind itself as a dependent to that clock.</p>
+<p>The base <a class="reference internal" href="#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">ClockBase</span></tt></a> class defines the set of methods common to
+all clocks (both underlying and dependent)</p>
+</div>
+<div class="section" id="limitations-on-tick-resolution-precision">
+<h2><a class="toc-backref" href="#id2">Limitations on tick resolution (precision)</a><a class="headerlink" href="#limitations-on-tick-resolution-precision" title="Permalink to this headline">¶</a></h2>
+<p>The Clock objects here do not run a thread that counts individual ticks. Instead, to determine the current tick value
+they query the parent clock for its current tick value and then calculate what the tick value should be.</p>
+<p>A clock is therefore <strong>limited in the precision and resolution of its tick value by its parents.</strong> <a class="reference internal" href="#dvbcss.clock.SysClock" title="dvbcss.clock.SysClock"><tt class="xref py py-class docutils literal"><span class="pre">SysClock</span></tt></a>,
+for example, is limited by the resolution of the underlying time source provided to it by <a class="reference internal" href="monotonic_time.html#module-dvbcss.monotonic_time" title="dvbcss.monotonic_time"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.monotonic_time</span></tt></a>
+module&#8217;s <a class="reference internal" href="monotonic_time.html#dvbcss.monotonic_time.time" title="dvbcss.monotonic_time.time"><tt class="xref py py-func docutils literal"><span class="pre">dvbcss.monotonic_time.time()</span></tt></a> function. And this will be operating system dependent. SysClock also outputs
+ticks as integer values.</p>
+<p>If a parent of a clock only reports whole number (integer) tick values then that also limits the resolution of any
+clocks that depend on it. For example, a clock that counts in integer ticks only at 25 ticks per second will cause a
+clock descended from it, with a tick rate of 100 ticks per second, to report tick values that increment 4 ticks
+at a time ... or worse if a parent of both has an even lower tick rate.</p>
+<p>With the clocks provided by this module, only <a class="reference internal" href="#dvbcss.clock.SysClock" title="dvbcss.clock.SysClock"><tt class="xref py py-class docutils literal"><span class="pre">SysClock</span></tt></a> limits itself to integer numbers of ticks.
+<a class="reference internal" href="#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> and <a class="reference internal" href="#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> are capable of fractional numbers of ticks provided that the
+parameters provided to them (e.g. the tickRate) are passed as floating point values (this will force python to
+do the maths in floating point instead of integer maths).</p>
+</div>
+<div class="section" id="timers-and-sleep-functions">
+<h2><a class="toc-backref" href="#id3">Timers and Sleep functions</a><a class="headerlink" href="#timers-and-sleep-functions" title="Permalink to this headline">¶</a></h2>
+<p>Use the functions of the <a class="reference internal" href="Task.html#module-dvbcss.task" title="dvbcss.task"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.task</span></tt></a> in conjunction with Clock objects
+to create code that sleeps, or which triggers callbacks, based on time as
+measured by these clocks.</p>
+</div>
+<div class="section" id="usage-examples">
+<h2><a class="toc-backref" href="#id4">Usage examples</a><a class="headerlink" href="#usage-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="simple-hierarchies-of-clocks">
+<h3><a class="toc-backref" href="#id5">Simple hierarchies of clocks</a><a class="headerlink" href="#simple-hierarchies-of-clocks" title="Permalink to this headline">¶</a></h3>
+<p>Here is a simple example where a clock represents a timeline and
+another represents a timeline related to the first by a correlation:</p>
+<div class="highlight-python"><pre>from dvbcss.clock import SysClock
+from dvbcss.clock import CorrelatedClock
+
+# create a clock based on dvbcss.monotonic_time.time() that ticks in milliseconds
+sysClock = SysClock(tickRate=1000)
+
+# create a clock to represent a timeline 
+baseTimeline = CorrelatedClock(parentClock=sysClock, tickRate=25, correlation=(0,0))
+
+# create a clock representing another timeline, where time zero corresponds to time 100
+# on the parent timeline
+subTimeline = CorrelatedClock(parentClock=baseTimeline, tickRate=25, correlation=(100,0)</pre>
+</div>
+<p>At some point later in time during the program, we query the values of all the clocks,
+confirming that the sub timeline is always 100 ticks ahead of the base timeline.</p>
+<div class="highlight-python"><pre>def printTimes():
+    sys  = sysClock.ticks()
+    base = baseTimeline.ticks()
+    sub  = subTimeline.ticks()
+    print "SysClock      ticks = %d", sys
+    print "Base timeline ticks = %d", base
+    print "Sub timeline  ticks = %d", sub
+    
+&gt;&gt;&gt; printTimes()
+SysClock      ticks = 20000
+Base timeline ticks = 500
+Sub timeline  ticks = 600 </pre>
+</div>
+<p><em>Note that in these examples, for clarity, the tick count on the sysClock is artificially low. It would likely be a much larger value.</em></p>
+<p>We then change the correlation for the base timeline, declaring tick 25 on its baseline to correspond to tick 0 on its parent timeline,
+and both the base timeline and the sub timeline reflect this:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; baseTimeline.correlation = (0,25)
+&gt;&gt;&gt; printTimes()
+SysClock      ticks = 30000
+Base timeline ticks = 775
+Sub timeline  ticks = 875 </pre>
+</div>
+</div>
+<div class="section" id="clock-speed-adjustment">
+<h3><a class="toc-backref" href="#id6">Clock speed adjustment</a><a class="headerlink" href="#clock-speed-adjustment" title="Permalink to this headline">¶</a></h3>
+<p>All clocks have a <tt class="xref py py-data docutils literal"><span class="pre">speed</span></tt> property. Normally this is 1.0. Some clock classes support changing this value. This scales the rate at which
+the clock ticks relative to its parent. For example, 0.5 corresponds to half speed; 2.0 = double speed, 0 = frozen and -1.0 = reverse.</p>
+<p>Clocks will take speed into account when returning their current tick position or converting it to or from the tick value of a parent clock. However
+it does not alter the tickRate property. A child clock will similarly ignore the speed property of a parent clock. In this way, the speed property can be
+used to tweak the speed of time, or to emulate speed control (fast forward, rewind, pause) for a media timeline.</p>
+<p>Here is an example where we create 3 clocks in a chain and all tick initially at 100 ticks per second:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; import time
+&gt;&gt;&gt; baseClock = Sysclock(tickRate=100)
+&gt;&gt;&gt; clock1 = TunableClock(parent=baseClock, tickRate=100)
+&gt;&gt;&gt; clock2 = TunableClock(parent=clock1, tickRate=100)</pre>
+</div>
+<p>We confirm that both clock1 and its child - clock2 - tick at 100 ticks per second:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; print clock1.ticks; time.sleep(1.0); print clock1.ticks
+5023
+5123
+&gt;&gt;&gt; print clock2.ticks; time.sleep(1.0); print clock2.ticks
+2150
+2250</pre>
+</div>
+<p>If we change the tick rate of clock1 this affects clock1, but its child - clock2 - continues to tick at 100 ticks every second:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; clock1.tickRate = 200
+&gt;&gt;&gt; print clock1.ticks; time.sleep(1.0); print clock1.ticks
+5440
+5640
+&gt;&gt;&gt; print clock2.ticks; time.sleep(1.0); print clock2.ticks
+4103
+4203</pre>
+</div>
+<p>But if we <em>instead</em> change the speed multiplier of clock1 then this not only affects the ticking rate of clock1 but also of its child - clock2:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; clock1.tickRate = 100
+&gt;&gt;&gt; clock1.speed = 2.0
+&gt;&gt;&gt; print clock1.ticks; time.sleep(1.0); print clock1.ticks
+5740
+5940
+&gt;&gt;&gt; print clock2.ticks; time.sleep(1.0); print clock2.ticks
+4603
+4803</pre>
+</div>
+</div>
+<div class="section" id="translating-tick-values-between-clocks">
+<h3><a class="toc-backref" href="#id7">Translating tick values between clocks</a><a class="headerlink" href="#translating-tick-values-between-clocks" title="Permalink to this headline">¶</a></h3>
+<p>The clock classes provide mechanisms to translate a tick value from one clock to a tick value of another clock such that it still
+represents the same moment in time. So long as both clocks share a common ancestor clock, the conversion will be possible.</p>
+<p><a class="reference internal" href="#dvbcss.clock.ClockBase.toParentTicks" title="dvbcss.clock.ClockBase.toParentTicks"><tt class="xref py py-func docutils literal"><span class="pre">toParentTicks()</span></tt></a> and <a class="reference internal" href="#dvbcss.clock.ClockBase.fromParentTicks" title="dvbcss.clock.ClockBase.fromParentTicks"><tt class="xref py py-func docutils literal"><span class="pre">fromParentTicks()</span></tt></a> converts tick values for a clock to/from its parent clock.
+<a class="reference internal" href="#dvbcss.clock.ClockBase.toOtherClockTicks" title="dvbcss.clock.ClockBase.toOtherClockTicks"><tt class="xref py py-func docutils literal"><span class="pre">toOtherClockTicks()</span></tt></a> will convert a tick value for this clock to the corresponding tick value for any other clock
+with a common ancestor to this one.</p>
+<div class="highlight-python"><pre>from dvbcss.clock import SysClock
+from dvbcss.clock import CorrelatedClock
+
+# create a clock based on dvbcss.monotonic_time.time() that ticks in milliseconds
+sysClock = SysClock(tickRate=1000)
+
+#                                       +------------+
+#                                   .-- | mediaClock |
+# +----------+     +-----------+ &lt;--'   +------------+
+# | sysClock | &lt;-- | wallClock | 
+# +----------+     +-----------+ &lt;--.   +-----------------+
+#                                   '-- | otherMediaClock |
+#                                       +-----------------+
+
+wallClock = CorrelatedClock(parentClock=sysClock, tickRate=1000000000, correlation=(0,0))
+mediaClock = CorrelatedClock(parentClock=wallClock, tickRate=25, correlation=(500021256, 0))
+otherMediaClock = CorrelatedClock(parentClock=wallClock, tickRate=30, correlation=(21093757, 0))
+
+# calculate wall clock time 'w' corresponding to a mediaClock time 1582:
+t = 1582
+w = mediaClock.toParentTicks(t)    
+print "When MediaClock ticks =", t, " wall clock ticks =", w
+
+# calculate mediaClock time 'm' corresponding to wall clock time 1920395
+w = 1920395
+m = mediaClock.fromParentTicks(w)
+print "When wall clock ticks =", w, " media clock ticks =", m
+
+# calculate other media clock time corresponding to media clock time 2248
+t = 2248
+o = mediaClock.toOtherClockTicks(otherMediaClock, t)
+print "When MediaClock ticks =", t, " other media clock ticks =", o</pre>
+</div>
+</div>
+<div class="section" id="implementing-new-clocks">
+<h3><a class="toc-backref" href="#id8">Implementing new clocks</a><a class="headerlink" href="#implementing-new-clocks" title="Permalink to this headline">¶</a></h3>
+<p>Implement a new clock class by subclassing <a class="reference internal" href="#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">ClockBase</span></tt></a> and implementing the stub methods.</p>
+<p>For example, here is a clock that is the same as its parent (same tick rate) except that its
+current tick value differs by a fixed offset.</p>
+<div class="highlight-python"><pre>from dvbcss.clock import ClockBase
+
+class FixedTicksOffsetClock(ClockBase):
+
+    def __init__(self, parent, offset):
+        super(FixedTicksOffsetClock,self).__init__()
+        self._parent = parent
+        self._offset = offset
+        
+    def calcWhen(self, ticksWhen):
+        return self._parent.calcWhen(ticksWhen - self._offset)
+        
+    def fromParentTicks(self, ticks):
+        return ticks + self._offset
+        
+    def getParent(self):
+        return self._parent
+        
+    @property
+    def tickRate(self):
+        return self._parent.tickRate
+    
+    @property
+    def ticks(self)
+        return self._parent.ticks + self._offset
+        
+    def toParentTicks(self, ticks):
+        return ticks - self._offset</pre>
+</div>
+<p>In use:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; f = FixedTicksOffsetClock(parentClock, 100)
+&gt;&gt;&gt; print parentClock.ticks, f.ticks
+216 316</pre>
+</div>
+<p>When doing this, you must decide whether to allow the speed to be adjusted. If you do, then it must be taken into account in the calculations for the methods:
+<tt class="xref py py-func docutils literal"><span class="pre">calcWhen()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">fromParentTicks()</span></tt> and <tt class="xref py py-func docutils literal"><span class="pre">toParentTicks()</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="functions">
+<h2><a class="toc-backref" href="#id9">Functions</a><a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="measureprecision-estimate-measurement-precision-of-a-clock">
+<h3><a class="toc-backref" href="#id10"><strong>measurePrecision</strong> - estimate measurement precision of a clock</a><a class="headerlink" href="#measureprecision-estimate-measurement-precision-of-a-clock" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="dvbcss.clock.measurePrecision">
+<tt class="descclassname">dvbcss.clock.</tt><tt class="descname">measurePrecision</tt><big>(</big><em>clock</em>, <em>sampleSize=10000</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.measurePrecision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do a very rough experiment to work out the precision of the provided clock.</p>
+<p>Works by empirically looking for the smallest observable difference in the tick count.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clock</strong> &#8211; (:class:dvbcss.clock.ClockBase) Clock to measure</li>
+<li><strong>sampleSize</strong> &#8211; (int) Number of iterations (sample size) to estimate the precision over</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float) estimate of clock measurement precision (in seconds)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id11">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="clockbase-base-class-for-clocks">
+<h3><a class="toc-backref" href="#id12"><strong>ClockBase</strong> - base class for clocks</a><a class="headerlink" href="#clockbase-base-class-for-clocks" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.clock.ClockBase">
+<em class="property">class </em><tt class="descclassname">dvbcss.clock.</tt><tt class="descname">ClockBase</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all clock classes.</p>
+<p>By default, adjusting tickRate and speed are not permitted unless a subclass overrides and implements a property setter.</p>
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.bind">
+<tt class="descname">bind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind for notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; When this clock changes, the <a class="reference internal" href="#dvbcss.clock.ClockBase.notify" title="dvbcss.clock.ClockBase.notify"><tt class="xref py py-func docutils literal"><span class="pre">notify()</span></tt></a> method of this dependent will be called, passing a single argument that is this clock.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.calcWhen">
+<tt class="descname">calcWhen</tt><big>(</big><em>ticksWhen</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.calcWhen" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return:</th><td class="field-body">&#8220;when&#8221; in terms of the underlying clock behind the root clock implementation (e.g. <tt class="xref py py-func docutils literal"><span class="pre">monotonic_time.time()</span></tt> in the case of <a class="reference internal" href="#dvbcss.clock.SysClock" title="dvbcss.clock.SysClock"><tt class="xref py py-class docutils literal"><span class="pre">SysClock</span></tt></a>)</td>
+</tr>
+</tbody>
+</table>
+<p>Stub. Implement in your subclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.fromParentTicks">
+<tt class="descname">fromParentTicks</tt><big>(</big><em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.fromParentTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub. Implement in your subclass.</p>
+<p>Implementations should use the parent clock&#8217;s <a class="reference internal" href="#dvbcss.clock.ClockBase.tickRate" title="dvbcss.clock.ClockBase.tickRate"><tt class="xref py py-data docutils literal"><span class="pre">tickRate</span></tt></a> property when performing the conversion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The specified tick value for the parent clock converted to the timescale of this clock.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Throws StopIteration:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if this clock has no parent</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.getEffectiveSpeed">
+<tt class="descname">getEffectiveSpeed</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.getEffectiveSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the &#8216;effective speed&#8217; of this clock.</p>
+<p>This is equal to multiplying together the speed properties of this clock and all of the parents up to the root clock.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.getParent">
+<tt class="descname">getParent</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.getParent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub. Implement in your subclass.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">ClockBase</span></tt></a> representing the immediate parent of this clock, or None if it is a root clock.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.ClockBase.nanos">
+<tt class="descname">nanos</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.nanos" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The tick count of this clock, but converted to units of nanoseconds, based on the current tick rate (but ignoring the <cite>speed</cite> property).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.nanosToTicks">
+<tt class="descname">nanosToTicks</tt><big>(</big><em>nanos</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.nanosToTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the supplied nanosecond to number of ticks given the current tick rate of this clock (but ignoring the <cite>speed</cite> property).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nanos</strong> &#8211; nanoseconds value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of ticks equivalent to the supplied nanosecond value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.notify">
+<tt class="descname">notify</tt><big>(</big><em>cause</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.notify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call to notify this clock that the clock on which it is based (its parent) has changed relative to the underlying timing source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cause</strong> &#8211; The clock that is calling this method.</td>
+</tr>
+</tbody>
+</table>
+<p>Will notify all dependents of this clock (entities that have registered themselves by calling <a class="reference internal" href="#dvbcss.clock.ClockBase.bind" title="dvbcss.clock.ClockBase.bind"><tt class="xref py py-func docutils literal"><span class="pre">bind()</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.ClockBase.speed">
+<tt class="descname">speed</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The speed at which the clock is running.
+Does not change the reported tickRate value, but will affect how ticks are calculated
+from parent clock ticks. Default = 1.0 = normal tick rate.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.ClockBase.tickRate">
+<tt class="descname">tickRate</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.tickRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only)The tick rate (in ticks per second) of this clock.</p>
+<p>Stub. Implement in your subclass.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.ClockBase.ticks">
+<tt class="descname">ticks</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.ticks" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The tick count for this clock.</p>
+<p>Stub. Implement in your subclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.toOtherClockTicks">
+<tt class="descname">toOtherClockTicks</tt><big>(</big><em>otherClock</em>, <em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.toOtherClockTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws NoCommonClock:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there is no common ancestor clock (meaning it is not possible to convert</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.toParentTicks">
+<tt class="descname">toParentTicks</tt><big>(</big><em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.toParentTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub. Implement in your subclass.</p>
+<p>Implementations should use the parent clock&#8217;s <a class="reference internal" href="#dvbcss.clock.ClockBase.tickRate" title="dvbcss.clock.ClockBase.tickRate"><tt class="xref py py-data docutils literal"><span class="pre">tickRate</span></tt></a> property when performing the conversion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The specified tick value of this clock converted to the timescale of the parent clock.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Throws StopIteration:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if this clock has no parent</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.ClockBase.unbind">
+<tt class="descname">unbind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.ClockBase.unbind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unbind from notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; The dependent to unbind from receiving notifications.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="sysclock-clock-based-on-time-module">
+<h3><a class="toc-backref" href="#id13"><strong>SysClock</strong> - Clock based on time module</a><a class="headerlink" href="#sysclock-clock-based-on-time-module" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.clock.SysClock">
+<em class="property">class </em><tt class="descclassname">dvbcss.clock.</tt><tt class="descname">SysClock</tt><big>(</big><em>tickRate=1000000</em>, <em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock" title="Permalink to this definition">¶</a></dt>
+<dd><p>A clock based directly on the standard library timer function <tt class="xref py py-func docutils literal"><span class="pre">monotonic_time.time()</span></tt>.
+Returns <cite>integer</cite> ticks when its <tt class="xref py py-data docutils literal"><span class="pre">ticks</span></tt> property is queried.</p>
+<p>The default tick rate is 1 million ticks per second, but a different tick rate can be chosen during initialisation.</p>
+<p>It is not permitted to change the <tt class="xref py py-data docutils literal"><span class="pre">tickRate</span></tt> or <a class="reference internal" href="#dvbcss.clock.SysClock.speed" title="dvbcss.clock.SysClock.speed"><tt class="xref py py-data docutils literal"><span class="pre">speed</span></tt></a> property of this clock because it directly represents a system clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tickRate</strong> &#8211; (int) tick rate for this clock (in ticks per second)</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.clock.SysClock.bind">
+<tt class="descname">bind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind for notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; When this clock changes, the <a class="reference internal" href="#dvbcss.clock.SysClock.notify" title="dvbcss.clock.SysClock.notify"><tt class="xref py py-func docutils literal"><span class="pre">notify()</span></tt></a> method of this dependent will be called, passing a single argument that is this clock.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.SysClock.getEffectiveSpeed">
+<tt class="descname">getEffectiveSpeed</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.getEffectiveSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the &#8216;effective speed&#8217; of this clock.</p>
+<p>This is equal to multiplying together the speed properties of this clock and all of the parents up to the root clock.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.SysClock.nanos">
+<tt class="descname">nanos</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.nanos" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The tick count of this clock, but converted to units of nanoseconds, based on the current tick rate (but ignoring the <cite>speed</cite> property).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.SysClock.nanosToTicks">
+<tt class="descname">nanosToTicks</tt><big>(</big><em>nanos</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.nanosToTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the supplied nanosecond to number of ticks given the current tick rate of this clock (but ignoring the <cite>speed</cite> property).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nanos</strong> &#8211; nanoseconds value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of ticks equivalent to the supplied nanosecond value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.SysClock.notify">
+<tt class="descname">notify</tt><big>(</big><em>cause</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.notify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call to notify this clock that the clock on which it is based (its parent) has changed relative to the underlying timing source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cause</strong> &#8211; The clock that is calling this method.</td>
+</tr>
+</tbody>
+</table>
+<p>Will notify all dependents of this clock (entities that have registered themselves by calling <a class="reference internal" href="#dvbcss.clock.SysClock.bind" title="dvbcss.clock.SysClock.bind"><tt class="xref py py-func docutils literal"><span class="pre">bind()</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.SysClock.speed">
+<tt class="descname">speed</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The speed at which the clock is running.
+Does not change the reported tickRate value, but will affect how ticks are calculated
+from parent clock ticks. Default = 1.0 = normal tick rate.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.SysClock.toOtherClockTicks">
+<tt class="descname">toOtherClockTicks</tt><big>(</big><em>otherClock</em>, <em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.toOtherClockTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws NoCommonClock:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there is no common ancestor clock (meaning it is not possible to convert</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.SysClock.unbind">
+<tt class="descname">unbind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.SysClock.unbind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unbind from notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; The dependent to unbind from receiving notifications.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="correlatedclock-clock-correlated-to-another-clock">
+<h3><a class="toc-backref" href="#id14"><strong>CorrelatedClock</strong> - Clock correlated to another clock</a><a class="headerlink" href="#correlatedclock-clock-correlated-to-another-clock" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.clock.CorrelatedClock">
+<em class="property">class </em><tt class="descclassname">dvbcss.clock.</tt><tt class="descname">CorrelatedClock</tt><big>(</big><em>parentClock</em>, <em>tickRate</em>, <em>correlation=(0</em>, <em>0)</em>, <em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock" title="Permalink to this definition">¶</a></dt>
+<dd><p>A clock locked to the tick count of the parent clock by a correlation and frequency setting.</p>
+<p>Correlation is a tuple <cite>(parentTicks, selfTicks)</cite></p>
+<p>When the parent clock ticks property has the value <cite>parentTicks</cite>, the ticks property of this clock
+shall have the value <cite>selfTicks</cite>.</p>
+<p>This relationship can be illustrated as follows:</p>
+<a class="reference internal image-reference" href="_images/correlated-clock.png"><img alt="_images/correlated-clock.png" class="align-center" src="_images/correlated-clock.png" style="width: 384pt;" /></a>
+<p>You can alter the correlation and tickRate and speed of this clock dynamically. Changes to tickRate and speed
+will not shift the point of correlation. This means that a change in tickRate or speed will probably cause the
+current tick value of the clock to jump. The amount it jumps by will be proportional to the distance the current
+time is from the point of correlation:</p>
+<a class="reference internal image-reference" href="_images/correlated-clock-speed-change-issue.png"><img alt="_images/correlated-clock-speed-change-issue.png" class="align-center" src="_images/correlated-clock-speed-change-issue.png" style="width: 384pt;" /></a>
+<p>If you want a speed change to only affect the ticks from a particular point (e.g. the current tick value) onwards
+then you must re-base the correlation. There is a function provided to do that in some circumstances:</p>
+<div class="highlight-python"><pre>c = CorrelatedClock(parentClock=parent, tickRate=1000, correlation=(50,78))
+
+   ... time passes ...
+   
+# now freeze the clock AT ITS CURRENT TICK VALUE
+
+c.rebaseCorrelationAtTicks(c.ticks)
+c.speed = 0
+
+# now resume the clock but at half speed, but again without the tick value jumping
+c.correlation = ( parent.ticks, c.ticks )
+c.speed = 0.5</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The maths to calculate and convert tick values will be performed, by default, as integer maths
+unless the parameters controlling the clock (tickRate etc) are floating point, or the ticks property
+of the parent clock supplies floating point values.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parentClock</strong> &#8211; The parent clock for this clock.</li>
+<li><strong>tickRate</strong> &#8211; (int) tick rate for this clock (in ticks per second)</li>
+<li><strong>correlation</strong> &#8211; (tuple(int, int)) The intial correlation for this clock. A tuple (parent tick value, this clock tick value)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.bind">
+<tt class="descname">bind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind for notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; When this clock changes, the <a class="reference internal" href="#dvbcss.clock.CorrelatedClock.notify" title="dvbcss.clock.CorrelatedClock.notify"><tt class="xref py py-func docutils literal"><span class="pre">notify()</span></tt></a> method of this dependent will be called, passing a single argument that is this clock.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.CorrelatedClock.correlation">
+<tt class="descname">correlation</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read or change the correlation tuple <cite>(parentTicks, selfTicks)</cite> of this clock to its parent clock.</p>
+<p>Assign a new tuple <cite>(parentTicks, selfTicks)</cite> to change the correlation. 
+This value must be a tuple, not a list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.getEffectiveSpeed">
+<tt class="descname">getEffectiveSpeed</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.getEffectiveSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the &#8216;effective speed&#8217; of this clock.</p>
+<p>This is equal to multiplying together the speed properties of this clock and all of the parents up to the root clock.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.CorrelatedClock.nanos">
+<tt class="descname">nanos</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.nanos" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The tick count of this clock, but converted to units of nanoseconds, based on the current tick rate (but ignoring the <cite>speed</cite> property).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.nanosToTicks">
+<tt class="descname">nanosToTicks</tt><big>(</big><em>nanos</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.nanosToTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the supplied nanosecond to number of ticks given the current tick rate of this clock (but ignoring the <cite>speed</cite> property).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nanos</strong> &#8211; nanoseconds value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of ticks equivalent to the supplied nanosecond value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.notify">
+<tt class="descname">notify</tt><big>(</big><em>cause</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.notify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call to notify this clock that the clock on which it is based (its parent) has changed relative to the underlying timing source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cause</strong> &#8211; The clock that is calling this method.</td>
+</tr>
+</tbody>
+</table>
+<p>Will notify all dependents of this clock (entities that have registered themselves by calling <a class="reference internal" href="#dvbcss.clock.CorrelatedClock.bind" title="dvbcss.clock.CorrelatedClock.bind"><tt class="xref py py-func docutils literal"><span class="pre">bind()</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.rebaseCorrelationAtTicks">
+<tt class="descname">rebaseCorrelationAtTicks</tt><big>(</big><em>tickValue</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.rebaseCorrelationAtTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the <a class="reference internal" href="#dvbcss.clock.CorrelatedClock.correlation" title="dvbcss.clock.CorrelatedClock.correlation"><tt class="xref py py-data docutils literal"><span class="pre">correlation</span></tt></a> property to an equivalent correlation (that does not change the timing relationship between
+parent clock and this clock) where the tick value for this clock is the provided tick value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.CorrelatedClock.tickRate">
+<tt class="descname">tickRate</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.tickRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read or change the tick rate (in ticks per second) of this clock. The value read is not affected by the value of the <tt class="xref py py-data docutils literal"><span class="pre">speed</span></tt> property.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.toOtherClockTicks">
+<tt class="descname">toOtherClockTicks</tt><big>(</big><em>otherClock</em>, <em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.toOtherClockTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws NoCommonClock:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there is no common ancestor clock (meaning it is not possible to convert</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.CorrelatedClock.unbind">
+<tt class="descname">unbind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.CorrelatedClock.unbind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unbind from notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; The dependent to unbind from receiving notifications.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tunableclock-clock-with-dynamically-adjustable-frequency-and-tick-offset">
+<h3><a class="toc-backref" href="#id15"><strong>TunableClock</strong> - Clock with dynamically adjustable frequency and tick offset</a><a class="headerlink" href="#tunableclock-clock-with-dynamically-adjustable-frequency-and-tick-offset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.clock.TunableClock">
+<em class="property">class </em><tt class="descclassname">dvbcss.clock.</tt><tt class="descname">TunableClock</tt><big>(</big><em>parentClock</em>, <em>tickRate</em>, <em>ticks=0</em>, <em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock" title="Permalink to this definition">¶</a></dt>
+<dd><p>A clock whose tick offset and speed can be adjusted on the fly.
+Must be based on another clock.</p>
+<p>Advancement of time of this clock is based on the tick count and rates reported by
+the supplied parent clock.</p>
+<p>If you adjust the tickRate or speed, then the change is applied going forward from the moment it is made.
+E.g. if you are observing the rate of increase of the ticks property, then doubling the speed wil cause
+the ticks property to start increasing faster but will not cause it to suddenly jump value.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The maths to calculate and convert tick values will be performed, by default, as integer maths
+unless the parameters controlling the clock (tickRate etc) are floating point, or the ticks property
+of the parent clock supplies floating point values.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parentClock</strong> &#8211; The parent clock for this clock.</li>
+<li><strong>tickRate</strong> &#8211; The tick rate (ticks per second) for this clock.</li>
+<li><strong>ticks</strong> &#8211; The starting tick value for this clock.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The specified starting tick value applies from the moment this object is initialised.</p>
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.adjustTicks">
+<tt class="descname">adjustTicks</tt><big>(</big><em>offset</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.adjustTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the tick count of this clock by the amount specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.bind">
+<tt class="descname">bind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind for notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; When this clock changes, the <a class="reference internal" href="#dvbcss.clock.TunableClock.notify" title="dvbcss.clock.TunableClock.notify"><tt class="xref py py-func docutils literal"><span class="pre">notify()</span></tt></a> method of this dependent will be called, passing a single argument that is this clock.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.getEffectiveSpeed">
+<tt class="descname">getEffectiveSpeed</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.getEffectiveSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the &#8216;effective speed&#8217; of this clock.</p>
+<p>This is equal to multiplying together the speed properties of this clock and all of the parents up to the root clock.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.TunableClock.nanos">
+<tt class="descname">nanos</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.nanos" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The tick count of this clock, but converted to units of nanoseconds, based on the current tick rate (but ignoring the <cite>speed</cite> property).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.nanosToTicks">
+<tt class="descname">nanosToTicks</tt><big>(</big><em>nanos</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.nanosToTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the supplied nanosecond to number of ticks given the current tick rate of this clock (but ignoring the <cite>speed</cite> property).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nanos</strong> &#8211; nanoseconds value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of ticks equivalent to the supplied nanosecond value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.notify">
+<tt class="descname">notify</tt><big>(</big><em>cause</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.notify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call to notify this clock that the clock on which it is based (its parent) has changed relative to the underlying timing source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cause</strong> &#8211; The clock that is calling this method.</td>
+</tr>
+</tbody>
+</table>
+<p>Will notify all dependents of this clock (entities that have registered themselves by calling <a class="reference internal" href="#dvbcss.clock.TunableClock.bind" title="dvbcss.clock.TunableClock.bind"><tt class="xref py py-func docutils literal"><span class="pre">bind()</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.TunableClock.slew">
+<tt class="descname">slew</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.slew" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an alternative method of querying or adjusting the speed property.</p>
+<p>The slew (in ticks per second) currently applied to this clock.</p>
+<p>Setting this property will set the speed property to correspond to the specified slew.</p>
+<p>For example: for a clock with tickRate of 100, then a slew of -25 corresponds to a speed of 0.75</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.TunableClock.tickRate">
+<tt class="descname">tickRate</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.tickRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read or change the tick rate (in ticks per second) of this clock. The value read is not affected by the value of the <tt class="xref py py-data docutils literal"><span class="pre">speed</span></tt> property.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.toOtherClockTicks">
+<tt class="descname">toOtherClockTicks</tt><big>(</big><em>otherClock</em>, <em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.toOtherClockTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws NoCommonClock:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there is no common ancestor clock (meaning it is not possible to convert</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.TunableClock.unbind">
+<tt class="descname">unbind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.TunableClock.unbind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unbind from notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; The dependent to unbind from receiving notifications.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="rangecorrelatedclock-clock-correlated-to-another-clock">
+<h3><a class="toc-backref" href="#id16"><strong>RangeCorrelatedClock</strong> - Clock correlated to another clock</a><a class="headerlink" href="#rangecorrelatedclock-clock-correlated-to-another-clock" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.clock.RangeCorrelatedClock">
+<em class="property">class </em><tt class="descclassname">dvbcss.clock.</tt><tt class="descname">RangeCorrelatedClock</tt><big>(</big><em>parentClock</em>, <em>tickRate</em>, <em>correlation1</em>, <em>correlation2</em>, <em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock" title="Permalink to this definition">¶</a></dt>
+<dd><p>A clock locked to the tick count of the parent clock by two different points of correlation.</p>
+<p>Each correlation is a tuple <cite>(parentTicks, selfTicks)</cite></p>
+<p>This relationship can be illustrated as follows:</p>
+<a class="reference internal image-reference" href="_images/range-correlated-clock.png"><img alt="_images/range-correlated-clock.png" class="align-center" src="_images/range-correlated-clock.png" style="width: 384pt;" /></a>
+<p>The tickRate you set is purely advisory - it is the tickRate reported to clocks that use this clock as the parent,
+and may differ from what the reality of the two correlations represents!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parentClock</strong> &#8211; The parent clock for this clock.</li>
+<li><strong>tickRate</strong> &#8211; The advisory tick rate (ticks per second) for this clock.</li>
+<li><strong>correlation1</strong> &#8211; (tuple(int, int)) The first point of correlation for this clock. A tuple (parent tick value, this clock tick value)</li>
+<li><strong>correlation2</strong> &#8211; (tuple(int, int)) The second point of correlation for this clock. A tuple (parent tick value, this clock tick value)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.clock.RangeCorrelatedClock.bind">
+<tt class="descname">bind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind for notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; When this clock changes, the <a class="reference internal" href="#dvbcss.clock.RangeCorrelatedClock.notify" title="dvbcss.clock.RangeCorrelatedClock.notify"><tt class="xref py py-func docutils literal"><span class="pre">notify()</span></tt></a> method of this dependent will be called, passing a single argument that is this clock.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.RangeCorrelatedClock.correlation1">
+<tt class="descname">correlation1</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.correlation1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read or change the first correlation tuple <cite>(parentTicks, selfTicks)</cite> of this clock to its parent clock.</p>
+<p>Assign a new tuple <cite>(parentTicks, selfTicks)</cite> to change the correlation. 
+This value must be a tuple, not a list.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.RangeCorrelatedClock.correlation2">
+<tt class="descname">correlation2</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.correlation2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read or change the first correlation tuple <cite>(parentTicks, selfTicks)</cite> of this clock to its parent clock.</p>
+<p>Assign a new tuple <cite>(parentTicks, selfTicks)</cite> to change the correlation. 
+This value must be a tuple, not a list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.RangeCorrelatedClock.getEffectiveSpeed">
+<tt class="descname">getEffectiveSpeed</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.getEffectiveSpeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the &#8216;effective speed&#8217; of this clock.</p>
+<p>This is equal to multiplying together the speed properties of this clock and all of the parents up to the root clock.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.RangeCorrelatedClock.nanos">
+<tt class="descname">nanos</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.nanos" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The tick count of this clock, but converted to units of nanoseconds, based on the current tick rate (but ignoring the <cite>speed</cite> property).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.RangeCorrelatedClock.nanosToTicks">
+<tt class="descname">nanosToTicks</tt><big>(</big><em>nanos</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.nanosToTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the supplied nanosecond to number of ticks given the current tick rate of this clock (but ignoring the <cite>speed</cite> property).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nanos</strong> &#8211; nanoseconds value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of ticks equivalent to the supplied nanosecond value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.RangeCorrelatedClock.notify">
+<tt class="descname">notify</tt><big>(</big><em>cause</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.notify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call to notify this clock that the clock on which it is based (its parent) has changed relative to the underlying timing source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cause</strong> &#8211; The clock that is calling this method.</td>
+</tr>
+</tbody>
+</table>
+<p>Will notify all dependents of this clock (entities that have registered themselves by calling <a class="reference internal" href="#dvbcss.clock.RangeCorrelatedClock.bind" title="dvbcss.clock.RangeCorrelatedClock.bind"><tt class="xref py py-func docutils literal"><span class="pre">bind()</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.clock.RangeCorrelatedClock.tickRate">
+<tt class="descname">tickRate</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.tickRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the tick rate (in ticks per second) of this clock. The value read is not affected by the value of the <tt class="xref py py-data docutils literal"><span class="pre">speed</span></tt> property.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.RangeCorrelatedClock.toOtherClockTicks">
+<tt class="descname">toOtherClockTicks</tt><big>(</big><em>otherClock</em>, <em>ticks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.toOtherClockTicks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws NoCommonClock:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there is no common ancestor clock (meaning it is not possible to convert</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.clock.RangeCorrelatedClock.unbind">
+<tt class="descname">unbind</tt><big>(</big><em>dependent</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/clock.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.clock.RangeCorrelatedClock.unbind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unbind from notification if this clock changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dependent</strong> &#8211; The dependent to unbind from receiving notifications.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Task.html" class="btn btn-neutral float-right" title="Task scheduling for clocks"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="monotonic_time.html" class="btn btn-neutral" title="Montonic time functions"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

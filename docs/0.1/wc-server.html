@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-WC Servers &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-WC protocol" href="wc.html"/>
+        <link rel="next" title="Clocks, Time and Scheduling modules" href="timing.html"/>
+        <link rel="prev" title="CSS-WC Clients" href="wc-client.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="wc.html">CSS-WC protocol</a> &raquo;</li>
+      
+    <li>CSS-WC Servers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/wc-server.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.server.wc"></span><div class="section" id="css-wc-servers">
+<h1>CSS-WC Servers<a class="headerlink" href="#css-wc-servers" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#example-usage" id="id2">Example usage</a></li>
+<li><a class="reference internal" href="#classes" id="id3">Classes</a><ul>
+<li><a class="reference internal" href="#wallclockserver" id="id4">WallClockServer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>Modules: <cite>dvbcss.protocol.server.wc</cite></p>
+<div class="contents local topic" id="id1">
+<ul class="simple">
+<li><a class="reference internal" href="#example-usage" id="id5">Example usage</a></li>
+<li><a class="reference internal" href="#classes" id="id6">Classes</a><ul>
+<li><a class="reference internal" href="#wallclockserver" id="id7">WallClockServer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="#dvbcss.protocol.server.wc.WallClockServer" title="dvbcss.protocol.server.wc.WallClockServer"><tt class="xref py py-class docutils literal"><span class="pre">WallClockServer</span></tt></a> class implements a standalone CSS-WC server.</p>
+<p>The server can be started and stopped. While running it runs in its own separate
+thread of execution in the background.</p>
+<p>An <a class="reference internal" href="examples.html"><em>example</em></a> server is provided in this package.</p>
+<div class="section" id="example-usage">
+<h2><a class="toc-backref" href="#id5">Example usage</a><a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<p>To use it, you need to provide a <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> object that represents the &#8220;wall clock&#8221;.
+Although it is not required, it is recommended to set the tick rate of that clock to
+match the required tick rate of the wall clock (1e9 ticks per second).</p>
+<p>First, create the clock and measure its precision:</p>
+<div class="highlight-python"><pre>from dvbcss.clock import SysClock, measurePrecision
+
+sysClock = SysClock(tickRate=1000000000)
+wallClock = sysClock
+
+precisionSecs = measurePrecision(wallClock)</pre>
+</div>
+<p>Next create and start the wall clock server. You must provide information on the maximum range of
+frequency error of the hardware clock underpinning the wall clock. This will depend on oscillator
+accuracy in the hardware the code is running on, and whether an NTP client is running (and
+which therefore may slew the clock).</p>
+<p>For example, here we assume the combined worst case of NTP client slew and hardware oscillator accuracy
+is approx 500 ppm:</p>
+<div class="highlight-python"><pre>from dvbcss.protocol.wc.server import WallClockServer
+
+mfe = 500
+
+wcServer = WallClockServer(wallClock, precisionSecs, mfe)
+wcServer.start()</pre>
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id6">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wallclockserver">
+<h3><a class="toc-backref" href="#id7">WallClockServer</a><a class="headerlink" href="#wallclockserver" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.server.wc.WallClockServer">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.wc.</tt><tt class="descname">WallClockServer</tt><big>(</big><em>wallClock</em>, <em>precision</em>, <em>maxFreqError</em>, <em>bindaddr='0.0.0.0'</em>, <em>bindport=6677</em>, <em>followup=False</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.WallClockServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A CSS-WC server.</p>
+<p>Pass it a <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> object and information on clock precision and frequency stability,
+and tell it which network interface to listen on.</p>
+<p>Call start() and stop() to start and stop the server. It runs in its own separate thread in the background.</p>
+<p>You can optionally ask this server to operate in a mode where it will send <em>follow-up</em> responses. Note, however, that
+in this implementation the transmit-timevalue reported in the follow-up response is not guaranteed to be more accurate.
+This option exists primarily to check whether a Wall Clock Client has implemennted handling of <em>follow-up</em>
+responses at all.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>wallClock</strong> &#8211; (:class:dvbcss.clock.ClockBase) The clock to be used as the wall clock for protocol interactions</li>
+<li><strong>precisionSecs</strong> &#8211; (float) The precision (in seconds) to be reported for the clock in protocol interactions</li>
+<li><strong>maxFreqErrorPpm</strong> &#8211; (float) The clock maximum frequency error in parts-per-million</li>
+<li><strong>bindaddr</strong> &#8211; (str, ip address) The ip address of the network interface to bind to, e.g. &#8220;127.0.0.1&#8221;. Defaults to &#8220;0.0.0.0&#8221; which binds to all interfaces.</li>
+<li><strong>bindport</strong> &#8211; (int) The port number to bind to (defaults to 6677)</li>
+<li><strong>followup</strong> &#8211; (bool) Set to True if the Wall Clock Server should send follow-up responses. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.protocol.server.wc.WallClockServer.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.WallClockServer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal method - the main runloop of the thread.</p>
+<p>Runs in a loop calling the <tt class="xref py py-func docutils literal"><span class="pre">handle()</span></tt> method of the object assigned to the <tt class="xref py py-data docutils literal"><span class="pre">handler</span></tt> property
+whenever a UDP packet is received.</p>
+<p>Does not return until the _pleaseStop attribute of the object has been set to True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.wc.WallClockServer.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.WallClockServer.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the wall clock server running. It runs in a thread in the background.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.wc.WallClockServer.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.WallClockServer.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the wall clock server running. Does not return until the thread has terminated.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="timing.html" class="btn btn-neutral float-right" title="Clocks, Time and Scheduling modules"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="wc-client.html" class="btn btn-neutral" title="CSS-WC Clients"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

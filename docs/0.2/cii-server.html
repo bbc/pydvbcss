@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-CII Servers &mdash; pydvbcss 0.2-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.2-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-CII protocol" href="cii.html"/>
+        <link rel="next" title="CSS-TS protocol" href="ts.html"/>
+        <link rel="prev" title="CSS-CII Clients" href="cii-client.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="cii.html">CSS-CII protocol</a> &raquo;</li>
+      
+    <li>CSS-CII Servers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/cii-server.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.server.cii"></span><div class="section" id="css-cii-servers">
+<h1>CSS-CII Servers<a class="headerlink" href="#css-cii-servers" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.protocol.server.cii</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#using-cii-server" id="id1">Using CII Server</a><ul>
+<li><a class="reference internal" href="#imports-and-initialisation" id="id2">1. Imports and initialisation</a></li>
+<li><a class="reference internal" href="#create-and-mount-the-cii-server" id="id3">2. Create and mount the CII server</a></li>
+<li><a class="reference internal" href="#start-cherrypy-running" id="id4">3. Start cherrypy running</a></li>
+<li><a class="reference internal" href="#setting-cii-state-and-pushing-it-to-connected-clients" id="id5">4. Setting CII state and pushing it to connected clients</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-does-ciiserver-do-for-you-and-what-does-it-not" id="id6">What does CIIServer do for you and what does it not?</a></li>
+<li><a class="reference internal" href="#classes" id="id7">Classes</a><ul>
+<li><a class="reference internal" href="#ciiserver-cii-server-handler-for-cherrypy" id="id8"><strong>CIIServer</strong> - CII Server handler for cherrypy</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer" title="dvbcss.protocol.server.cii.CIIServer"><tt class="xref py py-class docutils literal"><span class="pre">CIIServer</span></tt></a> class implements a CII server that can be plugged into the cherrypy
+web server engine.</p>
+<p>To create a CII Server, first create and mount the server in a cherrypy web server. Then
+you can start the cherrypy server and the CII server will start to accept connections from
+clients.
+While the server is running, update the CII state maintained by that server and instruct it when to push
+updates to all connected clients.</p>
+<p>An <a class="reference internal" href="examples.html"><em>example</em></a> server is provided in this package.</p>
+<div class="section" id="using-cii-server">
+<h2><a class="toc-backref" href="#id1">Using CII Server</a><a class="headerlink" href="#using-cii-server" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="imports-and-initialisation">
+<h3><a class="toc-backref" href="#id2">1. Imports and initialisation</a><a class="headerlink" href="#imports-and-initialisation" title="Permalink to this headline">¶</a></h3>
+<p>To run a CII server, you must import both ws4py&#8217;s cherrypy server and the <cite>dvbcss.protocol.server.cii</cite> module.
+When the <cite>dvbcss.protocol.server.cii</cite> module is imported, it will register as a &#8220;tool&#8221; with cherrypy, so it must
+be imported after cherrypy is imported.</p>
+<p>Next, subscribe the ws4py websocket plugin to cherrypy.</p>
+<div class="highlight-python"><pre>import cherrypy
+from ws4py.server.cherrypyserver import WebSocketPlugin
+from dvbcss.protocol.server.cii import CIIServer
+
+# initialise the ws4py websocket plugin
+WebSocketPlugin(cherrypy.engine).subscribe()</pre>
+</div>
+</div>
+<div class="section" id="create-and-mount-the-cii-server">
+<h3><a class="toc-backref" href="#id3">2. Create and mount the CII server</a><a class="headerlink" href="#create-and-mount-the-cii-server" title="Permalink to this headline">¶</a></h3>
+<p>You can now create an instance of a CIIServer and mount it into the cherrypy server at a path of your choosing.</p>
+<p>The configuration for that path must turn on the &#8220;dvb_cii&#8221; tool and pass a &#8220;handler_cls&#8221; argument whose value is the
+handler class that the CIIServer instance provides via the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.handler" title="dvbcss.protocol.server.cii.CIIServer.handler"><tt class="xref py py-data docutils literal"><span class="pre">CIIServer.handler</span></tt></a> attribute.</p>
+<p>For example, to create a CIIServer mounted at the URL path &#8220;/cii&#8221;:</p>
+<div class="highlight-python"><pre># create CII Server
+ciiServer = CIIServer(maxConnectionsAllowed=2)
+
+# bind it to the URL path /cii in the cherrypy server
+class Root(object):
+    @cherrypy.expose
+    def cii(self):
+        pass
+
+# construct the configuration for this path, providing the handler and turning on the tool hook
+cfg = {"/cii": {'tools.dvb_cii.on': True,
+                'tools.dvb_cii.handler_cls': ciiServer.handler
+               }
+      }
+
+cherrypy.tree.mount(Root(), "/", config=cfg)    </pre>
+</div>
+</div>
+<div class="section" id="start-cherrypy-running">
+<h3><a class="toc-backref" href="#id4">3. Start cherrypy running</a><a class="headerlink" href="#start-cherrypy-running" title="Permalink to this headline">¶</a></h3>
+<p>Start cherrypy running and our CII server will start to accept connections from clients:</p>
+<div class="highlight-python"><pre># configure cherrypy to serve on port 7681
+cherrypy.config.update({"server.socket_port":7681})
+
+# activate cherrypy web server (non blocking)
+cherrypy.engine.start()</pre>
+</div>
+<p>The cherrypy engine runs in a background thread when the cherrypy engine is started.</p>
+</div>
+<div class="section" id="setting-cii-state-and-pushing-it-to-connected-clients">
+<h3><a class="toc-backref" href="#id5">4. Setting CII state and pushing it to connected clients</a><a class="headerlink" href="#setting-cii-state-and-pushing-it-to-connected-clients" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="dvbcss.protocol.server.cii.CIIServer.cii"><tt class="xref py py-data docutils literal"><span class="pre">CIIServer.cii</span></tt></a> is a CII message object representing the CII state. Your code can read and alter the attributes of this
+message object to update the server side state.</p>
+<p>When a client first connects, a CII message object will automatically be sent to that client to send it the current CII state.
+Your code does not need to do this.</p>
+<p>If you update the CII state then you need to ask the CII server to push a change to all connected clients.
+To do this call the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.updateClients" title="dvbcss.protocol.server.cii.CIIServer.updateClients"><tt class="xref py py-func docutils literal"><span class="pre">CIIServer.updateClients()</span></tt></a>
+method. By default this will only push changes to CII state, and will not send a message at all if there is no change.
+However this behaviour can be overridden.</p>
+<div class="highlight-python"><pre>ciiServer.cii.contentId = "dvb://233a.1004.1080"
+ciiServer.cii.contentIdStatus = "partial"
+ciiServer.updateClients()
+
+...
+
+ciiServer.cii.contentId = "dvb://233a.1004.1080;21af~20131004T1015Z--PT01H00M"
+ciiServer.cii.contentIdStatus = "final"
+ciiServer.updateClients()</pre>
+</div>
+</div>
+</div>
+<div class="section" id="what-does-ciiserver-do-for-you-and-what-does-it-not">
+<h2><a class="toc-backref" href="#id6">What does CIIServer do for you and what does it not?</a><a class="headerlink" href="#what-does-ciiserver-do-for-you-and-what-does-it-not" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer" title="dvbcss.protocol.server.cii.CIIServer"><tt class="xref py py-class docutils literal"><span class="pre">CIIServer</span></tt></a> handles the connection and disconnection of clients without requiring any further intervention.
+It ensure the current state in its <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="dvbcss.protocol.server.cii.CIIServer.cii"><tt class="xref py py-data docutils literal"><span class="pre">cii</span></tt></a> property is sent, in a CII message, to the client as soon as it connects.</p>
+<p>The role of your code is to update the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="dvbcss.protocol.server.cii.CIIServer.cii"><tt class="xref py py-data docutils literal"><span class="pre">cii</span></tt></a> object as state changes, and to inform the CIIServer
+when it is time to update any connected clients by informing them of the changes to state by calling the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.updateClients" title="dvbcss.protocol.server.cii.CIIServer.updateClients"><tt class="xref py py-func docutils literal"><span class="pre">updateClients()</span></tt></a> method.</p>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id7">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ciiserver-cii-server-handler-for-cherrypy">
+<h3><a class="toc-backref" href="#id8"><strong>CIIServer</strong> - CII Server handler for cherrypy</a><a class="headerlink" href="#ciiserver-cii-server-handler-for-cherrypy" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.server.cii.CIIServer">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.cii.</tt><tt class="descname">CIIServer</tt><big>(</big><em>maxConnectionsAllowed=-1</em>, <em>enabled=True</em>, <em>initialCII=CII(protocolVersion='1.1')</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CIIServer class implements a server for the CSS-CII protocol. It transparently manages
+the connection and disconnection of clients and provides an interface for simply setting the
+CII state and requesting that it be pushed to any connected clients.</p>
+<p>Must be used in conjunction with a cherrypy web server:</p>
+<ol class="arabic">
+<li><p class="first">Ensure the ws4py <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py.server/#ws4py.server.cherrypyserver.WebSocketPlugin" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocketPlugin</span></tt></a> is subscribed, to the cherrypy server. E.g.</p>
+<div class="highlight-python"><pre>WebSocketPlugin(cherrypy.engine).subscribe()</pre>
+</div>
+</li>
+<li><p class="first">Mount the instance onto a particular URL path on a cherrypy web server. Set the config
+properties for the URL it is to be mounted at as follows:</p>
+<div class="highlight-python"><pre>{ 'tools.dvb_cii.on'         : True,
+  'tools.dvb_cii.handler_cls': myCiiServerInstance.handler }</pre>
+</div>
+</li>
+</ol>
+<p>Update the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="dvbcss.protocol.server.cii.CIIServer.cii"><tt class="xref py py-data docutils literal"><span class="pre">cii</span></tt></a> property with the CII state information and call the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.updateClients" title="dvbcss.protocol.server.cii.CIIServer.updateClients"><tt class="xref py py-func docutils literal"><span class="pre">updateClients()</span></tt></a> method to propagate state changes to
+any connected clients.</p>
+<p>When the server is &#8220;disabled&#8221; it will refuse attempts to connect by sending the HTTP status response 403 &#8220;Forbidden&#8221;.</p>
+<p>When the server has reached its connection limit, it will refuse attempts to connect by sending the HTTP status response 503 &#8220;Service unavailable&#8221;.</p>
+<p>This object provides properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.enabled" title="dvbcss.protocol.server.cii.CIIServer.enabled"><tt class="xref py py-data docutils literal"><span class="pre">enabled</span></tt></a> (read/write) controls whether this server is enabled or not</li>
+<li><a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="dvbcss.protocol.server.cii.CIIServer.cii"><tt class="xref py py-data docutils literal"><span class="pre">cii</span></tt></a> (read/write) the CII state that is being shared to connected clients</li>
+</ul>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>maxConnectionsAllowed</strong> &#8211; (int, default=-1) Maximum number of concurrent connections to be allowed, or -1 to allow as many connections as resources allow.</li>
+<li><strong>enabled</strong> &#8211; (bool, default=True) Whether the endpoint is initially enabled (True) or disabled (False)</li>
+<li><strong>initialCII</strong> &#8211; (<a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">dvbcss.protocol.cii.CII</span></tt></a>, default=CII(protocolVersion=&#8221;1.1&#8221;)) Initial value of CII state.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.cii.CIIServer.cii">
+<tt class="descname">cii</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">dvbcss.protocol.cii.CII</span></tt></a> message object representing current CII state.
+Set the attributes of this object to update that state.</p>
+<p>When <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.updateClients" title="dvbcss.protocol.server.cii.CIIServer.updateClients"><tt class="xref py py-func docutils literal"><span class="pre">updateClients()</span></tt></a> is called, it is this state that will be sent to connected clients.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.cii.CIIServer.handler">
+<tt class="descname">handler</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler class for new connections.</p>
+<p>When mounting the CII server with cherrypy, include in the config dict a key &#8216;tools.dvb_cii.handler_cls&#8217; with this handler class as the value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.cii.CIIServer.enabled">
+<tt class="descname">enabled</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></a>) Whether this server endpoint is enabled (True) or disabled (False).</p>
+<p>Set this property enable or disable the endpoint.</p>
+<p>When disabled, existing connections are closed with WebSocket closure reason code 1001
+and new attempts to connect will be refused with HTTP response status code 403 &#8220;Forbidden&#8221;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.cii.CIIServer.getConnections">
+<tt class="descname">getConnections</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.getConnections" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns dict:</th><td class="field-body">mapping a <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a> object to connection related data for all connections to this server. The dict can be updated.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.cii.CIIServer.onClientConnect">
+<tt class="descname">onClientConnect</tt><big>(</big><em>webSock</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.onClientConnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>If you override this method you must call the base class implementation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.cii.CIIServer.onClientDisconnect">
+<tt class="descname">onClientDisconnect</tt><big>(</big><em>webSock</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.onClientDisconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>If you override this method you must call the base class implementation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.cii.CIIServer.onClientMessage">
+<tt class="descname">onClientMessage</tt><big>(</big><em>webSock</em>, <em>message</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.onClientMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>If you override this method you must call the base class implementation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.cii.CIIServer.updateClients">
+<tt class="descname">updateClients</tt><big>(</big><em>sendOnlyDiff=True</em>, <em>sendIfEmpty=False</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.cii.CIIServer.updateClients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send update of current CII state from the <a class="reference internal" href="#dvbcss.protocol.server.cii.CIIServer.cii" title="dvbcss.protocol.server.cii.CIIServer.cii"><tt class="xref py py-data docutils literal"><span class="pre">CIIServer.cii</span></tt></a> object to all connected clients.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sendOnlyDiff</strong> &#8211; (bool, default=True) Send only the properties in the CII state that have changed since last time a message was sent. Set to False to send the entire message.</li>
+<li><strong>sendIfEmpty</strong> &#8211; (bool, default=False) Set to True to force that a CII message be sent, even if it will be empty (e.g. no change since last time)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>By default this method will only send a CII message to clients informing them of the differencesin state since last time a message was sent to them.
+If no properties have changed at all, then no message will be sent.</p>
+<p>The two optional arguments allow you to change this behaviour. For example, to force the messages sent to include all properties, even if they have not changed:</p>
+<div class="highlight-python"><pre>myCiiServer.updateClients(sendOnlyDiff=False)</pre>
+</div>
+<p>To additionally force it to send even if the CII state held at this server has no values for any of the properties:</p>
+<div class="highlight-python"><pre>myCiiServer.updateClients(sendOnlyDiff=False, sendIfEmpty=True)</pre>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ts.html" class="btn btn-neutral float-right" title="CSS-TS protocol"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cii-client.html" class="btn btn-neutral" title="CSS-CII Clients"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

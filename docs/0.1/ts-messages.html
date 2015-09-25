@@ -1,0 +1,584 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-TS Message objects &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-TS protocol" href="ts.html"/>
+        <link rel="next" title="CSS-TS Clients" href="ts-client.html"/>
+        <link rel="prev" title="CSS-TS Protocol overview" href="ts-overview.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="ts.html">CSS-TS protocol</a> &raquo;</li>
+      
+    <li>CSS-TS Message objects</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/ts-messages.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.ts"></span><div class="section" id="css-ts-message-objects">
+<h1>CSS-TS Message objects<a class="headerlink" href="#css-ts-message-objects" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.protocol.ts</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#examples" id="id1">Examples</a></li>
+<li><a class="reference internal" href="#infinity" id="id2">+/- infinity</a></li>
+<li><a class="reference internal" href="#classes" id="id3">Classes</a><ul>
+<li><a class="reference internal" href="#setup-data" id="id4">setup-data</a></li>
+<li><a class="reference internal" href="#control-timestamp" id="id5">Control Timestamp</a></li>
+<li><a class="reference internal" href="#apteptlpt-actual-earliest-and-latest-presentation-timestamp" id="id6">AptEptLpt (Actual, Earliest and Latest Presentation Timestamp)</a></li>
+<li><a class="reference internal" href="#timestamp" id="id7">Timestamp</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>A <a class="reference internal" href="#dvbcss.protocol.ts.SetupData" title="dvbcss.protocol.ts.SetupData"><tt class="xref py py-class docutils literal"><span class="pre">SetupData</span></tt></a> object represents a setup-data message sent by a client to a server
+immediately after opening a CSS-TS protocol connection.</p>
+<p>A <a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> object represents a Control Timestamp message sent by the server
+to the client.</p>
+<p>A <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt" title="dvbcss.protocol.ts.AptEptLpt"><tt class="xref py py-class docutils literal"><span class="pre">AptEptLpt</span></tt></a> object represents an Actual, Earliest and Latest Presentation Timestamp
+message that may be sent by a client to the server.</p>
+<p>The <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a> objects are used in the above message objects to represent the
+relationship between wall clock time and content (timeline) time.</p>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id1">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>SetupData examples:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; from dvbcss.protocol.ts import SetupData
+&gt;&gt;&gt; from dvbcss.protocol import OMIT
+
+&gt;&gt;&gt; s = SetupData(timelineSelector="urn:dvb:css:timeline:pts", ciStem="dvb://1004")
+&gt;&gt;&gt; s.pack()
+'{"timelineSelector": "urn:dvb:css:timeline:pts", "contentIdStem": "dvb://1004"}'</pre>
+</div>
+<div class="highlight-python"><pre>&gt;&gt;&gt; jsonMessage = \"""\
+... { "timelineSelector":"urn:dvb:css:timeline:temi:1:1",
+...   "contentIdStem":""
+... }
+... \"""
+&gt;&gt;&gt; SetupData.unpack(jsonMessage)
+SetupData(ciStem="", timelineSelector="urn:dvb:css:timeline:temi:1:1", private=OMIT)</pre>
+</div>
+<p>ControlTimestamp examples:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; from dvbcss.protocol.ts import ControlTimestamp, Timestamp
+
+&gt;&gt;&gt; t = Timestamp(contentTime=12345, wallClockTime=900028432)
+&gt;&gt;&gt; ct = ControlTimestamp(timestamp=t, timelineSpeedMultiplier=1)
+&gt;&gt;&gt; ct.pack()
+'{"timelineSpeedMultiplier": 1.0, "wallClockTime": "900028432", "contentTime": "12345"}'</pre>
+</div>
+<div class="highlight-python"><pre>&gt;&gt;&gt; jsonMessage = \"""\
+... { "contentTime" : "1003847",
+...   "wallClockTime" : "348957623498576",
+...   "timelineSpeedMultiplier" : 2.0
+... }
+... \"""
+&gt;&gt;&gt; c = ControlTimestamp.unpack(jsonMessage)
+&gt;&gt;&gt; c.timestamp.contentTime
+1003847
+&gt;&gt;&gt; c.timestamp.wallClockTime
+348957623498576
+&gt;&gt;&gt; c.timelineSpeedMultiplier
+2.0</pre>
+</div>
+<p>Actual, Earliest and Latest Presentation Timestamp examples:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; from dvbcss.protocol.ts import AptEptLpt, Timestamp
+
+&gt;&gt;&gt; te = Timestamp(contentTime=123465, wallClockTime=float("-inf"))
+&gt;&gt;&gt; tl = Timestamp(contentTime=123465, wallClockTime=float("+inf"))
+&gt;&gt;&gt; ael = AptEptLpt(earliest=te, latest=tl)
+&gt;&gt;&gt; ael.pack()
+'{"earliest": {"wallClockTime": "minusinfinity", "contentTime": "123465"}, "latest": {"wallClockTime": "plusinfinity", "contentTime": "123465"}}'</pre>
+</div>
+<div class="highlight-python"><pre>&gt;&gt;&gt; jsonMessage = \"""\
+... { "earliest" : { "contentTime" : "1000", "wallClockTime": "10059237" },
+...   "latest"   : { "contentTime" : "1000", "wallClockTime": "19284782" },
+...   "actual"   : { "contentTime" : "1005", "wallClockTime": "10947820" }
+... }
+... \"""
+&gt;&gt;&gt; ael=AptEptLpt.unpack(jsonMessage)
+&gt;&gt;&gt; ael.actual.contentTime
+1005
+&gt;&gt;&gt; ael.actual.wallClockTime
+10947820</pre>
+</div>
+</div>
+<div class="section" id="infinity">
+<span id="plus-minus-infinity"></span><h2><a class="toc-backref" href="#id2">+/- infinity</a><a class="headerlink" href="#infinity" title="Permalink to this headline">¶</a></h2>
+<p>For certain timestamp messages it is permissible to convey a time value that is either plus or minus infinity.
+Use the python <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> to express these values as follows:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; float("+inf")
+inf
+
+&gt;&gt;&gt; float("-inf")
+-inf</pre>
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id3">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="setup-data">
+<h3><a class="toc-backref" href="#id4">setup-data</a><a class="headerlink" href="#setup-data" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="class">
+<dt id="dvbcss.protocol.ts.SetupData">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.ts.</tt><tt class="descname">SetupData</tt><big>(</big><em>contentIdStem</em>, <em>timelineSelector</em>, <em>private=OMIT</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.SetupData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a CSS-TS Setup-Data message.</p>
+<p>This carries a content identifier stem and a timeline selector string, and is used, in effect,
+to request the timeline to be synchronised to via the CSS-TS protocol.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>contentIdStem</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The content identifier stem.</li>
+<li><strong>timelineSelector</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The timeline selector</li>
+<li><strong>private</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="protocol.html#private-data"><em>Signalling that a property is to be omitted from a message</em></a>) &#8211; Optional private data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The attributes of the object have the same name as the SetupData message properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.ts.SetupData.contentIdStem" title="dvbcss.protocol.ts.SetupData.contentIdStem"><tt class="xref py py-data docutils literal"><span class="pre">contentIdStem</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.ts.SetupData.timelineSelector" title="dvbcss.protocol.ts.SetupData.timelineSelector"><tt class="xref py py-data docutils literal"><span class="pre">timelineSelector</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.ts.SetupData.private" title="dvbcss.protocol.ts.SetupData.private"><tt class="xref py py-data docutils literal"><span class="pre">private</span></tt></a></li>
+</ul>
+<p>Converting to and from JSON representation is performed using the <a class="reference internal" href="#dvbcss.protocol.ts.SetupData.pack" title="dvbcss.protocol.ts.SetupData.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> method and <a class="reference internal" href="#dvbcss.protocol.ts.SetupData.unpack" title="dvbcss.protocol.ts.SetupData.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> class method.
+Properties set to equal <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> will be omitted when the message
+is packed to a JSON representation.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.SetupData.contentIdStem">
+<tt class="descname">contentIdStem</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.SetupData.contentIdStem" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) The stem (subset starting from the LHS) of a content identifier</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.SetupData.timelineSelector">
+<tt class="descname">timelineSelector</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.SetupData.timelineSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) The timeline selector</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.SetupData.private">
+<tt class="descname">private</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.SetupData.private" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="protocol.html#private-data"><em>Signalling that a property is to be omitted from a message</em></a>) Optional private data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.ts.SetupData.pack">
+<tt class="descname">pack</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.SetupData.pack" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string containing JSON representation of this message.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if there are values for properties that are not permitted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.ts.SetupData.unpack">
+<em class="property">classmethod </em><tt class="descname">unpack</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.SetupData.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert JSON string representation of this message encoded as a <a class="reference internal" href="#dvbcss.protocol.ts.SetupData" title="dvbcss.protocol.ts.SetupData"><tt class="xref py py-class docutils literal"><span class="pre">SetupData</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if not possible.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="control-timestamp">
+<h3><a class="toc-backref" href="#id5">Control Timestamp</a><a class="headerlink" href="#control-timestamp" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="class">
+<dt id="dvbcss.protocol.ts.ControlTimestamp">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.ts.</tt><tt class="descname">ControlTimestamp</tt><big>(</big><em>timestamp</em>, <em>timelineSpeedMultiplier</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.ControlTimestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a CSS-TS Control Timestamp message.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timestamp</strong> (<em>Timestamp</em>) &#8211; carries the <cite>contentTime</cite> and <cite>wallClockTime</cite> properties of the Control Timestamp</li>
+<li><strong>timelineSpeedMultiplier</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/constants.html#None" title="(in Python v2.7)"><tt class="xref py py-obj docutils literal"><span class="pre">None</span></tt></a>) &#8211; the timeline speed multiplier</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The attributes of the object have the following relationship to the message properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp.timestamp" title="dvbcss.protocol.ts.ControlTimestamp.timestamp"><tt class="xref py py-data docutils literal"><span class="pre">timestamp</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp.timelineSpeedMultiplier" title="dvbcss.protocol.ts.ControlTimestamp.timelineSpeedMultiplier"><tt class="xref py py-data docutils literal"><span class="pre">timelineSpeedMultiplier</span></tt></a></li>
+</ul>
+<p>Converting to and from JSON representation is performed using the <a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp.pack" title="dvbcss.protocol.ts.ControlTimestamp.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> method and <a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp.unpack" title="dvbcss.protocol.ts.ControlTimestamp.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> class method.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.ControlTimestamp.timestamp">
+<tt class="descname">timestamp</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.ControlTimestamp.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a> object representing the contentTime and wallClockTime parts of the timestamp)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.ControlTimestamp.timelineSpeedMultiplier">
+<tt class="descname">timelineSpeedMultiplier</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.ControlTimestamp.timelineSpeedMultiplier" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/constants.html#None" title="(in Python v2.7)"><tt class="xref py py-obj docutils literal"><span class="pre">None</span></tt></a>) Timeline speed. For example: 1 = normal, 0 = pause, -0.5 = half speed reverse. Use <cite>None</cite> only when the Control Timestamp is supposed to indicate that the timeline is unavailable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.ts.ControlTimestamp.pack">
+<tt class="descname">pack</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.ControlTimestamp.pack" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string containing JSON representation of this message.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if there are values for properties that are not permitted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.ts.ControlTimestamp.unpack">
+<em class="property">classmethod </em><tt class="descname">unpack</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.ControlTimestamp.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert JSON string representation of this message encoded as a <a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if not possible.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="apteptlpt-actual-earliest-and-latest-presentation-timestamp">
+<h3><a class="toc-backref" href="#id6">AptEptLpt (Actual, Earliest and Latest Presentation Timestamp)</a><a class="headerlink" href="#apteptlpt-actual-earliest-and-latest-presentation-timestamp" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="class">
+<dt id="dvbcss.protocol.ts.AptEptLpt">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.ts.</tt><tt class="descname">AptEptLpt</tt><big>(</big><em>actual=OMIT</em>, <em>earliest=Timestamp(contentTime=0</em>, <em>wallClockTime=-inf)</em>, <em>latest=Timestamp(contentTime=0</em>, <em>wallClockTime=inf)</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.AptEptLpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a CSS-TS Actual, Earliest and Latest Presentation Timestamp message.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>actual</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) &#8211; Optional timestamp representing the actual presentation timing</li>
+<li><strong>earliest</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) &#8211; Timestamp representing the earliest possible presentation timing</li>
+<li><strong>latest</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) &#8211; Timestamp representing the latest possible presentation timing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>For the <em>actual presentation timestamp</em>, the contentTime and wallClockTime must both be non-null integer values.</p>
+<p>For the <em>earliest presentation timestamp</em>, the contentTime must be a non-null integer. wallClockTime can be a
+non-null integer or <a class="reference internal" href="#plus-minus-infinity"><em>plus infinity</em></a></p>
+<p>For the <em>latest presentation timestamp</em>, the contentTime must be a non-null integer. wallClockTime can be a
+non-null integer or <a class="reference internal" href="#plus-minus-infinity"><em>minus infinity</em></a></p>
+<p>The attributes of the object have the same names as the Actual, Earliest and Latest presentation timestamp message properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt.actual" title="dvbcss.protocol.ts.AptEptLpt.actual"><tt class="xref py py-data docutils literal"><span class="pre">actual</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt.earliest" title="dvbcss.protocol.ts.AptEptLpt.earliest"><tt class="xref py py-data docutils literal"><span class="pre">earliest</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt.latest" title="dvbcss.protocol.ts.AptEptLpt.latest"><tt class="xref py py-data docutils literal"><span class="pre">latest</span></tt></a></li>
+</ul>
+<p>Converting to and from JSON representation is performed using the <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt.pack" title="dvbcss.protocol.ts.AptEptLpt.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> method and <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt.unpack" title="dvbcss.protocol.ts.AptEptLpt.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> class method.
+If values of properties do not meet the requirements described above, then <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt.pack" title="dvbcss.protocol.ts.AptEptLpt.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> will raise <tt class="xref py py-class docutils literal"><span class="pre">ValueError</span></tt> exceptions.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.AptEptLpt.actual">
+<tt class="descname">actual</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.AptEptLpt.actual" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt> or <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) Actual presentation timestamp</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.AptEptLpt.earliest">
+<tt class="descname">earliest</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.AptEptLpt.earliest" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) Earliest presentation timestamp. The wallClockTime property must be an <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">float(&quot;+inf&quot;)</span></tt>. It must not be <tt class="xref py py-class docutils literal"><span class="pre">float(&quot;-inf&quot;)</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.AptEptLpt.latest">
+<tt class="descname">latest</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.AptEptLpt.latest" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="#dvbcss.protocol.ts.Timestamp" title="dvbcss.protocol.ts.Timestamp"><tt class="xref py py-class docutils literal"><span class="pre">Timestamp</span></tt></a>) Latest presentation timestamp. The wallClockTime property must be an <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">float(&quot;-inf&quot;)</span></tt>. It must not be <tt class="xref py py-class docutils literal"><span class="pre">float(&quot;+inf&quot;)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.ts.AptEptLpt.pack">
+<tt class="descname">pack</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.AptEptLpt.pack" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string containing JSON representation of this message.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if there are values for properties that are not permitted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.ts.AptEptLpt.unpack">
+<em class="property">classmethod </em><tt class="descname">unpack</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.AptEptLpt.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert JSON string representation of this message encoded as a <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt" title="dvbcss.protocol.ts.AptEptLpt"><tt class="xref py py-class docutils literal"><span class="pre">AptEptLpt</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if not possible.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="timestamp">
+<h3><a class="toc-backref" href="#id7">Timestamp</a><a class="headerlink" href="#timestamp" title="Permalink to this headline">¶</a></h3>
+<p>This object does not directly represent a message, but is instead used by <a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> and <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt" title="dvbcss.protocol.ts.AptEptLpt"><tt class="xref py py-class docutils literal"><span class="pre">AptEptLpt</span></tt></a>
+as a representation of a correlation between a content time and a wall clock time.</p>
+<blockquote>
+<div><dl class="class">
+<dt id="dvbcss.protocol.ts.Timestamp">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.ts.</tt><tt class="descname">Timestamp</tt><big>(</big><em>contentTime</em>, <em>wallClockTime</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.Timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a Timestamp part(s) of a <a class="reference internal" href="#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> or <a class="reference internal" href="#dvbcss.protocol.ts.AptEptLpt" title="dvbcss.protocol.ts.AptEptLpt"><tt class="xref py py-class docutils literal"><span class="pre">AptEptLpt</span></tt></a> object.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>contentTime</strong> (<a class="reference external" href="http://docs.python.org/library/constants.html#None" title="(in Python v2.7)"><tt class="xref py py-obj docutils literal"><span class="pre">None</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) &#8211; The content time (time on timeline) part of a timestamp</li>
+<li><strong>wallClockTime</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> or <a class="reference internal" href="#plus-minus-infinity"><em>+/- infinity</em></a> <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> (&#8220;+inf&#8221;) or <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> (&#8220;-inf&#8221;)) &#8211; The wall clock time part of a timestamp</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The values for contentTime and wallClockTime are allowed to be arbitrarily large precision integers because they are carried as a string
+in the JSON representation.</p>
+<p>The attributes of the object have the same name as the corresponding message properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.ts.Timestamp.contentTime" title="dvbcss.protocol.ts.Timestamp.contentTime"><tt class="xref py py-data docutils literal"><span class="pre">contentTime</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.ts.Timestamp.wallClockTime" title="dvbcss.protocol.ts.Timestamp.wallClockTime"><tt class="xref py py-data docutils literal"><span class="pre">wallClockTime</span></tt></a></li>
+</ul>
+<p>Converting to and from JSON representation is performed using the <tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt> method and <tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt> class method.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.Timestamp.contentTime">
+<tt class="descname">contentTime</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.Timestamp.contentTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/constants.html#None" title="(in Python v2.7)"><tt class="xref py py-obj docutils literal"><span class="pre">None</span></tt></a> or large <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) The content time part of a timestamp</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.ts.Timestamp.wallClockTime">
+<tt class="descname">wallClockTime</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.ts.Timestamp.wallClockTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write large <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">float(&quot;+inf&quot;)</span></tt> or <tt class="xref py py-class docutils literal"><span class="pre">float(&quot;-inf&quot;)</span></tt> ) The wall clock time part of a timestamp</p>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ts-client.html" class="btn btn-neutral float-right" title="CSS-TS Clients"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ts-overview.html" class="btn btn-neutral" title="CSS-TS Protocol overview"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

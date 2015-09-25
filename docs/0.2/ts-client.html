@@ -1,0 +1,667 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-TS Clients &mdash; pydvbcss 0.2-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.2-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-TS protocol" href="ts.html"/>
+        <link rel="next" title="CSS-TS Servers" href="ts-server.html"/>
+        <link rel="prev" title="CSS-TS Message objects" href="ts-messages.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="ts.html">CSS-TS protocol</a> &raquo;</li>
+      
+    <li>CSS-TS Clients</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/ts-client.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.client.ts"></span><div class="section" id="css-ts-clients">
+<h1>CSS-TS Clients<a class="headerlink" href="#css-ts-clients" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.protocol.client.ts</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#using-tsclientclockcontroller" id="id1">Using TSClientClockController</a></li>
+<li><a class="reference internal" href="#using-tsclientconnection" id="id2">Using TSClientConnection</a></li>
+<li><a class="reference internal" href="#classes" id="id3">Classes</a><ul>
+<li><a class="reference internal" href="#tsclientconnection" id="id4"><strong>TSClientConnection</strong></a></li>
+<li><a class="reference internal" href="#tsclientclockcontroller" id="id5"><strong>TSClientClockController</strong></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>There are two classes provided for implementing CSS-TS clients:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController" title="dvbcss.protocol.client.ts.TSClientClockController"><tt class="xref py py-class docutils literal"><span class="pre">TSClientClockController</span></tt></a> wraps a TSClientConnection and provides a higher level interface that
+provides information about timeline availability and drives a <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> object to match the
+timeline.</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection" title="dvbcss.protocol.client.ts.TSClientConnection"><tt class="xref py py-class docutils literal"><span class="pre">TSClientConnection</span></tt></a> implements the core functionality of connecting to a CSS-TS server
+and providing methods and callbacks to manage the connection and send and receive <a class="reference internal" href="ts-messages.html#module-dvbcss.protocol.ts" title="dvbcss.protocol.ts"><tt class="xref py py-mod docutils literal"><span class="pre">timestamp</span></tt></a>
+messages.</li>
+</ul>
+<p>An <a class="reference internal" href="examples.html"><em>example</em></a> client is provided in this package that uses the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController" title="dvbcss.protocol.client.ts.TSClientClockController"><tt class="xref py py-class docutils literal"><span class="pre">TSClientClockController</span></tt></a> class.</p>
+<div class="section" id="using-tsclientclockcontroller">
+<h2><a class="toc-backref" href="#id1">Using TSClientClockController</a><a class="headerlink" href="#using-tsclientclockcontroller" title="Permalink to this headline">¶</a></h2>
+<p>This class provides a high level interface that drives a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object to match
+the timeline provided by a CSS-TS server. Subclass to get notifications of connection, disconnection and timing
+changes or changes in timeline availability.</p>
+<p>Create it, passing the URL of the server to connect to, and a <tt class="xref py py-class docutils literal"><span class="pre">connect</span></tt> and
+<a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.disconnect" title="dvbcss.protocol.client.ts.TSClientClockController.disconnect"><tt class="xref py py-func docutils literal"><span class="pre">disconnect()</span></tt></a> to connect and disconnect from the server.</p>
+<p>The clock you provide must be a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object and the parent clock of that clock must represent
+the <em>wall clock</em>. The tick rate of this clock must match that of the timeline and the tick rate of the wall clock
+must be 1 tick per nanosecond (1e9 ticks per second).
+This should therefore be used in conjunction with a
+<tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt> to ensure the wall clock is meaningfully synchronised to the same server.</p>
+<p>The <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController" title="dvbcss.protocol.client.ts.TSClientClockController"><tt class="xref py py-class docutils literal"><span class="pre">TSClientClockController</span></tt></a> object maintains the connection and automatically adjusts the
+<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.correlation" title="dvbcss.clock.CorrelatedClock.correlation"><tt class="xref py py-data docutils literal"><span class="pre">correlation</span></tt></a> of the clock to synchronise it, using the information in the
+Control Timestamps received from the server.
+It also adjust the <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.tickRate" title="dvbcss.clock.CorrelatedClock.tickRate"><tt class="xref py py-func docutils literal"><span class="pre">tickRate()</span></tt></a> to match speed changes of the timeline.</p>
+<p>You can set a minimum threshold for how much the timing must change before the the timeline clock will be adjusted.</p>
+<p>You can also provide separate clock objects to represent the earliest and latest presentation timings that your
+application can achieve (and that you wish to convey to the server). These must also be
+<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> objects. Use the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.sendAptEptLpt" title="dvbcss.protocol.client.ts.TSClientClockController.sendAptEptLpt"><tt class="xref py py-func docutils literal"><span class="pre">TSClientClockController.sendAptEptLpt()</span></tt></a> method to
+cause that information to be sent to the server.</p>
+<p>A simple example:</p>
+<div class="highlight-python"><pre>from dvbcss.protocol.client.ts import TSClientClockController
+from dvbcss.clock import CorrelatedClock, SysClock
+
+sysClock = SysClock()
+wallClock = CorrelatedClock(parent=sysClock, tickRate=1000000000)  # 1 nanosecond per tick
+timelineClock = CorrelatedClock(parent=wallClock, tickRate=90000)  # will represent PTS
+
+# NOTE: need a Wall Clock Client too (not shown in this example)
+#       to ensure wallClock is synchronised 
+
+class MyTSClient(TSClientClockController):
+    
+    def onConnected(self):
+        print "Conected!"
+    
+    def onDisconnected(self):
+        print "Disconnected :-("
+    
+    def onTimelineAvailable(self):
+        print "Timeline is available!"
+        
+    def onTimelineUnavailable(self):
+        print "Timeline is not available :-("
+
+    def onTimingChange(self, speedHasChanged):
+        print "Timing of clock has been adjusted."
+        if speedHasChanged:
+            print "The speed of the clock has altered."
+            
+# make connection. Want PTS timeline for any DVB service.
+client = MyTSClient("ws://192.168.1.1:7682/ts",
+                    "dvb://",
+                    "urn:dvb:css:timeline:pts",
+                    timelineClock)
+client.connect()
+
+for i in range(0,60):
+    time.sleep(1)
+    print "Timeline available?", client.timelineAvailable
+    print "Timeline currently at tick value = ", timelineClock.ticks
+    
+client.disconnect()</pre>
+</div>
+<p>The client runs in a separate thread managed by the websocket client library, so the <cite>onXXX</cite> methods are called while the main thread sleeps.</p>
+</div>
+<div class="section" id="using-tsclientconnection">
+<h2><a class="toc-backref" href="#id2">Using TSClientConnection</a><a class="headerlink" href="#using-tsclientconnection" title="Permalink to this headline">¶</a></h2>
+<p>This class provides the lowest level interface to a CSS-TS server. It only implements
+the parsing of incoming Control Timestamp messages and sending of outgoing Actual, Earliest
+and Latest Presentation Timestamp messages. It does not try to understand the meaning of the
+messages sent or received.</p>
+<p>You can use the class either by subclassing and overriding the various stub methods or by
+creating an instance and replacing the stub methods with your own function handlers dynamically.</p>
+<p>Pass the WebSocket URL of the CSS-TS server during initialisation then call the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.connect" title="dvbcss.protocol.client.ts.TSClientConnection.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a>
+and <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.disconnect" title="dvbcss.protocol.client.ts.TSClientConnection.disconnect"><tt class="xref py py-func docutils literal"><span class="pre">disconnect()</span></tt></a> methods to connect and disconnect from the server.
+The <cite>onXXX()</cite> methods are called when connection or disconnection takes place, if there is a protocol
+error (e.g. a message was received that could not be parsed as Control Timestamp) or a new Control Timestamp is
+received.</p>
+<p>A simple example:</p>
+<div class="highlight-python"><pre>from dvbcss.protocol.client.ts import TSClientConnection
+from dvbcss.protocol.ts import AptEptLpt
+from dvbcss.protocol import OMIT
+
+class MyClientConnection(TSClientConnection):
+    def onConnected(self):
+        print "Connected!"
+        e = Timestamp(0, float("-inf"))
+        l = Timestamp(0, float("+inf"))
+        aptEptLpt = AptEptLpt(earliest=e, latest=l, actual=OMIT)
+        client.sendTimestamp(aptEptLpt)
+        
+    def onDisconnected(self, code, reason):
+        print "Disconnected :-("
+        
+    def onControlTimestamp(self, ct):
+        print "Received a ControlTimestamp: "+str(ct)
+
+# make connection. Want PTS timeline for any DVB service.
+client = MyTSClientConnection("ws://127.0.0.1/ts", "dvb://", "urn:dvb:css:timeline:pts")
+client.connect()
+
+time.sleep(60)      # run only for 60 seconds then disconnect
+
+client.disconnect()</pre>
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id3">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tsclientconnection">
+<h3><a class="toc-backref" href="#id4"><strong>TSClientConnection</strong></a><a class="headerlink" href="#tsclientconnection" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.ts.</tt><tt class="descname">TSClientConnection</tt><big>(</big><em>url</em>, <em>contentIdStem</em>, <em>timelineSelector</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple object for connecting to a CSS-TS server (an MSAS) and handling the connection.</p>
+<p>Use by subclassing and overriding the following methods or assigning your own functions to them at runtime:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.onConnected" title="dvbcss.protocol.client.ts.TSClientConnection.onConnected"><tt class="xref py py-func docutils literal"><span class="pre">onConnected()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.onDisconnected" title="dvbcss.protocol.client.ts.TSClientConnection.onDisconnected"><tt class="xref py py-func docutils literal"><span class="pre">onDisconnected()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.onControlTimestamp" title="dvbcss.protocol.client.ts.TSClientConnection.onControlTimestamp"><tt class="xref py py-func docutils literal"><span class="pre">onControlTimestamp()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.onProtocolError" title="dvbcss.protocol.client.ts.TSClientConnection.onProtocolError"><tt class="xref py py-func docutils literal"><span class="pre">onProtocolError()</span></tt></a></li>
+</ul>
+<p>If you do not wish to subclass, you can instead create an instance of this class and replace the methods listed above with your own functions dynamically.</p>
+<p>Use the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.sendTimestamp" title="dvbcss.protocol.client.ts.TSClientConnection.sendTimestamp"><tt class="xref py py-func docutils literal"><span class="pre">sendTimestamp()</span></tt></a> method to send Actual, Earliest and Latest Presentation Timestamps to the server.</p>
+<p>This class has the following properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientConnection.connected" title="dvbcss.protocol.client.ts.TSClientConnection.connected"><tt class="xref py py-data docutils literal"><span class="pre">connected</span></tt></a> (read only) whether the client is connected or not</li>
+</ul>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The WebSocket URL of the TS Server to connect to. E.g. &#8220;ws://127.0.0.1/mysystem/ts&#8221;</li>
+<li><strong>contentIdStem</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The stem of the content id to be included in the SetupData message that is sent as soon as the connection is opened.</li>
+<li><strong>timelineSelector</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The timeline selector to be included in the SetupData message that is sent as soon as the connection is opened.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ConnectionError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there was a problem and the connection could not be opened.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.connected">
+<tt class="descname">connected</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This property is True if the connection is connect, otherwise False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><em>code=1001</em>, <em>reason=''</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>code</strong> &#8211; (optional <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) The connection closure code to be sent in the WebSocket disconnect frame</li>
+<li><strong>reason</strong> &#8211; (optional <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) The human readable reason for the closure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.onConnected">
+<tt class="descname">onConnected</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.onConnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is opened and the setup-data message has been sent.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.onControlTimestamp">
+<tt class="descname">onControlTimestamp</tt><big>(</big><em>controlTimestamp</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.onControlTimestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when a Control Timestamp message is received from the server.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>controlTimestamp</strong> &#8211; A <a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> object representing the received message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.onDisconnected">
+<tt class="descname">onDisconnected</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.onDisconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is closed.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.onProtocolError">
+<tt class="descname">onProtocolError</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.onProtocolError" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when there has been an error in the use of the TS protocol - e.g. receiving the wrong kind of message.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> description of the problem.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientConnection.sendTimestamp">
+<tt class="descname">sendTimestamp</tt><big>(</big><em>aptEptLpt</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientConnection.sendTimestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send an Actual, Earliest and Latest Presentation Timestamp message to the TS Server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>aptEptLpt</strong> &#8211; The <a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.AptEptLpt" title="dvbcss.protocol.ts.AptEptLpt"><tt class="xref py py-class docutils literal"><span class="pre">AptEptLpt</span></tt></a> object representing the Actual, Earliest and Latest Presentation Timestamp to be sent.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tsclientclockcontroller">
+<h3><a class="toc-backref" href="#id5"><strong>TSClientClockController</strong></a><a class="headerlink" href="#tsclientclockcontroller" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.ts.</tt><tt class="descname">TSClientClockController</tt><big>(</big><em>tsUrl</em>, <em>contentIdStem</em>, <em>timelineSelector</em>, <em>timelineClock</em>, <em>correlationChangeThresholdSecs=0.0001</em>, <em>earliestClock=None</em>, <em>latestClock=None</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class manages a CSS-TS protocol connection and controls a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> to synchronise it to the timeline
+provided by the server.</p>
+<p>Subclass and override the following methods when using this class:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.onConnected" title="dvbcss.protocol.client.ts.TSClientClockController.onConnected"><tt class="xref py py-func docutils literal"><span class="pre">onConnected()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.onDisconnected" title="dvbcss.protocol.client.ts.TSClientClockController.onDisconnected"><tt class="xref py py-func docutils literal"><span class="pre">onDisconnected()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.onTimingChange" title="dvbcss.protocol.client.ts.TSClientClockController.onTimingChange"><tt class="xref py py-func docutils literal"><span class="pre">onTimingChange()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.onTimelineAvailable" title="dvbcss.protocol.client.ts.TSClientClockController.onTimelineAvailable"><tt class="xref py py-func docutils literal"><span class="pre">onTimelineAvailable()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.onTimelineUnavailable" title="dvbcss.protocol.client.ts.TSClientClockController.onTimelineUnavailable"><tt class="xref py py-func docutils literal"><span class="pre">onTimelineUnavailable()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.onProtocolError" title="dvbcss.protocol.client.ts.TSClientClockController.onProtocolError"><tt class="xref py py-func docutils literal"><span class="pre">onProtocolError()</span></tt></a></li>
+</ul>
+<p>If you do not wish to subclass, you can instead create an instance of this class and replace the methods listed above with your own functions dynamically.</p>
+<p>Create an instance of this class and use the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.connect" title="dvbcss.protocol.client.ts.TSClientClockController.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a> and <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.disconnect" title="dvbcss.protocol.client.ts.TSClientClockController.disconnect"><tt class="xref py py-func docutils literal"><span class="pre">disconnect()</span></tt></a> methods to start and stop its connection to
+the server. The <cite>contentIdStem</cite> and <cite>timelineSelector</cite> you specify are sent to the server in a
+<a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.SetupData" title="dvbcss.protocol.ts.SetupData"><tt class="xref py py-class docutils literal"><span class="pre">SetupData</span></tt></a> message to choose the timeline to receive from the server.</p>
+<p>While connected, while the timeline is available, the timelineClock you provided will have its <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.correlation" title="dvbcss.clock.CorrelatedClock.correlation"><tt class="xref py py-data docutils literal"><span class="pre">correlation</span></tt></a>
+updated to keep it in sync with the timeline received from the server.</p>
+<p>The <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.speed" title="dvbcss.clock.CorrelatedClock.speed"><tt class="xref py py-data docutils literal"><span class="pre">speed</span></tt></a> property of the timeline clock will also be adjusted to match
+the timeline speed indicated by the server. For example: it will be set to zero when the timeline is paused,
+or 2.0 when the timeline speed is x2. The <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.tickRate" title="dvbcss.clock.CorrelatedClock.tickRate"><tt class="xref py py-data docutils literal"><span class="pre">tickRate</span></tt></a> property of the clock
+is not changed.</p>
+<p>Requirements for the timeline clock you provide:</p>
+<ul class="simple">
+<li>The <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.tickRate" title="dvbcss.clock.CorrelatedClock.tickRate"><tt class="xref py py-data docutils literal"><span class="pre">tickRate</span></tt></a> of the <strong>timeline clock</strong> must match that of the timeline.</li>
+<li>Its parent must represent the <strong>wall clock</strong></li>
+<li>The <strong>wall clock</strong> must have a <cite>~dvbcss.clock.CorrelatedClock.tickRate</cite> that matches the wall clock tick rate.</li>
+</ul>
+<p>The TSClientClockController has the following properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.connected" title="dvbcss.protocol.client.ts.TSClientClockController.connected"><tt class="xref py py-data docutils literal"><span class="pre">connected</span></tt></a> (read only) is the client connected?</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.timelineAvailable" title="dvbcss.protocol.client.ts.TSClientClockController.timelineAvailable"><tt class="xref py py-data docutils literal"><span class="pre">timelineAvailable</span></tt></a> (read only) is the timeline available?</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.latestCt" title="dvbcss.protocol.client.ts.TSClientClockController.latestCt"><tt class="xref py py-data docutils literal"><span class="pre">latestCt</span></tt></a> (read only) is the most recently received <a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> message</li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.earliestClock" title="dvbcss.protocol.client.ts.TSClientClockController.earliestClock"><tt class="xref py py-data docutils literal"><span class="pre">earliestClock</span></tt></a> (read/write) earliest possible presentation timing, or <tt class="xref py py-class docutils literal"><span class="pre">None</span></tt></li>
+<li><a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.latestClock" title="dvbcss.protocol.client.ts.TSClientClockController.latestClock"><tt class="xref py py-data docutils literal"><span class="pre">latestClock</span></tt></a> (read/write) latest possible presentation timing, or <tt class="xref py py-class docutils literal"><span class="pre">None</span></tt></li>
+</ul>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The WebSocket URL of the TS Server to connect to. E.g. &#8220;ws://127.0.0.1/mysystem/ts&#8221;</li>
+<li><strong>contentIdStem</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The stem of the content id to be included in the SetupData message that is sent as soon as the conncetion is opened.</li>
+<li><strong>timelineSelector</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The timeline selector to be included in the SetupData message that is sent as soon as the conncetion is opened.</li>
+<li><strong>timelineClock</strong> (<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a>) &#8211; A clock object whose parent must represent the wall clock.</li>
+<li><strong>correlationChangeThresholdSecs</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Minimum threshold for the change in the timeline (in units of seconds) that will result in the timeline clock being adjusted.</li>
+<li><strong>earliestClock</strong> (<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">None</span></tt>) &#8211; An optional clock object representing the earliest possible presentation timing that this client can achieve (expressed on the same timeline)</li>
+<li><strong>latestClock</strong> (<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">None</span></tt>) &#8211; An optional clock object representing the latest possible presentation timing that this client can achieve (expressed on the same timeline)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.connected">
+<tt class="descname">connected</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></a>) True if currently connected to the server, otherwise False.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.latestCt">
+<tt class="descname">latestCt</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.latestCt" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a>) A copy of the most recently received Control Timestamp.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.timelineAvailable">
+<tt class="descname">timelineAvailable</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.timelineAvailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></a>) True if the most recently received Control Timestamp indicates that the timeline is available</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.earliestClock">
+<tt class="descname">earliestClock</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.earliestClock" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://docs.python.org/library/constants.html#None" title="(in Python v2.7)"><tt class="xref py py-data docutils literal"><span class="pre">None</span></tt></a> or a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> correlated to the WallClock representing the earliest possible presentation timing.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.latestClock">
+<tt class="descname">latestClock</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.latestClock" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://docs.python.org/library/constants.html#None" title="(in Python v2.7)"><tt class="xref py py-data docutils literal"><span class="pre">None</span></tt></a> or a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> correlated to the WallClock representing the latest possible presentation timing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the client by trying to open the connection.</p>
+<p>If the connection opens successfully, a <a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.SetupData" title="dvbcss.protocol.ts.SetupData"><tt class="xref py py-class docutils literal"><span class="pre">SetupData</span></tt></a> message will be sent automatically.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ConnectionError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if there was a problem and the connection could not be opened.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.getStatusSummary">
+<tt class="descname">getStatusSummary</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.getStatusSummary" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns str:</th><td class="field-body">A human readable string describing the state of the timeline and the connection.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.onConnected">
+<tt class="descname">onConnected</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.onConnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is opened and the setup-data message has been sent.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.onDisconnected">
+<tt class="descname">onDisconnected</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.onDisconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the connection is closed.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.onProtocolError">
+<tt class="descname">onProtocolError</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.onProtocolError" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when there has been an error in the use of the CII protocol - e.g. receiving the wrong kind of message.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> description of the problem.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.onTimelineAvailable">
+<tt class="descname">onTimelineAvailable</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.onTimelineAvailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the server indicates that the timeline is available.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.onTimelineUnavailable">
+<tt class="descname">onTimelineUnavailable</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.onTimelineUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the server indicates that the timeline is unavailable.</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.onTimingChange">
+<tt class="descname">onTimingChange</tt><big>(</big><em>speedChanged</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.onTimingChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when the server indicates that the timeline timing has changed.</p>
+<p>This means that a received Control Timestamp has changed the timing of the clock relative
+to the wall clock by the threshold amount or more, or that the speed of the timeline has changed.
+(as indicated by the timelineSpeedMultiplier property of received Control Timestamps).</p>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speedChanged</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></a>) True if the speed of the timeline has changed, otherwise False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.ts.TSClientClockController.sendAptEptLpt">
+<tt class="descname">sendAptEptLpt</tt><big>(</big><em>includeApt=True</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/ts.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ts.TSClientClockController.sendAptEptLpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends an Actual, Earliest and Latest presentation timestamp to the CSS-TS server.</p>
+<ul class="simple">
+<li>The EPT is derived from the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.earliestClock" title="dvbcss.protocol.client.ts.TSClientClockController.earliestClock"><tt class="xref py py-data docutils literal"><span class="pre">earliestClock</span></tt></a> property, if it is not None.</li>
+<li>The LPT is derived from the <a class="reference internal" href="#dvbcss.protocol.client.ts.TSClientClockController.latestClock" title="dvbcss.protocol.client.ts.TSClientClockController.latestClock"><tt class="xref py py-data docutils literal"><span class="pre">latestClock</span></tt></a> property, if it is not None.</li>
+<li>The APT is only included if the includeApt argument is True (default=True).</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>includeApt</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></a>) Set to False if the Actual Presentation Timestamp is <em>not</em> to be included in the message (default=True)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ts-server.html" class="btn btn-neutral float-right" title="CSS-TS Servers"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ts-messages.html" class="btn btn-neutral" title="CSS-TS Message objects"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

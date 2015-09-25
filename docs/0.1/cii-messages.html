@@ -1,0 +1,602 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-CII Message objects &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-CII protocol" href="cii.html"/>
+        <link rel="next" title="CSS-CII Clients" href="cii-client.html"/>
+        <link rel="prev" title="CSS-CII protocol" href="cii.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="cii.html">CSS-CII protocol</a> &raquo;</li>
+      
+    <li>CSS-CII Message objects</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/cii-messages.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.cii"></span><div class="section" id="css-cii-message-objects">
+<h1>CSS-CII Message objects<a class="headerlink" href="#css-cii-message-objects" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.protocol.cii</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#examples" id="id1">Examples</a></li>
+<li><a class="reference internal" href="#classes" id="id2">Classes</a><ul>
+<li><a class="reference internal" href="#cii-message" id="id3">CII Message</a></li>
+<li><a class="reference internal" href="#timeline-option" id="id4">Timeline Option</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>A <a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> object represents a CII message sent from server to client via the CSS-CII protocol.</p>
+<p>A <a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption" title="dvbcss.protocol.cii.TimelineOption"><tt class="xref py py-class docutils literal"><span class="pre">TimelineOption</span></tt></a> object describes a timeline selector
+and the tick rate of the timeline if that selector is used to request a
+timeline from the CSS-TS server. It is carried in a list in the
+<a class="reference internal" href="#dvbcss.protocol.cii.CII.timelines" title="dvbcss.protocol.cii.CII.timelines"><tt class="xref py py-data docutils literal"><span class="pre">timelines</span></tt></a> property of a <a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> message.</p>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id1">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> messages:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; from dvbcss.protocol.cii import CII
+&gt;&gt;&gt; from dvbcss.protocol import OMIT
+
+&gt;&gt;&gt; jsonCiiMessage = \"""\
+...     { "protocolVersion":"1.1",
+...       "contentId":"dvb://1234.5678.01ab",
+...       "contentIdStatus":"partial"
+...     }
+... \"""
+
+&gt;&gt;&gt; cii = CII.unpack(jsonCiiMessage)
+&gt;&gt;&gt; cii.contentId
+'dvb://1234.5678.01ab'
+
+&gt;&gt;&gt; print cii.mrsUrl
+OMIT
+
+&gt;&gt;&gt; cii.protocolVersion = OMIT
+&gt;&gt;&gt; cii.pack()
+'{contentId":"dvb://1234.5678.01ab","contentIdStatus":"partial"}'</pre>
+</div>
+<p><a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption" title="dvbcss.protocol.cii.TimelineOption"><tt class="xref py py-class docutils literal"><span class="pre">TimelineOption</span></tt></a> within CII messages:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; from dvbcss.protocol.cii import CII, TimelineOption
+
+&gt;&gt;&gt; t1 = TimelineOption(timelineSelector="urn:dvb:css:timeline:pts", unitsPerTick=1, unitsPerSecond=90000)
+&gt;&gt;&gt; t2 = TimelineOption(timelineSelector="urn:dvb:css:timeline:temi:1:1", unitsPerTick=1, unitsPerSecond=1000)
+
+&gt;&gt;&gt; print t1.timelineSelector, t1.unitsPerTick, t1.unitsPerSecond, t1.accuracy
+urn:dvb:css:timeline:pts 1 90000 OMIT</pre>
+</div>
+<div class="highlight-python"><pre>&gt;&gt;&gt; cii = CII(presentationStatus="final", timelines=[t1, t2])
+&gt;&gt;&gt; cii.pack()
+'{ "presentationStatus": "final",
+   "timelines": [ { "timelineProperties": {"unitsPerSecond": 90000, "unitsPerTick": 1},
+                    "timelineSelector": "urn:dvb:css:timeline:pts"
+                  },
+                  { "timelineProperties": {"unitsPerSecond": 1000, "unitsPerTick": 1},
+                    "timelineSelector": "urn:dvb:css:timeline:temi:1:1"
+                  }
+                ]
+ }'</pre>
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id2">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cii-message">
+<h3><a class="toc-backref" href="#id3">CII Message</a><a class="headerlink" href="#cii-message" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="class">
+<dt id="dvbcss.protocol.cii.CII">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.cii.</tt><tt class="descname">CII</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a CII message used in the CSS-CII protocol.</p>
+<p><strong>Initialisation takes the following parameters, all of which are optional
+keyword arguments that default to</strong> <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> :</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>protocolVersion</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or &#8220;1.1&#8221;) &#8211; The protocol version being used by the server.</li>
+<li><strong>mrsUrl</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) &#8211; The URL of an MRS server known to the server.</li>
+<li><strong>contentId</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) &#8211; Content identifier URI.</li>
+<li><strong>contentIdStatus</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or &#8220;partial&#8221; or &#8220;final&#8221;) &#8211; Content identifier status.</li>
+<li><strong>presentationStatus</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) &#8211; Presentation status as a <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of one or more strings, e.g. <tt class="docutils literal"><span class="pre">[</span> <span class="pre">&quot;okay&quot;</span> <span class="pre">]</span></tt></li>
+<li><strong>wcUrl</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) &#8211; CSS-WC server endpoint URL in the form &#8220;udp://&lt;host&gt;:&lt;port&gt;&#8221;</li>
+<li><strong>tsUrl</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) &#8211; CSS-TS server endpoint WebSocket URL</li>
+<li><strong>teUrl</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) &#8211; CSS-TE server endpoint WebSocket URL</li>
+<li><strong>timelines</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption" title="dvbcss.protocol.cii.TimelineOption"><tt class="xref py py-class docutils literal"><span class="pre">TimelineOption</span></tt></a>) &#8211; List of timeline options.</li>
+<li><strong>private</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="protocol.html#private-data"><em>Signalling that a property is to be omitted from a message</em></a>) &#8211; Private data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The attributes of the object have the same name as the CII message properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.protocolVersion" title="dvbcss.protocol.cii.CII.protocolVersion"><tt class="xref py py-data docutils literal"><span class="pre">protocolVersion</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.mrsUrl" title="dvbcss.protocol.cii.CII.mrsUrl"><tt class="xref py py-data docutils literal"><span class="pre">mrsUrl</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.contentId" title="dvbcss.protocol.cii.CII.contentId"><tt class="xref py py-data docutils literal"><span class="pre">contentId</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.contentIdStatus" title="dvbcss.protocol.cii.CII.contentIdStatus"><tt class="xref py py-data docutils literal"><span class="pre">contentIdStatus</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.presentationStatus" title="dvbcss.protocol.cii.CII.presentationStatus"><tt class="xref py py-data docutils literal"><span class="pre">presentationStatus</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.wcUrl" title="dvbcss.protocol.cii.CII.wcUrl"><tt class="xref py py-data docutils literal"><span class="pre">wcUrl</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.tsUrl" title="dvbcss.protocol.cii.CII.tsUrl"><tt class="xref py py-data docutils literal"><span class="pre">tsUrl</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.teUrl" title="dvbcss.protocol.cii.CII.teUrl"><tt class="xref py py-data docutils literal"><span class="pre">teUrl</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.timelines" title="dvbcss.protocol.cii.CII.timelines"><tt class="xref py py-data docutils literal"><span class="pre">timelines</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.CII.private" title="dvbcss.protocol.cii.CII.private"><tt class="xref py py-data docutils literal"><span class="pre">private</span></tt></a></li>
+</ul>
+<p>Properties are accessed as attributes of this object using the same name as their JSON property name.</p>
+<p>Converting to and from JSON representation is performed using the <a class="reference internal" href="#dvbcss.protocol.cii.CII.pack" title="dvbcss.protocol.cii.CII.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> method and <a class="reference internal" href="#dvbcss.protocol.cii.CII.unpack" title="dvbcss.protocol.cii.CII.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> class method.
+Properties set to equal <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> will be omitted when the message
+is packed to a JSON representation.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.protocolVersion">
+<tt class="descname">protocolVersion</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.protocolVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or &#8220;1.1&#8221;) The protocol version being used by the server.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.mrsUrl">
+<tt class="descname">mrsUrl</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.mrsUrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) The URL of an MRS server known to the server</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.contentId">
+<tt class="descname">contentId</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.contentId" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) Content identifier (URL)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.contentIdStatus">
+<tt class="descname">contentIdStatus</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.contentIdStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or &#8220;partial&#8221; or &#8220;final&#8221;) Content identifier status</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.presentationStatus">
+<tt class="descname">presentationStatus</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.presentationStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) Presentation status, e.g. <tt class="docutils literal"><span class="pre">[</span> <span class="pre">&quot;okay&quot;</span> <span class="pre">]</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.wcUrl">
+<tt class="descname">wcUrl</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.wcUrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) CSS-WC server endpoint URL in form &#8220;udp://&lt;host&gt;:&lt;port&gt;&#8221;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.tsUrl">
+<tt class="descname">tsUrl</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.tsUrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) CSS-TS server endpoint WebSocket URL</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.teUrl">
+<tt class="descname">teUrl</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.teUrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) CSS-TE server endpoint WebSocket URL</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.timelines">
+<tt class="descname">timelines</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.timelines" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <tt class="xref py py-class docutils literal"><span class="pre">list`(:class:`TimelineOption</span></tt>)) Timeline options</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.CII.private">
+<tt class="descname">private</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.private" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> )
+Private data as a <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> objects that can be converted
+to JSON by <a class="reference external" href="http://docs.python.org/library/json.html#json.dumps" title="(in Python v2.7)"><tt class="xref py py-func docutils literal"><span class="pre">json.dumps()</span></tt></a>.
+Each dict must contain at least a key called &#8220;type&#8221; with a URI string as its value.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.cii.CII.allProperties">
+<em class="property">classmethod </em><tt class="descname">allProperties</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.allProperties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all property names, whether OMITted or not</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.cii.CII.combine">
+<tt class="descname">combine</tt><big>(</big><em>diff</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.combine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies this CII object, and updates that copy with any properties (that are not omitted) in the CII object supplied as the <cite>diff</cite> argument.
+The updated copy is then returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>diff</strong> &#8211; (<a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a>) A CII object whose properties (that are not omitted) will be used to update the copy before it is returned.</td>
+</tr>
+</tbody>
+</table>
+<p>new = old.combine(diff) is equivalent to the following operations:</p>
+<div class="highlight-python"><pre>new = old.copy()
+new.update(diff)</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.cii.CII.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.copy" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of this CII object. The copy is a deep copy.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.cii.CII.definedProperties">
+<tt class="descname">definedProperties</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.definedProperties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the names of properties whose value is not OMIT</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.cii.CII.diff">
+<em class="property">classmethod </em><tt class="descname">diff</tt><big>(</big><em>old</em>, <em>new</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.diff" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>old</strong> &#8211; (<a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a>) A CII object</li>
+<li><strong>new</strong> &#8211; (<a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a>) A CII object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">CII object representing changes from old to new CII objects.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If in the new CII object a property is OMITted, it property won&#8217;t appear in the returned CII object that represents the changes.</p>
+<p>If in the old CII object a property is OMITted, but it has a non-omitted value in the new object, then it is assumed
+to be a change.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.cii.CII.pack">
+<tt class="descname">pack</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.pack" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string containing JSON representation of this message.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">if there are values for properties that are not permitted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.cii.CII.unpack">
+<em class="property">classmethod </em><tt class="descname">unpack</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert JSON string representation of this message encoded as a <a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if not possible.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.cii.CII.update">
+<tt class="descname">update</tt><big>(</big><em>diff</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.CII.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates this CII object with the values of any properties (that are not omitted) in the CII object provided as the <cite>diff</cite> argument.</p>
+<p>Note that this changes this object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>diff</strong> &#8211; (<a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a>) A CII object whose properties (that are not omitted) will be used to update this CII object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="timeline-option">
+<h3><a class="toc-backref" href="#id4">Timeline Option</a><a class="headerlink" href="#timeline-option" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="class">
+<dt id="dvbcss.protocol.cii.TimelineOption">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.cii.</tt><tt class="descname">TimelineOption</tt><big>(</big><em>timelineSelector</em>, <em>unitsPerTick</em>, <em>unitsPerSecond</em>, <em>accuracy=OMIT</em>, <em>private=OMIT</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a CSS-CII Timeline Option used in the &#8220;timelines&#8221; property of a CII message.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timelineSelector</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The timeline selector</li>
+<li><strong>unitsPerTick</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Denominator of tick rate (in ticks per second) for the corresponding timeline</li>
+<li><strong>unitsPerSecond</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Numerator of tick rate (in ticks per second) for the corresponding timeline</li>
+<li><strong>accuracy</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) &#8211; Optional indication of timeline accuracy</li>
+<li><strong>private</strong> (<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-obj docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference internal" href="protocol.html#private-data"><em>Signalling that a property is to be omitted from a message</em></a>) &#8211; Optional private data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>It represents a timeline selector and the tick rate of the timeline
+if that selector is used to request a timeline from the CSS-TS server.
+It is carried in a <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> in the <a class="reference internal" href="#dvbcss.protocol.cii.CII.timelines" title="dvbcss.protocol.cii.CII.timelines"><tt class="xref py py-data docutils literal"><span class="pre">timelines</span></tt></a> property of a <a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> message.</p>
+<p>The tick rate of the timeline is expressed by the <cite>unitsPerTick</cite> and <cite>unitsPerSecond</cite> values.
+The tick rate in ticks per second is equal to <cite>unitsPerTick</cite> / <cite>unitsPerSecond</cite>.</p>
+<p>Accuracy and private data are optional, but the other fields are mandatory.</p>
+<p>The attributes of the object have the same name as the relevant CII message properties:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.timelineSelector" title="dvbcss.protocol.cii.TimelineOption.timelineSelector"><tt class="xref py py-data docutils literal"><span class="pre">timelineSelector</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.unitsPerTick" title="dvbcss.protocol.cii.TimelineOption.unitsPerTick"><tt class="xref py py-data docutils literal"><span class="pre">unitsPerTick</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.unitsPerSecond" title="dvbcss.protocol.cii.TimelineOption.unitsPerSecond"><tt class="xref py py-data docutils literal"><span class="pre">unitsPerSecond</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.accuracy" title="dvbcss.protocol.cii.TimelineOption.accuracy"><tt class="xref py py-data docutils literal"><span class="pre">accuracy</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.private" title="dvbcss.protocol.cii.TimelineOption.private"><tt class="xref py py-data docutils literal"><span class="pre">private</span></tt></a></li>
+</ul>
+<p>Converting to and from JSON representation is performed using the <a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.pack" title="dvbcss.protocol.cii.TimelineOption.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> method and <a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption.unpack" title="dvbcss.protocol.cii.TimelineOption.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> class method.
+Properties set to equal <a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> will be omitted when the message
+is packed to a JSON representation.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.TimelineOption.timelineSelector">
+<tt class="descname">timelineSelector</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.timelineSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>) The timeline selector</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.TimelineOption.unitsPerTick">
+<tt class="descname">unitsPerTick</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.unitsPerTick" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) The units per tick of the timeline</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.TimelineOption.unitsPerSecond">
+<tt class="descname">unitsPerSecond</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.unitsPerSecond" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) The units per second of the timeline</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.TimelineOption.accuracy">
+<tt class="descname">accuracy</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.accuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The accuracy of the timeline with respect to the content in seconds.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.cii.TimelineOption.private">
+<tt class="descname">private</tt><em class="property"> = OMIT</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.private" title="Permalink to this definition">¶</a></dt>
+<dd><p>(<a class="reference internal" href="protocol.html#dvbcss.protocol.OMIT" title="dvbcss.protocol.OMIT"><tt class="xref py py-data docutils literal"><span class="pre">OMIT</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> )
+Private data as a <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> objects that can be converted to JSON by <a class="reference external" href="http://docs.python.org/library/json.html#json.dumps" title="(in Python v2.7)"><tt class="xref py py-func docutils literal"><span class="pre">json.dumps()</span></tt></a>.
+Each dict must contain at least a key called &#8220;type&#8221; with a URI string as its value.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.cii.TimelineOption.decode">
+<em class="property">classmethod </em><tt class="descname">decode</tt><big>(</big><em>struct</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal method used by a <a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> message object when unpacking to JSON format.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.cii.TimelineOption.encode">
+<em class="property">classmethod </em><tt class="descname">encode</tt><big>(</big><em>item</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal class method used by a <a class="reference internal" href="#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> message object when packing to JSON format.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.cii.TimelineOption.pack">
+<tt class="descname">pack</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.pack" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">string containing JSON presentation of this message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.cii.TimelineOption.unpack">
+<em class="property">classmethod </em><tt class="descname">unpack</tt><big>(</big><em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/cii.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.cii.TimelineOption.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert JSON string representation of this message encoded as a <a class="reference internal" href="#dvbcss.protocol.cii.TimelineOption" title="dvbcss.protocol.cii.TimelineOption"><tt class="xref py py-class docutils literal"><span class="pre">TimelineOption</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Throws ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">if not possible.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cii-client.html" class="btn btn-neutral float-right" title="CSS-CII Clients"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cii.html" class="btn btn-neutral" title="CSS-CII protocol"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

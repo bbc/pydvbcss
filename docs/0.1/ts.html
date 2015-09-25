@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-TS protocol &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="DVB CSS Protocol modules" href="protocol.html"/>
+        <link rel="next" title="CSS-TS Protocol overview" href="ts-overview.html"/>
+        <link rel="prev" title="CSS-CII Servers" href="cii-server.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+    <li>CSS-TS protocol</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/ts.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="css-ts-protocol">
+<h1>CSS-TS protocol<a class="headerlink" href="#css-ts-protocol" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ts-overview.html">CSS-TS Protocol overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ts-overview.html#determining-timeline-selection-and-availability">Determining timeline selection and availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-overview.html#what-does-a-timestamp-convey">What does a timestamp convey?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ts-messages.html">CSS-TS Message objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ts-messages.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-messages.html#infinity">+/- infinity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-messages.html#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ts-client.html">CSS-TS Clients</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ts-client.html#using-tsclientclockcontroller">Using TSClientClockController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-client.html#using-tsclientconnection">Using TSClientConnection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-client.html#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ts-server.html">CSS-TS Servers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ts-server.html#using-tsserver-and-timeline-sources">Using TSServer and Timeline Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-server.html#what-does-tsserver-do-for-you-and-what-does-it-not">What does TSServer do for you and what does it not?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-server.html#more-about-timeline-sources">More about Timeline Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-server.html#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-server.html#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>This package provides objects for representing messages exchanged via the DVB CSS-TS protocol and for implementing clients and servers.</p>
+<p>The TS protocol is a mechanism for a server to share timeline position and playback speed with a client. In effect it enables a client to synchronise its
+understanding of the progress of media presentation with that of a server, in terms of a particular timeline.</p>
+<p>The client initially sends a <a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.SetupData" title="dvbcss.protocol.ts.SetupData"><tt class="xref py py-class docutils literal"><span class="pre">SetupData</span></tt></a> message to specify what timeline it wants to synchronise in terms of.
+The server then periodically sends <a class="reference internal" href="ts-messages.html#dvbcss.protocol.ts.ControlTimestamp" title="dvbcss.protocol.ts.ControlTimestamp"><tt class="xref py py-class docutils literal"><span class="pre">ControlTimestamp</span></tt></a> messages to inform the client of the state of presentation timing.
+The client can also send <tt class="xref py py-class docutils literal"><span class="pre">AptEptLpt</span></tt> (Actual, Earliest and Latest Presentation Timestamp) messages to the server
+to inform it of its playback timing and range of playback timings it can achieve.</p>
+<p>The client implementation in this library can control a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a>, synchronising it to the timeline.
+The server implementation in this library uses <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> objects as its source of timelines that it
+is to share with clients.</p>
+<p>Modules for using the CSS-TS protocol:</p>
+<ul class="simple">
+<li><a class="reference internal" href="ts-messages.html#module-dvbcss.protocol.ts" title="dvbcss.protocol.ts"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.protocol.ts</span></tt></a> : objects for representing and packing/unpacking the CSS-TS protocol messages.</li>
+<li><a class="reference internal" href="ts-client.html#module-dvbcss.protocol.client.ts" title="dvbcss.protocol.client.ts"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.protocol.client.ts</span></tt></a> : implementation of a client for a CSS-TS connection.</li>
+<li><a class="reference internal" href="ts-server.html#module-dvbcss.protocol.server.ts" title="dvbcss.protocol.server.ts"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.protocol.server.ts</span></tt></a> : implementation of a server for a CSS-TS connection.</li>
+</ul>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ts-overview.html" class="btn btn-neutral float-right" title="CSS-TS Protocol overview"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cii-server.html" class="btn btn-neutral" title="CSS-CII Servers"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

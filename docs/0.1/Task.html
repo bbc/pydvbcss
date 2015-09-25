@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Task scheduling for clocks &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="Clocks, Time and Scheduling modules" href="timing.html"/>
+        <link rel="next" title="Internal implementation details" href="internals.html"/>
+        <link rel="prev" title="Synthesised clocks (dvbcss.clock)" href="clock.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="timing.html">Clocks, Time and Scheduling modules</a> &raquo;</li>
+      
+    <li>Task scheduling for clocks</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/Task.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.task"></span><div class="section" id="task-scheduling-for-clocks">
+<h1>Task scheduling for clocks<a class="headerlink" href="#task-scheduling-for-clocks" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.task</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id1">Introduction</a></li>
+<li><a class="reference internal" href="#example" id="id2">Example</a></li>
+<li><a class="reference internal" href="#functions" id="id3">Functions</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id1">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#module-dvbcss.task" title="dvbcss.task"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.task</span></tt></a> module provides sleep and scheduling functions for use with the <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.clock</span></tt></a> module.
+These functions track adjustments to clocks (such as changes in the tick rate or tick value/offset)
+to ensure that the sleep or scheduled event happen when the clock actually reaches the target
+tick count value.</p>
+<p>To use this module, just import it and directly call the functions <a class="reference internal" href="#dvbcss.task.sleepFor" title="dvbcss.task.sleepFor"><tt class="xref py py-func docutils literal"><span class="pre">sleepFor()</span></tt></a>, <a class="reference internal" href="#dvbcss.task.sleepUntil" title="dvbcss.task.sleepUntil"><tt class="xref py py-func docutils literal"><span class="pre">sleepUntil()</span></tt></a>,
+<a class="reference internal" href="#dvbcss.task.scheduleEvent" title="dvbcss.task.scheduleEvent"><tt class="xref py py-func docutils literal"><span class="pre">scheduleEvent()</span></tt></a> or <a class="reference internal" href="#dvbcss.task.runAt" title="dvbcss.task.runAt"><tt class="xref py py-func docutils literal"><span class="pre">runAt()</span></tt></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Scheduling happens on a single thread, so if you use the <a class="reference internal" href="#dvbcss.task.runAt" title="dvbcss.task.runAt"><tt class="xref py py-func docutils literal"><span class="pre">runAt()</span></tt></a> function, try to keep the callback code
+as fast and simple as possible, so that it returns control as quickly as possible.</p>
+</div>
+<p>See <a class="reference internal" href="task-internals.html"><em>How the dvbcss.task module works internally</em></a> for information on how the internals of the Task module work.</p>
+</div>
+<div class="section" id="example">
+<h2><a class="toc-backref" href="#id2">Example</a><a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>A simple example:</p>
+<div class="highlight-python"><pre>from dvbcss.clock import SysClock
+from dvbcss.clock import CorrelatedClock
+from dvbcss.task import sleepFor, runAt
+
+s = SysClock()
+c = CorrelatedClock(parentClock=s, tickRate=1000)
+
+# wait 1 second
+sleepFor(c, numTicks=1000)
+
+# schedule callback in 5 seconds
+def foo(message):
+    print "Callback!", message
+
+runAt(clock=c, whenTicks=c.ticks+5000, foo, "Tick count progressed by 5 seconds")
+
+# ... but change the correlation to make the clock jump 1 second forward
+#     causing the callback to happen one second earlier
+c.correlation = (c.correlation[0], c.correlation[1] + 1000)
+
+# ... the callback will now happen in 4 seconds time instead</pre>
+</div>
+</div>
+<div class="section" id="functions">
+<h2><a class="toc-backref" href="#id3">Functions</a><a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="dvbcss.task.sleepUntil">
+<tt class="descclassname">dvbcss.task.</tt><tt class="descname">sleepUntil</tt><big>(</big><em>clock</em>, <em>whenTicks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/task.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.task.sleepUntil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sleep until the specified <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> reaches the specified tick value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; (<a class="reference internal" href="clock.html#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">dvbcss.clock.ClockBase</span></tt></a>) Clock to sleep against the ticks of.</li>
+<li><strong>whenTicks</strong> &#8211; (int) The tick value of the clock at which this function returns.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Returns after the specified tick value is reached.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dvbcss.task.sleepFor">
+<tt class="descclassname">dvbcss.task.</tt><tt class="descname">sleepFor</tt><big>(</big><em>clock</em>, <em>numTicks</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/task.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.task.sleepFor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sleep for the number of ticks of the specified clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; (<a class="reference internal" href="clock.html#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">dvbcss.clock.ClockBase</span></tt></a>) Clock to sleep against the ticks of.</li>
+<li><strong>numTicks</strong> &#8211; (int) The number of ticks to sleep for.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Returns after the elapsed number of ticks of the specified clock have passed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dvbcss.task.scheduleEvent">
+<tt class="descclassname">dvbcss.task.</tt><tt class="descname">scheduleEvent</tt><big>(</big><em>clock</em>, <em>whenTicks</em>, <em>event</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/task.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.task.scheduleEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schedule the <a class="reference external" href="http://docs.python.org/library/threading.html#threading.Event" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">threading.Event</span></tt></a> to be called when the specified clock reaches (or passes) the specified tick value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; (<a class="reference internal" href="clock.html#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">dvbcss.clock.ClockBase</span></tt></a>) Clock to schedule the event against</li>
+<li><strong>whenTicks</strong> &#8211; (int) The tick value of the clock at which the event is to be triggered.</li>
+<li><strong>event</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/threading.html#threading.Event" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">threading.Event</span></tt></a>) python Event object that the :method:threading.Event.set method will be called on at the scheduled time</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dvbcss.task.runAt">
+<tt class="descclassname">dvbcss.task.</tt><tt class="descname">runAt</tt><big>(</big><em>clock</em>, <em>whenTicks</em>, <em>callBack</em>, <em>args=None</em>, <em>kwargs=None</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/task.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.task.runAt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the specified callback function when the specified clock reaches (or passes) the specified tick value.</p>
+<p>The callback happens on the single thread used within the clock scheduling system. You should avoid writing
+code that hogs this thread to do substantial processing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; (<a class="reference internal" href="clock.html#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><tt class="xref py py-class docutils literal"><span class="pre">dvbcss.clock.ClockBase</span></tt></a>) Clock to schedule the callback against</li>
+<li><strong>whenTicks</strong> &#8211; (int) The tick value of the clock at which the callback is to be called.</li>
+<li><strong>callback</strong> &#8211; (callable) Function to be called</li>
+<li><strong>args</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of positional arguments to be passed to the callback function when it is called.</li>
+<li><strong>kwargs</strong> &#8211; A <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> of keyword arguments to be pased to the callback function when it is called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="internals.html" class="btn btn-neutral float-right" title="Internal implementation details"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="clock.html" class="btn btn-neutral" title="Synthesised clocks (dvbcss.clock)"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

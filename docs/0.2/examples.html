@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Run the examples &mdash; pydvbcss 0.2-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.2-release documentation" href="index.html"/>
+        <link rel="next" title="DVB CSS Protocol modules" href="protocol.html"/>
+        <link rel="prev" title="pydvbcss" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Run the examples</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/examples.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-examples"></span><div class="section" id="run-the-examples">
+<h1>Run the examples<a class="headerlink" href="#run-the-examples" title="Permalink to this headline">¶</a></h1>
+<p>The code in the <cite>examples</cite> directory demonstrates how to create and control
+servers and clients for all three protocols: CSS-CII, CSS-TS and CSS-WC.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#wallclockserver-py-and-wallclockclient-py" id="id7"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li><a class="reference internal" href="#ciiserver-py-and-ciiclient-py" id="id8"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li><a class="reference internal" href="#tsserver-py-and-tsclient-py" id="id9"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li><a class="reference internal" href="#tvdevice-py" id="id10"><strong>TVDevice.py</strong></a></li>
+</ul>
+</div>
+<p>There are instructions below on how to run the examples and see them interact with each other.</p>
+<p>See the sources here: <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples">on github</a></p>
+<div class="section" id="wallclockserver-py-and-wallclockclient-py">
+<h2><a class="toc-backref" href="#id7"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a><a class="headerlink" href="#wallclockserver-py-and-wallclockclient-py" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="get-started">
+<h3>Get started<a class="headerlink" href="#get-started" title="Permalink to this headline">¶</a></h3>
+<p>The <em>WallClockServer</em> and <em>WallClockClient</em> examples use the library to
+implement a simple server and client for the <a class="reference internal" href="wc.html"><em>CSS-WC protocol</em></a>.</p>
+<p>First start the server, specifying the host and IP to listen on:</p>
+<div class="highlight-shell"><pre>$ python examples/WallClockServer.py 127.0.0.1 6677</pre>
+</div>
+<p>Leave it running in the background and start a client, telling it where to connect to the server:</p>
+<div class="highlight-shell"><pre>$ python examples/WallClockClient.py 127.0.0.1 6677</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The wall clock protocol is connectionless (it uses UDP) This means the client will not report an error if
+you enter the wrong IP address or port number.</p>
+<p class="last">Watch the &#8220;dispersion&#8221; values which indicate how
+much margin for error there is in the client&#8217;s wall clock estimate. If the value is very large, this
+means it is not receiving responses from the server.</p>
+</div>
+</div>
+<div class="section" id="how-they-work">
+<h3>How they work<a class="headerlink" href="#how-they-work" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-examples.WallClockServer">
+<span id="wallclockserver-py-source"></span><h4>WallClockServer.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/WallClockServer.py">[source]</a><a class="headerlink" href="#module-examples.WallClockServer" title="Permalink to this headline">¶</a></h4>
+<p>It works by instantiating a <a class="reference internal" href="wc-server.html#dvbcss.protocol.server.wc.WallClockServer" title="dvbcss.protocol.server.wc.WallClockServer"><tt class="xref py py-class docutils literal"><span class="pre">WallClockServer</span></tt></a>
+object and providing that object with a <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> object to be used
+as the Wall Clock that is to be served.</p>
+<p>At the command line you can override default options for
+the ip address and port the server binds to; the
+maximum frequency error it reports and whether it sends &#8220;follow-up&#8221; responses
+to requests.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for usage information.</p>
+</div>
+<div class="section" id="module-examples.WallClockClient">
+<span id="wallclockclient-py-source"></span><h4>WallClockClient.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/WallClockClient.py">[source]</a><a class="headerlink" href="#module-examples.WallClockClient" title="Permalink to this headline">¶</a></h4>
+<p>It works by instantiating a <a class="reference internal" href="wc-client.html#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a>
+object and plugs into that object a
+<a class="reference internal" href="wc-client.html#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate" title="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate"><tt class="xref py py-class docutils literal"><span class="pre">LowestDispersionCandidate</span></tt></a> algorithm
+object that adjusts a <a class="reference internal" href="clock.html#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> representing the Wall Clock.</p>
+<p>At the command line
+you must specify the host and port of the Wall Clock server. Default options
+can be overridden for the IP address and port that the client listens on.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for usage information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="ciiserver-py-and-ciiclient-py">
+<h2><a class="toc-backref" href="#id8"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a><a class="headerlink" href="#ciiserver-py-and-ciiclient-py" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Get started<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>CIIServer</cite> and <cite>CIIClient</cite> examples implement the <em>CSS-CII</em>
+protocol, with the server sharing some pretend CII status information with
+the client.</p>
+<p>First start the server:</p>
+<blockquote>
+<div>$ python examples/CIIServer.py</div></blockquote>
+<p>The server listens on 127.0.0.1 on port 7681 and accepts WebSocket connections to <cite>ws://&lt;ip&gt;:&lt;port&gt;/cii</cite>.</p>
+<p>Leave it running in the background and connect using the client and see how
+the CII data is pushed by the server whenever it changes:</p>
+<blockquote>
+<div>$ python examples/CIIClient.py ws:/127.0.0.1:7681/cii</div></blockquote>
+</div>
+<div class="section" id="id2">
+<h3>How they work<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-examples.CIIServer">
+<span id="ciiserver-py-source"></span><h4>CIIServer.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/CIIServer.py">[source]</a><a class="headerlink" href="#module-examples.CIIServer" title="Permalink to this headline">¶</a></h4>
+<p>It works by setting up a web server and the ws4py plug-in for cherrypy that provides
+WebSockets support.
+It then instantiates a <a class="reference internal" href="cii-server.html#dvbcss.protocol.server.cii.CIIServer" title="dvbcss.protocol.server.cii.CIIServer"><tt class="xref py py-class docutils literal"><span class="pre">CIIServer</span></tt></a>
+and mounts it into the cherrypy server at the URL resource path &#8220;/cii&#8221;.</p>
+<p>While the server is running, it pretends to be hopping between a few different broadcast
+channels every 7 seconds, with a 2 second &#8220;transitioning&#8221; period on each hop.</p>
+<p>This is an artificially simple example and does not provide values for most properties of
+the CII message - such as a MRS URL, or any URLs for a WC or TS endpoints.</p>
+<p>It does not do any media presentation, but just provides a CSS-CII server with some pretend data.</p>
+<p>This server, by default, serves on port 7681 and provides a CSS-CII service at the
+URL resource path <tt class="docutils literal"><span class="pre">/cii</span></tt>. It can therefore be connected to using
+the WebSocket URL &#8220;ws://&lt;host&gt;:7681/cii&#8221; e.g. &#8220;ws://127.0.0.1:7681/cii&#8221;.
+Command line options can be used to override these defaults and to reduce the amount of logging output.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for more detailed usage information.</p>
+</div>
+<div class="section" id="id3">
+<h4>CIIServer.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/CIIClient.py">[source]</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<span class="target" id="module-examples.CIIClient"></span><p>It works by instantiating a <a class="reference internal" href="cii-client.html#dvbcss.protocol.client.cii.CIIClient" title="dvbcss.protocol.client.cii.CIIClient"><tt class="xref py py-class docutils literal"><span class="pre">CIIClient</span></tt></a>
+and attaching handler
+functions to be notified of when connection and disconnection occurs
+and of changes to the CII information being pushed from the server.</p>
+<p>At the command line you must specify:</p>
+<ul class="simple">
+<li>the WebSocket URL of the CSS-CII server, in the form <cite>ws://&lt;host&gt;:&lt;port&gt;/&lt;path&gt;</cite></li>
+</ul>
+<p>Command line options can be used to reduce the amount of logging output.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for usage information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="tsserver-py-and-tsclient-py">
+<h2><a class="toc-backref" href="#id9"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a><a class="headerlink" href="#tsserver-py-and-tsclient-py" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>Get started<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>TServer</cite> and <cite>TSClient</cite> examples implement the <em>CSS-TS</em> protocol, with the
+server pretending to have a few different timelines for a DVB broadcast service (where the content ID is a DVB URL).</p>
+<p>First start the server:</p>
+<div class="highlight-shell"><pre>$ python examples/TSServer.py</pre>
+</div>
+<p>The server listens on 127.0.0.1 on port 7681 and accepts WebSocket connections to <cite>ws://&lt;ip&gt;:&lt;port&gt;/ts</cite>.
+It also includes a wall clock server, also on 127.0.0.1 on port 6677.</p>
+<p>Leave it running in the background and connect using the client and see
+how the client is able to synchronise and periodically print an estimate of the timeline position (converted to units of seconds):</p>
+<div class="highlight-shell"><pre>$ python examples/TSClient.py ws://127.0.0.1:7681/ts udp://127.0.0.1:6677 "dvb://" "urn:dvb:css:timeline:pts" 90000</pre>
+</div>
+<p>Here we have told it to request a timeline for whatever content the server thinks it is showing provided that the content ID begins with &#8220;dvb://&#8221;.
+Assuming that matches, then the timeline is to be a PTS timeline, which ticks at 90kHz (the standard rate of PTS in an MPEG transport stream).</p>
+</div>
+<div class="section" id="id5">
+<h3>How they work<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-examples.TSServer">
+<span id="tsserver-py-source"></span><h4>TSServer.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/TSServer.py">[source]</a><a class="headerlink" href="#module-examples.TSServer" title="Permalink to this headline">¶</a></h4>
+<p>It works by setting up a web server and the ws4py plug-in for cherrypy that provides
+WebSockets support.
+It then instantiates a <a class="reference internal" href="ts-server.html#dvbcss.protocol.server.ts.TSServer" title="dvbcss.protocol.server.ts.TSServer"><tt class="xref py py-class docutils literal"><span class="pre">TSServer</span></tt></a>
+and mounts it into the cherrypy server at the URL resource path &#8220;/ts&#8221;.
+It also includes a wall clock server.</p>
+<p>It does not play any media, but instead serves an imaginary set of timelines.</p>
+<p>It creates <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> objects to represent timelines and the wall clock.
+<a class="reference internal" href="ts-server.html#dvbcss.protocol.server.ts.SimpleClockTimelineSource" title="dvbcss.protocol.server.ts.SimpleClockTimelineSource"><tt class="xref py py-class docutils literal"><span class="pre">SimpleClockTimelineSource</span></tt></a> objects are used to interface the clocks as
+sources of timelines to the TS server object.</p>
+<p>It has a hardcoded DVB URL as the content ID (displayed when you start it running)
+and provides the following timelines:</p>
+<ul class="simple">
+<li>&#8220;<cite>urn:dvb:css:timeline:pts</cite>&#8221; ... a PTS timeline</li>
+<li>&#8220;<cite>urn:dvb:css:timelime:temi:1:1</cite>&#8221; ... a TEMI timeline ticking at 1kHz</li>
+<li>&#8220;<cite>urn:pydvbcss:sporadic</cite>&#8221; ... a meaningless timeline whose availability toggles every 10 seconds.</li>
+</ul>
+<p>The PTS and TEMI timelines both pause periodically and have their timing tweaked by a fraction of
+a second. The &#8220;sporadic&#8221; timeline shows how the protocol supports having timelines appear (become
+available) and disappear (become unavailable) while a client is connected.</p>
+<p>By default, this server serves at 127.0.0.1 on port 7681 and provides a CSS-TS service at the
+URL <cite>ws://127.0.0.1:7681/ts</cite>. It also provides a wall clock server bound to 0.0.0.0 on UDP port 6677.
+Command line options can be used to override these defaults and to reduce the amount of logging output.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for more detailed usage information.</p>
+</div>
+<div class="section" id="module-examples.TSClient">
+<span id="tsclient-py-source"></span><h4>TSClient.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/TSClient.py">[source]</a><a class="headerlink" href="#module-examples.TSClient" title="Permalink to this headline">¶</a></h4>
+<p>It works by implementing <cite>both</cite> a wall clock client and a CSS-TS client. A
+<a class="reference internal" href="ts-client.html#dvbcss.protocol.client.ts.TSClientClockController" title="dvbcss.protocol.client.ts.TSClientClockController"><tt class="xref py py-class docutils literal"><span class="pre">TSClientClockController</span></tt></a> object is instantiated
+and provided with a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object to represent
+the synchronisation timeline. The controller adjusts the clock object to match
+the timeline information coming from the server.</p>
+<p>At the command line you must specify:</p>
+<ul class="simple">
+<li>the WebSocket URL of the CSS-TS server, in the form <cite>ws://&lt;host&gt;:&lt;port&gt;/&lt;path&gt;</cite></li>
+<li>a <cite>udp://&lt;host&gt;:&lt;port&gt;</cite> format URL for the Wall Clock server</li>
+<li>The content ID stem and timeline selector to be used when requesting the timeline</li>
+<li>The tick rate of the timeline.</li>
+</ul>
+<p>Default options can be overridden for the IP address and port that the Wall Clock client
+binds to and to reduce the amount of logging output.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for usage information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="tvdevice-py">
+<h2><a class="toc-backref" href="#id10"><strong>TVDevice.py</strong></a><a class="headerlink" href="#tvdevice-py" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h3>Get started<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>This is a very simple example of a server running all three protocols (CSS-WC, CSS-TS and CSS-CII).
+It pretends to be showing a DVB broadcast service and able to provide a PTS or TEMI timeline for it.</p>
+<p>First start the server:</p>
+<div class="highlight-shell"><pre>$ python examples/TVDevice.py</pre>
+</div>
+<p>While we leave it running in the background, we can try to interact with it using the various example
+clients described above.</p>
+<p>By default it provides a wall clock server on 127.0.0.1 port 6677</p>
+<div class="highlight-shell"><pre>$ python examples/WallClockClient.py 127.0.0.1 6677</pre>
+</div>
+<p>... and a CSS-CII server that can be reached at <cite>ws://127.0.0.1:7681/cii</cite></p>
+<div class="highlight-shell"><pre>$ python examples/CIIClient.py ws:/127.0.0.1:7681/cii</pre>
+</div>
+<p>... and a CSS-TS server that can be reached at <cite>ws://127.0.0.1:7681/ts</cite></p>
+<div class="highlight-shell"><pre>$ python examples/TSClient.py ws://127.0.0.1:7681/ts udp://127.0.0.1:6677 "dvb://" "urn:dvb:css:timeline:temi:1:1" 1000</pre>
+</div>
+</div>
+<div class="section" id="how-it-works">
+<h3>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-examples.TVDevice">
+<span id="tvdevice-py-source"></span><h4>TVDevice.py <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/examples/TVDevice.py">[source]</a><a class="headerlink" href="#module-examples.TVDevice" title="Permalink to this headline">¶</a></h4>
+<p>This example works by setting up a web server and the ws4py plug-in for cherrypy that provides
+WebSockets support.
+It then instantiates a <a class="reference internal" href="ts-server.html#dvbcss.protocol.server.ts.TSServer" title="dvbcss.protocol.server.ts.TSServer"><tt class="xref py py-class docutils literal"><span class="pre">TSServer</span></tt></a> and
+<a class="reference internal" href="cii-server.html#dvbcss.protocol.server.cii.CIIServer" title="dvbcss.protocol.server.cii.CIIServer"><tt class="xref py py-class docutils literal"><span class="pre">CIIServer</span></tt></a> and mounts it into the cherrypy server.
+It also includes a wall clock server.</p>
+<p>It does not play any media, but instead serves an imaginary set of timelines and
+pretends to be presenting a broadcast service.</p>
+<p>It creates <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> objects to represent timelines and the wall clock.
+<a class="reference internal" href="ts-server.html#dvbcss.protocol.server.ts.SimpleClockTimelineSource" title="dvbcss.protocol.server.ts.SimpleClockTimelineSource"><tt class="xref py py-class docutils literal"><span class="pre">SimpleClockTimelineSource</span></tt></a> objects are used to interface the clocks as
+sources of timelines to the TS server object.</p>
+<p>It has a hardcoded DVB URL as the content ID (displayed when you start it running)
+and provides the following timelines:</p>
+<ul class="simple">
+<li><cite>urn:dvb:css:timeline:pts</cite> ... a PTS timeline</li>
+<li><cite>urn:dvb:css:timelime:temi:1:1</cite> ... a TEMI timeline ticking at 1kHz</li>
+</ul>
+<p>The PTS and TEMI timelines both start ticking up from zero the moment the server starts.</p>
+<p>By default, this server serves at 127.0.0.1 on port 7681 and provides a CSS-CII service at the
+URL <cite>ws://127.0.0.1:7681/cii</cite> and a CSS-TS service at the
+URL <cite>ws://127.0.0.1:7681/ts</cite>. It also provides a wall clock server bound to 0.0.0.0 on UDP port 6677.
+Command line options can be used to override these defaults and to reduce the amount of logging output.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">--help</span></tt> command line option for more detailed usage information.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="protocol.html" class="btn btn-neutral float-right" title="DVB CSS Protocol modules"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="pydvbcss"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DVB CSS Protocol modules &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="next" title="CSS-CII protocol" href="cii.html"/>
+        <link rel="prev" title="Run the examples" href="examples.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">DVB CSS Protocol modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>DVB CSS Protocol modules</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/protocol.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol"></span><div class="section" id="dvb-css-protocol-modules">
+<h1>DVB CSS Protocol modules<a class="headerlink" href="#dvb-css-protocol-modules" title="Permalink to this headline">¶</a></h1>
+<p>Module: <cite>dvbcss.protocol</cite></p>
+<p>The <a class="reference internal" href="#module-dvbcss.protocol" title="dvbcss.protocol"><tt class="xref py py-mod docutils literal"><span class="pre">dvbcss.protocol</span></tt></a> module contains classes to implement the CSS-CII, CSS-TS and CSS-WC protocols.
+For each protocol there are objects to represent the messages that flow across the protocols and classes
+that implement clients and servers for the protocols.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cii.html">CSS-CII protocol</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii-messages.html">CSS-CII Message objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cii-client.html">CSS-CII Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cii-server.html">CSS-CII Servers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ts.html">CSS-TS protocol</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ts-overview.html">CSS-TS Protocol overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-messages.html">CSS-TS Message objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-client.html">CSS-TS Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts-server.html">CSS-TS Servers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wc.html">CSS-WC protocol</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wc-messages.html">CSS-WC Message objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc-client.html">CSS-WC Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc-server.html">CSS-WC Servers</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>See <a class="reference internal" href="servers-internals.html"><em>Protocol server implementation details</em></a> for information on how the servers are implemented.</p>
+<div class="section" id="common-types-and-objects">
+<h2>Common types and objects<a class="headerlink" href="#common-types-and-objects" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="signalling-that-a-property-is-to-be-omitted-from-a-message">
+<span id="private-data"></span><h3>Signalling that a property is to be omitted from a message<a class="headerlink" href="#signalling-that-a-property-is-to-be-omitted-from-a-message" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="dvbcss.protocol.OMIT">
+<tt class="descclassname">dvbcss.protocol.</tt><tt class="descname">OMIT</tt><em class="property"> object</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.OMIT" title="Permalink to this definition">¶</a></dt>
+<dd><p>When this object is assigned to an attribute of a protocol message object this
+indicates that the corresponding property is not included in the JSON
+representation of that message (it is omitted).</p>
+<p>Here is an example. By default nearly all properties of a freshly created CII
+message object are &#8216;OMIT&#8217;:</p>
+<div class="highlight-python"><pre>&gt;&gt;&gt; from dvbcss.protocol.cii import CII
+&gt;&gt;&gt; from dvbcss.protocol import OMIT
+
+&gt;&gt;&gt; c=CII()
+&gt;&gt;&gt; print repr(c.contentId)
+OMIT
+
+&gt;&gt;&gt; c.wcUrl = "udp://192.168.1.1:6677"
+&gt;&gt;&gt; print repr(c.wcUrl)
+'udp://192.168.1.1:6677'
+
+&gt;&gt;&gt; c.wcUrl = OMIT
+&gt;&gt;&gt; print repr(c.wcUrl)
+OMIT</pre>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>Private data<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Some protocol messages contain optional properties to carry private data.</p>
+<p>Private data is encoded in message objects here as a <a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> objects
+where each has a key &#8220;type&#8221; whose value is a URI.</p>
+<p>Each dict can contain any other
+keys and values you wish so long as they can be parsed by the python <a class="reference external" href="http://docs.python.org/library/json.html#module-json" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">json</span></tt></a> module&#8217;s encoder.
+For example:</p>
+<div class="highlight-python"><pre>example_private_data = [
+    { "type" : "urn:bbc.co.uk:pid", "pid":"b00291843",
+      "entity":"episode"
+    },
+    { "type" : "tag:bbc.co.uk/programmes/clips/link-url",
+      "http://www.bbc.co.uk/programmes/b1290532/"
+    }
+]</pre>
+</div>
+</div>
+<div class="section" id="exceptions">
+<h3>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.ConnectionError">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.</tt><tt class="descname">ConnectionError</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.ConnectionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception that is raised when it was not possible to open a connection to a server.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cii.html" class="btn btn-neutral float-right" title="CSS-CII protocol"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="examples.html" class="btn btn-neutral" title="Run the examples"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

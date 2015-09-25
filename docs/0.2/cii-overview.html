@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-CII Protocol introduction &mdash; pydvbcss 0.2-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.2-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-CII protocol" href="cii.html"/>
+        <link rel="next" title="CSS-CII Message objects" href="cii-messages.html"/>
+        <link rel="prev" title="CSS-CII protocol" href="cii.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="cii.html">CSS-CII protocol</a> &raquo;</li>
+      
+    <li>CSS-CII Protocol introduction</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/cii-overview.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="css-cii-protocol-introduction">
+<h1>CSS-CII Protocol introduction<a class="headerlink" href="#css-cii-protocol-introduction" title="Permalink to this headline">¶</a></h1>
+<p><strong>Here is a quick introduction to the CSS-CII protocol. For full details, refer to the</strong>
+<a class="reference external" href="https://www.dvb.org/search/results/keywords/A167">DVB specification</a>.</p>
+<p>The CSS-CII protocol is for sharing the server&#8217;s (e.g. TV&#8217;s) current
+&#8220;Content Identifier and other Information&#8221; (yes really!) with the client (e.g.
+companion). It also includes the URL of the <a class="reference internal" href="ts.html"><em>CSS-TS</em></a> and
+<a class="reference internal" href="wc.html"><em>CSS-WC</em></a> servers so the client knows where to find them.</p>
+<p>CII comprises a set of defined properties.  The server pushes state update
+messages containing some or all properties (at minimum those that have changed).
+How often these messages are pushed and which properties are included are
+up to the server.</p>
+<p>It is a WebSockets based protocol and messages are in JSON format.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#sequence-of-interaction" id="id1">Sequence of interaction</a></li>
+<li><a class="reference internal" href="#cii-message-properties" id="id2">CII message properties</a></li>
+</ul>
+</div>
+<div class="section" id="sequence-of-interaction">
+<h2><a class="toc-backref" href="#id1">Sequence of interaction</a><a class="headerlink" href="#sequence-of-interaction" title="Permalink to this headline">¶</a></h2>
+<p>The client is assumed to already know the WebSocket URL for the CSS-CII server
+(for example: because the TV chooses to advertise it via a network service
+discovery mechanism).</p>
+<p>1. The client connects to the CSS-TS server. Either this is refused via an HTTP status code response,
+or it is accepted.</p>
+<p>2. The server immediately responds with a first CII state update message. This
+contains (at minimum) all properties whose values are not null.</p>
+<p>3. The server can re-send the CII state update message as often as it wishes.
+At minimum it will do so when one or more of the properties have changed value.
+The server will, at minimum, include the properties that have changed, but could
+also include others in the message.</p>
+<p>This protocol is a state update mechanism. The client is locally
+mirroring the state of the TV by remembering the most recent values received
+for each of the properties. When a message is received it updates that local
+state and can react to any changes if it needs to.</p>
+<p>Any messages sent by the client are ignored by the server.</p>
+</div>
+<div class="section" id="cii-message-properties">
+<h2><a class="toc-backref" href="#id2">CII message properties</a><a class="headerlink" href="#cii-message-properties" title="Permalink to this headline">¶</a></h2>
+<p>Every message sent by the server is a CII message and consists of a single JSON
+object with zero, one, more or all of the following properties:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">protocolVersion</span></tt> - currently &#8220;1.1&#8221; and must be included in the first message sent by the server after the client connects.</li>
+<li><tt class="docutils literal"><span class="pre">contentId</span></tt> - a URI representing the ID of the content being presented by the server.
+This will be a variant on a DVB URL (&#8220;dvb://&#8221;) for DVB broadcast services, or the URL of  the MPD for MPEG DASH streams.</li>
+<li><tt class="docutils literal"><span class="pre">contentIdStatus</span></tt> - whether the content Id is in its &#8220;final&#8221; form or whether it is a &#8220;partial&#8221; version until full information is available.
+For example: a DVB broadcast content ID might not include some elements until the TV detects certain metadata in the broadcast stream which can take a few seconds.</li>
+<li><tt class="docutils literal"><span class="pre">presentationStatus</span></tt> - Primarily, whether presentation of the content is &#8220;okay&#8221;, &#8220;transitioning&#8221; from one piece of content to the next, or in a &#8220;fault&#8221; condition.
+This can be extended by suffixing space separated additional terms after the primary term.</li>
+<li><tt class="docutils literal"><span class="pre">mrsUrl</span></tt> - The URL of an MRS server.</li>
+<li><tt class="docutils literal"><span class="pre">tsUrl</span></tt> - The WebSockets URL of the CSS-TS server that a client should use if it wants to do Timeline Synchronisation.</li>
+<li><tt class="docutils literal"><span class="pre">wcUrl</span></tt> - The UDP URL (&#8220;udp://&lt;host&gt;:&lt;port&#8221;) of the CSS-WC server.</li>
+<li><tt class="docutils literal"><span class="pre">teUrl</span></tt> - The WebSockets URL of the CSS-TE server that a client should use if it wants to receive Trigger Events.</li>
+<li><tt class="docutils literal"><span class="pre">timelines</span></tt> - a list of zero, one or more timelines that the TV believes to be available for synchronising to.</li>
+<li><tt class="docutils literal"><span class="pre">private</span></tt> - Extension mechanism to carry additional private data.</li>
+</ul>
+<p>An example <a class="reference internal" href="cii-messages.html#dvbcss.protocol.cii.CII" title="dvbcss.protocol.cii.CII"><tt class="xref py py-class docutils literal"><span class="pre">CII</span></tt></a> message:</p>
+<div class="highlight-json"><pre>{
+        "protocolVersion"    : "1.1",
+        "mrsUrl"             : "http://css.bbc.co.uk/dvb/233A/mrs",
+        "contentId"          : "dvb://233a.1004.1044;363a~20130218T0915Z--PT00H45M",
+        "contentIdStatus"    : "partial",
+        "presentationStatus" : "okay",
+        "wcUrl"              : "udp://192.168.1.5:5800",
+        "tsUrl"              : "ws://192.168.1.8:5815",
+        "timelines" : [
+                {
+                        "timelineSelector"   : "urn:dvb:css:timeline:temi:1:1",
+                        "timelineProperties" : {
+                                "unitsPerTick"   : 5,
+                                "unitsPerSecond" : 10
+                        }
+                }
+        ]
+}</pre>
+</div>
+<p>Another example where the contentId has changed, due to a channel change. The
+server has chosen to omit properties that have not changed since the previous
+message:</p>
+<div class="highlight-json"><pre>{
+        "contentId"          : "dvb://233a.1004.1044;364f~20130218T1000Z--PT01H15M",
+        "contentIdStatus"    : "partial",
+}</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cii-messages.html" class="btn btn-neutral float-right" title="CSS-CII Message objects"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cii.html" class="btn btn-neutral" title="CSS-CII protocol"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,773 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSS-WC Clients &mdash; pydvbcss 0.2-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.2-release documentation" href="index.html"/>
+        <link rel="up" title="CSS-WC protocol" href="wc.html"/>
+        <link rel="next" title="CSS-WC Servers" href="wc-server.html"/>
+        <link rel="prev" title="CSS-WC Message objects" href="wc-messages.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="protocol.html">DVB CSS Protocol modules</a> &raquo;</li>
+      
+          <li><a href="wc.html">CSS-WC protocol</a> &raquo;</li>
+      
+    <li>CSS-WC Clients</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/wc-client.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.client.wc"></span><span class="target" id="module-dvbcss.protocol.client.wc.algorithm"></span><div class="section" id="css-wc-clients">
+<h1>CSS-WC Clients<a class="headerlink" href="#css-wc-clients" title="Permalink to this headline">¶</a></h1>
+<p>Modules: <cite>dvbcss.protocol.client.wc</cite> | <cite>dvbcss.protocol.client.wc.algorithm</cite></p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#using-a-wall-clock-client" id="id5">Using a Wall Clock Client</a></li>
+<li><a class="reference internal" href="#algorithms" id="id6">Algorithms</a><ul>
+<li><a class="reference internal" href="#dispersion-algorithm" id="id7">Dispersion algorithm</a></li>
+<li><a class="reference internal" href="#simple-algorithm" id="id8">Simple algorithm</a></li>
+<li><a class="reference internal" href="#writing-new-algorithms" id="id9">Writing new algorithms</a></li>
+<li><a class="reference internal" href="#composable-filter-and-prediction-algorithm" id="id10">Composable Filter and prediction algorithm</a><ul>
+<li><a class="reference internal" href="#round-trip-time-threshold-filter" id="id11">Round-trip time threshold Filter</a></li>
+<li><a class="reference internal" href="#lowest-dispersion-candidate-filter" id="id12">Lowest dispersion candidate filter</a></li>
+<li><a class="reference internal" href="#simple-predictor" id="id13">Simple Predictor</a></li>
+<li><a class="reference internal" href="#writing-your-own-filter" id="id14">Writing your own Filter</a></li>
+<li><a class="reference internal" href="#writing-your-own-predictor" id="id15">Writing your own Predictor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functions" id="id16">Functions</a><ul>
+<li><a class="reference internal" href="#filter-and-prediction-algorithm-creator" id="id17">Filter and Prediction algorithm creator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classes" id="id18">Classes</a><ul>
+<li><a class="reference internal" href="#wallclockclient" id="id19">WallClockClient</a></li>
+<li><a class="reference internal" href="#id4" id="id20">Dispersion algorithm</a></li>
+<li><a class="reference internal" href="#most-recent-measurement-algorithm" id="id21">Most recent measurement algorithm</a></li>
+<li><a class="reference internal" href="#filter-and-prediction-composable-algorithms" id="id22">Filter and Prediction composable algorithms</a><ul>
+<li><a class="reference internal" href="#filters" id="id23">Filters</a></li>
+<li><a class="reference internal" href="#predictors" id="id24">Predictors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#general-helper-classes" id="id25">General helper classes</a><ul>
+<li><a class="reference internal" href="#dispersion-calculator" id="id26">Dispersion calculator</a></li>
+<li><a class="reference internal" href="#candidate-quality-calculator" id="id27">Candidate quality calculator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a> class provides a complete Wall Clock Client implementation.
+It is used in conjunction with an <a class="reference internal" href="#algorithms"><em>algorithm</em></a> for adjusting a <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> object
+so that it mirrors the server&#8217;s Wall Clock.</p>
+<div class="section" id="using-a-wall-clock-client">
+<h2><a class="toc-backref" href="#id5">Using a Wall Clock Client</a><a class="headerlink" href="#using-a-wall-clock-client" title="Permalink to this headline">¶</a></h2>
+<p>Recommended simplest use is to instantiate a <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a> and provide it with an
+instance of the <tt class="xref py py-class docutils literal"><span class="pre">LowestDispersionCandidate</span></tt> algorithm to control how it updates a clock.</p>
+<p><a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a> is used by providing it with an object implementing the clock
+synchronisation <a class="reference internal" href="#algorithms"><em>algorithm</em></a>. The Wall Clock client handles the
+protocol interaction (sending the requests and parsing the responses) at the times
+specified by the algorithm and passes the results of each request-response measurement
+(known as a &#8216;candidate&#8217;) to the algorithm. The algorithm then adjusts the clock.</p>
+<p>The type of Clock class that can be used for the wall clock will depend on the algorithm.
+Some algorithms require that the tick rate of the clock be 1 tick per nanosecond (tick rate = 1000000000).
+The WallClockClient class does not require this, but it is recommended to use this tick rate.</p>
+<p>A simple example that connects to a wall clock server at 192.168.0.115 port 6677 and sends requests once per second:</p>
+<div class="highlight-python"><pre>from dvbcss.clock import SysClock as SysClock
+from dvbcss.clock import TunableClock as TunableClock
+from dvbcss.protocol.client.wc import WallClockClient
+from dvbcss.protocol.client.wc.algorithm import LowestDispersionCandidate
+
+sysClock=SysClock()
+wallClock=TunableClock(sysClock,tickRate=1000000000)
+
+algorithm = LowestDispersionCandidate(wallClock,repeatSecs=1,timeoutSecs=0.5)
+
+bind = ("0.0.0.0", 6677)
+server = ("192.168.0.115", 6677)
+
+wc_client=WallClockClient(bind, server, wallClock, algorithm)
+wc_client.start()
+
+# wall clock client is now running in the background</pre>
+</div>
+<p>After the <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient.start" title="dvbcss.protocol.client.wc.WallClockClient.start"><tt class="xref py py-func docutils literal"><span class="pre">start()</span></tt></a> method is called, the WallClockClient runs in a separate thread and execution continues.</p>
+</div>
+<div class="section" id="algorithms">
+<span id="id1"></span><h2><a class="toc-backref" href="#id6">Algorithms</a><a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
+<p>The algorithm object determines when (and how often) a WallClockClient sends CSS-WC protocol requests
+and processes the results of requests and responses to adjust the <a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a> object representing
+the wall clock.</p>
+<div class="section" id="dispersion-algorithm">
+<h3><a class="toc-backref" href="#id7">Dispersion algorithm</a><a class="headerlink" href="#dispersion-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate" title="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate"><tt class="xref py py-class docutils literal"><span class="pre">LowestDispersionCandidate</span></tt></a> algorithm is the recommended algorithm.
+It uses the candidate with the lowest dispersion.</p>
+</div>
+<div class="section" id="simple-algorithm">
+<h3><a class="toc-backref" href="#id8">Simple algorithm</a><a class="headerlink" href="#simple-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="#dvbcss.protocol.client.wc.algorithm.MostRecent" title="dvbcss.protocol.client.wc.algorithm.MostRecent"><tt class="xref py py-class docutils literal"><span class="pre">MostRecent</span></tt></a> algorithm is a simple naive algorithm that uses
+the most recent candidate irrespective of its quality (e.g. how long the round-trip time of the measurement was)</p>
+</div>
+<div class="section" id="writing-new-algorithms">
+<h3><a class="toc-backref" href="#id9">Writing new algorithms</a><a class="headerlink" href="#writing-new-algorithms" title="Permalink to this headline">¶</a></h3>
+<p>An algorithm is an object that has the following method:</p>
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm..algorithm">
+<tt class="descclassname">.</tt><tt class="descname">algorithm</tt><big>(</big><em>self</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm..algorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference external" href="http://www.jeffknupp.com/blog/2013/04/07/improve-your-python-yield-and-generators-explained">python generator</a>
+function that yields whenever it wants a Wall Clock protocol measurement to be taken:</p>
+<div class="highlight-python"><pre>candidateOrNone = yield timeoutSecs</pre>
+</div>
+<p>The yield must pass a timeout in seconds. This is the maximum amount of time the Wall Clock client will
+wait for a response to its request before timing out.</p>
+<p>The yield statement will return either <tt class="xref py py-class docutils literal"><span class="pre">None</span></tt> or a <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> containing two
+<a class="reference internal" href="wc-messages.html#dvbcss.protocol.wc.Candidate" title="dvbcss.protocol.wc.Candidate"><tt class="xref py py-class docutils literal"><span class="pre">Candidate</span></tt></a> object representing the result of the measurement in units of ticks
+and units of nanoseconds:</p>
+<div class="highlight-python"><pre>{
+    "ticks" : candidate,    # in units of ticks
+    "nanos" : candidate,    # same, but in units of nanoseconds
+}</pre>
+</div>
+<p>The algorithm can then use the Candidate object in its algorithm for estimating the wall clock (and in
+the case of most practical implementations: adjusting a <tt class="xref py py-mod docutils literal"><span class="pre">dvbcss:Clock</span></tt> object).</p>
+</dd></dl>
+
+<p>Here is an example of a simple naive algorithm that adjusts a <a class="reference internal" href="clock.html#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> object
+using the most recent measurement, irrespective of influencing factors such as previous measurements or
+network latency (round trip time). It makes requests at most once per second and has a timeout on waiting
+for responses of half a second:</p>
+<div class="highlight-python"><pre>class NaiveAlgorithm(object):
+
+    def __init__(self,clock):
+        self.clock = clock
+    
+    def algorithm(self):
+        while True:
+            candidate=(yield 0.5)
+            if candidate is not None:
+                candidate=candidate["ticks"]
+                self.clock.adjustTicks(candidate.offset)
+                time.sleep(1.0)</pre>
+</div>
+</div>
+<div class="section" id="composable-filter-and-prediction-algorithm">
+<h3><a class="toc-backref" href="#id10">Composable Filter and prediction algorithm</a><a class="headerlink" href="#composable-filter-and-prediction-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>There is also a simple modular framework for building up an algorithm out of two parts:</p>
+<ul class="simple">
+<li><em>Filters</em> - processes measurement candidates, determining whether to reject them.</li>
+<li><em>A Predictor</em> - takes the measurement candidates outputted from the filtering step and use them to adjust the clock.</li>
+</ul>
+<p>Use the <a class="reference internal" href="#dvbcss.protocol.client.wc.algorithm.FilterAndPredict" title="dvbcss.protocol.client.wc.algorithm.FilterAndPredict"><tt class="xref py py-func docutils literal"><span class="pre">FilterAndPredict()</span></tt></a> function to compose zero, one or more Filters,
+and a Predictor into an algorithm that can be used with a <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a>.</p>
+<p>When using this algorithm, you provide a <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object to it, whose parent is the
+clock given to the :class:<a href="#id2"><span class="problematic" id="id3">`</span></a>~dvbcss.protocol.client.wc.WallClockClient.</p>
+<p>This algorithm controls the <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object by settings its
+<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.correlation" title="dvbcss.clock.CorrelatedClock.correlation"><tt class="xref py py-data docutils literal"><span class="pre">correlation</span></tt></a> property to (0,offset) where <cite>offset</cite> is provided by the
+predictor. The parent of this clock is the clock used by the <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a>
+in generating the measurement candidates. So the job of the predictor is always to estimate the current absolute
+offset between that clock and the wall clock of the server.</p>
+<p>Here is a simple example that uses a simple predictor and a round-trip-time threshold filter:</p>
+<div class="highlight-python"><pre>from dvbcss.protocol.wc.algorithm import FilterAndPredict, FilterRttThreshold, PredictSimple
+
+sysClock = SysClock(tickRate=1000000000)
+wallClock = CorrelatedClock(parentClock=sysClock, tickRate=1000000000, correlation=(0,0))
+
+filters = [ FilterRttTreshold(thresholdMillis=10.0) ]
+predictor = PredictSimple()
+
+algorithm = FilterAndPredict(wallClock, repeatSecs, timeoutSecs, filters, predictor)
+
+bind = ("0.0.0.0", 6677)
+server = ("192.168.0.115", 6677)
+
+wc_client=WallClockClient(bind, server, wallClock, algorithm)
+wc_client.start()</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The Clock object given to the algorithm must be <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-mod docutils literal"><span class="pre">CorrelatedClock</span></tt></a>
+whose parent is the clock object provided to the WallClockClient object.</p>
+<p class="last">Both clocks must have the same tick rate.</p>
+</div>
+<div class="section" id="round-trip-time-threshold-filter">
+<h4><a class="toc-backref" href="#id11">Round-trip time threshold Filter</a><a class="headerlink" href="#round-trip-time-threshold-filter" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="xref py py-class docutils literal"><span class="pre">FilterRttThreshold</span></tt> class implements a filter that eliminates any candidate
+where the round-trip time exceeds a threshold.</p>
+</div>
+<div class="section" id="lowest-dispersion-candidate-filter">
+<h4><a class="toc-backref" href="#id12">Lowest dispersion candidate filter</a><a class="headerlink" href="#lowest-dispersion-candidate-filter" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="xref py py-class docutils literal"><span class="pre">FilterLowestDispersionCandidate</span></tt> class implements a filter that eliminates
+any candidate if it does not have a lower dispersion that any candidate that came before it.</p>
+</div>
+<div class="section" id="simple-predictor">
+<h4><a class="toc-backref" href="#id13">Simple Predictor</a><a class="headerlink" href="#simple-predictor" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="xref py py-class docutils literal"><span class="pre">PredictSimple</span></tt> class is a simple predictor that uses the candidate
+most recently provided to it and uses the offset calculated by that candidate as the prediction.</p>
+</div>
+<div class="section" id="writing-your-own-filter">
+<h4><a class="toc-backref" href="#id14">Writing your own Filter</a><a class="headerlink" href="#writing-your-own-filter" title="Permalink to this headline">¶</a></h4>
+<p>You can write your own Filter by creating a class with the following method defined:</p>
+<blockquote>
+<div><dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm._filterpredict..checkCandidate">
+<tt class="descclassname">.</tt><tt class="descname">checkCandidate</tt><big>(</big><em>self</em>, <em>candidate</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm/_filterpredict.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm._filterpredict..checkCandidate" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>candidate</strong> &#8211; A (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a>)  containing two <a class="reference internal" href="wc-messages.html#dvbcss.protocol.wc.Candidate" title="dvbcss.protocol.wc.Candidate"><tt class="xref py py-class docutils literal"><span class="pre">Candidate</span></tt></a> objects
+representing the result of the measurement in units of ticks (dict key <cite>&#8220;ticks&#8221;</cite>) and units
+of nanoseconds (dict key <cite>&#8220;nanos&#8221;</cite>):</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="writing-your-own-predictor">
+<h4><a class="toc-backref" href="#id15">Writing your own Predictor</a><a class="headerlink" href="#writing-your-own-predictor" title="Permalink to this headline">¶</a></h4>
+<p>You can write your own Predictor by creating a class with the following methods defined:</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm._filterpredict..addCandidate">
+<tt class="descclassname">.</tt><tt class="descname">addCandidate</tt><big>(</big><em>self</em>, <em>candidate</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm/_filterpredict.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm._filterpredict..addCandidate" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">param candidate:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">A (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a>)  containing two <a class="reference internal" href="wc-messages.html#dvbcss.protocol.wc.Candidate" title="dvbcss.protocol.wc.Candidate"><tt class="xref py py-class docutils literal"><span class="pre">Candidate</span></tt></a> objects
+representing the result of the measurement in units of ticks (dict key <cite>&#8220;ticks&#8221;</cite>) and units
+of nanoseconds (dict key <cite>&#8220;nanos&#8221;</cite>):</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>This method is called whenever a measurement candidate resulting from a request-response measurement
+survives the filtering process.</p>
+</dd></dl>
+
+</div></blockquote>
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm._filterpredict..predictOffset">
+<tt class="descclassname">.</tt><tt class="descname">predictOffset</tt><big>(</big><em>self</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm/_filterpredict.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm._filterpredict..predictOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must return the difference between the clock used and the server wall clock. The clock used
+by the client is a fixed clock. The difference therefore represents the difference between that clock and
+the Wall Clock on the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The offset (in ticks) between the client clock and the wall clock</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="functions">
+<h2><a class="toc-backref" href="#id16">Functions</a><a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="filter-and-prediction-algorithm-creator">
+<h3><a class="toc-backref" href="#id17">Filter and Prediction algorithm creator</a><a class="headerlink" href="#filter-and-prediction-algorithm-creator" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="dvbcss.protocol.client.wc.algorithm.FilterAndPredict">
+<tt class="descclassname">dvbcss.protocol.client.wc.algorithm.</tt><tt class="descname">FilterAndPredict</tt><big>(</big><em>clock</em>, <em>repeatSecs=1.0</em>, <em>timeoutSecs=0.2</em>, <em>filters=[]</em>, <em>predictor=&lt;dvbcss.protocol.client.wc.algorithm._filterpredict.PredictSimple object at 0x103d80790&gt;</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.FilterAndPredict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines zero, one or more Filters and a Predictor and returns an algorithm for a WallClockClient.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>clock</strong> &#8211; A <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object that will be adjusted to match the Wall Clock.</li>
+<li><strong>repeatSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The rate at which Wall Clock protocol requests are to be sent (in seconds).</li>
+<li><strong>timeoutSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The timeout on waiting for responses to requests (in seconds).</li>
+<li><strong>filters</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> of Filters) A list of zero, one or more Filters</li>
+<li><strong>predictor</strong> &#8211; (Predictor) The Predictor to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An algorithm object embodying the filtering and prediction process, that is suitable to be passed to a
+<a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This algorithm controls the <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-class docutils literal"><span class="pre">CorrelatedClock</span></tt></a> object by settings its
+<a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock.correlation" title="dvbcss.clock.CorrelatedClock.correlation"><tt class="xref py py-data docutils literal"><span class="pre">correlation</span></tt></a> property to (0,offset) where <cite>offset</cite> is provided by the
+predictor. The parent of this clock is the clock used by the <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a>
+in generating the measurement candidates. So the job of the predictor is always to estimate the current absolute
+offset between that clock and the wall clock of the server.</p>
+<p>Requests are made at the repetition rate specified. If a response is received within the timeout period it
+is then it is transformed into a measurement candidate and passed to the filters.
+Filters are applied in the order you list them. If a candidate survives filtering, then it is passed to the
+predictor. Every time a candidate is provided to the predictor, the offset returned by the predictor replaces
+the previous offset.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The Clock object must be <a class="reference internal" href="clock.html#dvbcss.clock.CorrelatedClock" title="dvbcss.clock.CorrelatedClock"><tt class="xref py py-mod docutils literal"><span class="pre">CorrelatedClock</span></tt></a> whose parent is the clock object
+provided to the WallClockClient object with which this algorithm is used.</p>
+<p class="last"><em>It must not be the same clock object.</em> However both must have
+the same tick rate. If the same clock object is used or different tick rates are used then
+the Wall Clock will not synchronise correctly..</p>
+</div>
+<p>The tick rate of the Clock can be any tick rate (it does not have to be one tick per nanosecond),
+but too low a tick rate will limit clock synchronisation precision.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="classes">
+<h2><a class="toc-backref" href="#id18">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wallclockclient">
+<h3><a class="toc-backref" href="#id19">WallClockClient</a><a class="headerlink" href="#wallclockclient" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.WallClockClient">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.</tt><tt class="descname">WallClockClient</tt><big>(</big><em>(bindaddr</em>, <em>bindport)</em>, <em>(dstaddr</em>, <em>dstport)</em>, <em>wallClock</em>, <em>wcAlgorithm</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.WallClockClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple object implementing the client side of the CSS-TS protocol.</p>
+<p>Use by initialising and supplying with an algorithm object and Clock object.</p>
+<p><strong>Initialisation takes the following parameters:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>(bindaddr,bindport)</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>, <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) A tuple containing the IP address (as a string) and port (as an int) to bind to to listen for incoming packets</li>
+<li><strong>(dstaddr,dstport)</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a>, <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>) A tuple containing the IP address (as a string) and port (as an int) of the Wall Clock server</li>
+<li><strong>wallClock</strong> &#8211; (<a class="reference internal" href="clock.html#module-dvbcss.clock" title="dvbcss.clock"><tt class="xref py py-mod docutils literal"><span class="pre">clock</span></tt></a>) The local clock that will be controlled to be a Wall Clock</li>
+<li><strong>wcAlgorithm</strong> &#8211; (<a class="reference internal" href="#algorithms"><em>algorithm</em></a>) The algorithm for the client to use to update the clock.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>It is recommended to use the <a class="reference internal" href="#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate" title="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate"><tt class="xref py py-class docutils literal"><span class="pre">LowestDispersionCandidate</span></tt></a> algorithm.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.client.wc.WallClockClient.algorithm">
+<tt class="descname">algorithm</tt><em class="property"> = None</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.WallClockClient.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read only) The <a class="reference internal" href="#algorithms"><em>algorithm</em></a> object being used with this WallClockClient</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.WallClockClient.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.WallClockClient.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call this method to start the client running. This function call returns immediately
+and the client proceeds to run in a thread in the background.</p>
+<p>Does nothing if the client is already running.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.WallClockClient.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.WallClockClient.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call this method to stop the client running. Returns once the client has stopped.</p>
+<p>If the client is not running then nothing happens and this call returns immediately.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3><a class="toc-backref" href="#id20">Dispersion algorithm</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.algorithm.</tt><tt class="descname">LowestDispersionCandidate</tt><big>(</big><em>clock</em>, <em>repeatSecs=1.0</em>, <em>timeoutSecs=0.2</em>, <em>localMaxFreqErrorPpm=500</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Algorithm that selects the candidate (request-response measurement result) with the lowest
+dispersion.</p>
+<p>Dispersion is a formal measure of the error bounds of the Wall Clock estimate. This value is the sum
+of possible error due to:</p>
+<ul class="simple">
+<li>measurement precision limitations (at both client and server)</li>
+<li>round-trip time</li>
+<li>maximum potential for oscillator frequency error at the client and at the server server
+This grows as the candidate (that was used to most recently adjust the clock) ages.</li>
+</ul>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The Clock object must be the same one that is provided to the WallClockClient, otherwise
+this algorithm will not synchronise correctly.</p>
+</div>
+</div></blockquote>
+<p>The tick rate of the Clock can be any tick rate (it does not have to be one tick per nanosecond),
+but too low a tick rate will limit clock synchronisation precision.</p>
+<p>There is a stub callback function provided that you can override (e.g. by subclassing)
+that will be called whenever the clock is adjusted:</p>
+<ul class="simple">
+<li><tt class="xref py py-func docutils literal"><span class="pre">onClockAdjusted()</span></tt></li>
+</ul>
+<p>The arguments to this method provide details of when
+the adjustment took place and what adjustment was made. It also reports the dispersion
+before and after the adjustment and gives information needed to extrapolate future
+dispersions. You can use this, for example, to record the clock dispersion over time.</p>
+<p><em>Initialisation takes the following parameters:</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; A <a class="reference internal" href="clock.html#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> object representing that will be adjusted to match the Wall Clock.</li>
+<li><strong>repeatSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The rate at which Wall Clock protocol requests are to be sent (in seconds).</li>
+<li><strong>timeoutSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The timeout on waiting for responses to requests (in seconds).</li>
+<li><strong>localMaxFreqErrorPpm</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The maximum frequency error of the local oscillator that underpins the clock object provided (in ppm).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate.getCurrentDispersion">
+<tt class="descname">getCurrentDispersion</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate.getCurrentDispersion" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Current dispersion at this moment in time in units of nanoseconds.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate.getWorstDispersion">
+<tt class="descname">getWorstDispersion</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate.getWorstDispersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the worst (greatest) dispersion encountered since
+the previous time this method was called.</p>
+<p>The first time it is called, the value reported will be very large,
+reflecting the fact that initially dispersion is high because the
+client is not yet synchronised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dispersion</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate.onClockAdjusted">
+<tt class="descname">onClockAdjusted</tt><big>(</big><em>timeAfterAdjustment</em>, <em>adjustment</em>, <em>oldDispersionNanos</em>, <em>newDispersionNanos</em>, <em>dispersionGrowthRate</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate.onClockAdjusted" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called immediately after a clock adjustment has been made,
+and gives details on how the clock was changed and the effect on the dispersion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeAfterAdjustment</strong> &#8211; The wall clock time (in ticks) immedaitely after the adjustment took place</li>
+<li><strong>adjustment</strong> &#8211; The amount by which the wall clock instaneously changed (in ticks)</li>
+<li><strong>oldDispersionNanos</strong> &#8211; The dispersion (in nanoseconds) just prior to adjustment</li>
+<li><strong>newDispersionNanos</strong> &#8211; The dispersion (in nanoseconds) immediately after adjustment</li>
+<li><strong>dispersionGrowthRate</strong> &#8211; The rate at which dispersion will continue to grow.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>To calculate a future dispersion at time T:</dt>
+<dd>futureDispersion = newDispersionNanos + (t-timeOfAdjustment) * dispersionGrowthRate</dd>
+</dl>
+<p><em>This is a stub for this method. Sub-classes should implement it.</em></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="most-recent-measurement-algorithm">
+<h3><a class="toc-backref" href="#id21">Most recent measurement algorithm</a><a class="headerlink" href="#most-recent-measurement-algorithm" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.algorithm.MostRecent">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.algorithm.</tt><tt class="descname">MostRecent</tt><big>(</big><em>clock</em>, <em>repeatSecs=1.0</em>, <em>timeoutSecs=0.2</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.MostRecent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple (naive) Wall Clock client algorithm.</p>
+<p>Crash locks the supplied clock based on the offset observed in the
+result of every successful request/response.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The Clock object must be the same one that is provided to the WallClockClient, otherwise
+this algorithm will not synchronise correctly.</p>
+</div>
+</div></blockquote>
+<p>The tick rate of the Clock can be any tick rate (it does not have to be one tick per nanosecond),
+but too low a tick rate will limit clock synchronisation precision.</p>
+<p><em>Initialisation takes the following parameters:</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; A <a class="reference internal" href="clock.html#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> object representing that will be adjusted to match the Wall Clock.</li>
+<li><strong>repeatSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The rate at which Wall Clock protocol requests are to be sent (in seconds).</li>
+<li><strong>timeoutSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The timeout on waiting for responses to requests (in seconds).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="dvbcss.protocol.client.wc.algorithm.MostRecent.getCurrentDispersion">
+<tt class="descname">getCurrentDispersion</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.MostRecent.getCurrentDispersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calling this method will always result in <cite>ValueError</cite> being raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises ValueError:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">This algorithm does not model clock synchronisation accuracy.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="filter-and-prediction-composable-algorithms">
+<h3><a class="toc-backref" href="#id22">Filter and Prediction composable algorithms</a><a class="headerlink" href="#filter-and-prediction-composable-algorithms" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="filters">
+<h4><a class="toc-backref" href="#id23">Filters</a><a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.algorithm._filterpredict.FilterRttThreshold">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.algorithm._filterpredict.</tt><tt class="descname">FilterRttThreshold</tt><big>(</big><em>thresholdMillis=1.0</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm/_filterpredict.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm._filterpredict.FilterRttThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple filter that rejects all candidates where round trip time exceeds a specified threshold.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>thresholdMillis</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The threshold to use (in milliseconds)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.algorithm._filterpredict.FilterLowestDispersionCandidate">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.algorithm._filterpredict.</tt><tt class="descname">FilterLowestDispersionCandidate</tt><big>(</big><em>clock</em>, <em>precisionSecs</em>, <em>maxFreqErrorPpm</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm/_filterpredict.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm._filterpredict.FilterLowestDispersionCandidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple filter that will reject a candidate unless its dispersion is lower than any candidate seen
+previously.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clock</strong> &#8211; A <a class="reference internal" href="clock.html#dvbcss.clock.TunableClock" title="dvbcss.clock.TunableClock"><tt class="xref py py-class docutils literal"><span class="pre">TunableClock</span></tt></a> object representing that will be adjusted to match the Wall Clock.</li>
+<li><strong>precisionSecs</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The measurement precision of the local clock (in units of seconds).</li>
+<li><strong>maxFreqErrorPpm</strong> &#8211; (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) The maximum frequency error of the local oscillator that underpins the clock object provided (in ppm).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="predictors">
+<h4><a class="toc-backref" href="#id24">Predictors</a><a class="headerlink" href="#predictors" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.algorithm._filterpredict.PredictSimple">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.algorithm._filterpredict.</tt><tt class="descname">PredictSimple</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm/_filterpredict.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm._filterpredict.PredictSimple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple naive predictor that uses the offset calculated by the most recent candidate.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="general-helper-classes">
+<h3><a class="toc-backref" href="#id25">General helper classes</a><a class="headerlink" href="#general-helper-classes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="dispersion-calculator">
+<h4><a class="toc-backref" href="#id26">Dispersion calculator</a><a class="headerlink" href="#dispersion-calculator" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="dvbcss.protocol.client.wc.algorithm.DispersionCalculator">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.client.wc.algorithm.</tt><tt class="descname">DispersionCalculator</tt><big>(</big><em>clock</em>, <em>localPrecisionSecs</em>, <em>localMaxFreqErrorPpm</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/client/wc/algorithm.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.client.wc.algorithm.DispersionCalculator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="candidate-quality-calculator">
+<h4><a class="toc-backref" href="#id27">Candidate quality calculator</a><a class="headerlink" href="#candidate-quality-calculator" title="Permalink to this headline">¶</a></h4>
+<p>This function is used internally by the <a class="reference internal" href="#dvbcss.protocol.client.wc.WallClockClient" title="dvbcss.protocol.client.wc.WallClockClient"><tt class="xref py py-class docutils literal"><span class="pre">WallClockClient</span></tt></a> class.
+.. autofunction:: dvbcss.protocol.client.wc.algorithm.calcQuality</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="wc-server.html" class="btn btn-neutral float-right" title="CSS-WC Servers"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="wc-messages.html" class="btn btn-neutral" title="CSS-WC Message objects"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

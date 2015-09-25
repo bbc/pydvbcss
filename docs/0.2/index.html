@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydvbcss &mdash; pydvbcss 0.2-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.2-release documentation" href="#"/>
+        <link rel="next" title="Run the examples" href="examples.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="#" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="servers-internals.html">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>pydvbcss</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="pydvbcss">
+<h1>pydvbcss<a class="headerlink" href="#pydvbcss" title="Permalink to this headline">¶</a></h1>
+<p><strong>DVB protocols for synchronisation between TV Devices and Companion Screen Applications.</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Release:</th><td class="field-body">0.2-release</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Licence:</th><td class="field-body"><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License v2.0</a>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Latest Source:</th><td class="field-body"><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/">https://github.com/BBC/pydvbcss/tree/master/</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">How to install:</th><td class="field-body"><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/README.md">https://github.com/BBC/pydvbcss/tree/master/README.md</a></td>
+</tr>
+</tbody>
+</table>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals.html">Internal implementation details</a></li>
+</ul>
+</div>
+<ul class="simple">
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a> | <a class="reference internal" href="genindex.html"><em>Full Index</em></a></li>
+</ul>
+<p>This collection of Python modules provides clients and servers for the network protocols defined in the
+<a class="reference external" href="https://www.dvb.org/search/results/keywords/A167">DVB &#8220;Companion Screens and Streams&#8221; (CSS) specification</a>.
+There are also supporting classes
+that model clocks (e.g. to represent timelines) and their inter-relationships.</p>
+<p>Use it to build clients and servers for each of the protocols (CSS-WC, CSS-CII and CSS-TS)
+that mock or simulate the roles of TV Devices and Companion Screen Applications
+for testing and prototyping.</p>
+<p><em>To use this library you need to have a working understanding of these protocols and, of course, the Python programming language.</em></p>
+</div>
+<div class="section" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic simple">
+<li>Install, following the instructions in the <a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/README.md">README</a>.</li>
+<li>Try to <a class="reference internal" href="examples.html"><em>Run the examples</em></a>.</li>
+<li>Read the docs for the <a class="reference internal" href="protocol.html"><em>DVB CSS Protocol modules</em></a>.</li>
+<li>Use the library in you own code</li>
+</ol>
+</div>
+<div class="section" id="state-of-implementation">
+<h1>State of implementation<a class="headerlink" href="#state-of-implementation" title="Permalink to this headline">¶</a></h1>
+<p>This library does not currently implement the <cite>CSS-TE</cite> or <cite>CSS-MRS</cite> protocols (from the DVB specification).</p>
+<p>There are some unit tests but these mainly only cover the calculations done within clock objects and the packing and unpacking of JSON messages.</p>
+</div>
+<div class="section" id="license-and-contributing">
+<h1>License and Contributing<a class="headerlink" href="#license-and-contributing" title="Permalink to this headline">¶</a></h1>
+<p><em>pydvbcss</em> is licensed as open source software under the terms of the
+<a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License v2.0</a>.</p>
+<p>See the <cite>CONTRIBUTING</cite> and <cite>AUTHORS</cite> files for information on how to contribute and who has contributed to this library.</p>
+</div>
+<div class="section" id="contact-and-discuss">
+<h1>Contact and discuss<a class="headerlink" href="#contact-and-discuss" title="Permalink to this headline">¶</a></h1>
+<p>There is a <a class="reference external" href="https://groups.google.com/forum/#!forum/pydvbcss">pydvbcss google group</a> for announcements and discussion of this library.</p>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="examples.html" class="btn btn-neutral float-right" title="Run the examples"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

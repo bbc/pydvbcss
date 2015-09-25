@@ -1,0 +1,659 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Protocol server implementation details &mdash; pydvbcss 0.1-release documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="pydvbcss 0.1-release documentation" href="index.html"/>
+        <link rel="up" title="Internal implementation details" href="internals.html"/>
+        <link rel="next" title="How the dvbcss.task module works internally" href="task-internals.html"/>
+        <link rel="prev" title="Internal implementation details" href="internals.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> pydvbcss</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="internals.html">Internal implementation details</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Protocol server implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pydvbcss</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="internals.html">Internal implementation details</a> &raquo;</li>
+      
+    <li>Protocol server implementation details</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/servers-internals.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <span class="target" id="module-dvbcss.protocol.server"><span id="servers-internals"></span></span><div class="section" id="protocol-server-implementation-details">
+<h1>Protocol server implementation details<a class="headerlink" href="#protocol-server-implementation-details" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#css-wc" id="id3">CSS-WC</a><ul>
+<li><a class="reference internal" href="#overview" id="id4">Overview</a></li>
+<li><a class="reference internal" href="#classes" id="id5">Classes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#css-cii-and-css-ts" id="id6">CSS-CII and CSS-TS</a><ul>
+<li><a class="reference internal" href="#id1" id="id7">Overview</a></li>
+<li><a class="reference internal" href="#id2" id="id8">Classes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="css-wc">
+<h2><a class="toc-backref" href="#id3">CSS-WC</a><a class="headerlink" href="#css-wc" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="overview">
+<h3><a class="toc-backref" href="#id4">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<p>The CSS-WC server is based on a simple generic framework for building UDP servers</p>
+</div>
+<div class="section" id="classes">
+<h3><a class="toc-backref" href="#id5">Classes</a><a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.server.wc.UdpRequestServer">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.wc.</tt><tt class="descname">UdpRequestServer</tt><big>(</big><em>socket</em>, <em>handler</em>, <em>maxMsgSize</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.UdpRequestServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple request handling server framework.</p>
+<p>Pass it an open UDP socket object that blocks on receive,
+and it will call your handler, passing the socket, plus the received data.</p>
+<p>This all happens in a separate thread.</p>
+<p>Use start() and stop() methods to start and stop the handling thread.</p>
+<p>Socket must have set blocking and a timeout.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>socket</strong> (<tt class="xref py py-class docutils literal"><span class="pre">socket.socket</span></tt>) &#8211; Bound socket ready to receive (and send) UDP packets</li>
+<li><strong>handler</strong> &#8211; (object) Object providing a <a class="reference internal" href="#dvbcss.protocol.server.UdpRequestServer.handle" title="dvbcss.protocol.server.UdpRequestServer.handle"><tt class="xref py py-func docutils literal"><span class="pre">handle()</span></tt></a> method.</li>
+<li><strong>maxMsgSize</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The maximum message size (sets the UDP receive buffer size)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <cite>handler</cite> object must have a method with the following signature:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="dvbcss.protocol.server.UdpRequestServer.handle">
+<tt class="descname">handle</tt><big>(</big><em>socket</em>, <em>received_data</em>, <em>src_addr</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.UdpRequestServer.handle" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>socket</strong> &#8211; The <tt class="xref py py-class docutils literal"><span class="pre">socket</span></tt> object for the connection on which the packet was received.</li>
+<li><strong>received_data</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The received UDP packet payload</li>
+<li><strong>src_addr</strong> &#8211; The source address. For an AF_INET connection this will be a tuple (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> host, <a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> port)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+<dl class="method">
+<dt id="dvbcss.protocol.server.wc.UdpRequestServer.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.UdpRequestServer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal method - the main runloop of the thread.</p>
+<p>Runs in a loop calling the <a class="reference internal" href="#dvbcss.protocol.server.UdpRequestServer.handle" title="dvbcss.protocol.server.UdpRequestServer.handle"><tt class="xref py py-func docutils literal"><span class="pre">handle()</span></tt></a> method of the object assigned to the <tt class="xref py py-data docutils literal"><span class="pre">handler</span></tt> property
+whenever a UDP packet is received.</p>
+<p>Does not return until the _pleaseStop attribute of the object has been set to True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.wc.UdpRequestServer.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.UdpRequestServer.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the wall clock server running. It runs in a thread in the background.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.wc.UdpRequestServer.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.UdpRequestServer.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the wall clock server running. Does not return until the thread has terminated.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dvbcss.protocol.server.wc.WallClockServerHandler">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.wc.</tt><tt class="descname">WallClockServerHandler</tt><big>(</big><em>wallClock</em>, <em>precisionSecs</em>, <em>maxFreqErrorPpm</em>, <em>followup=False</em>, <em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server/wc.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.wc.WallClockServerHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Wall Clock Server Handler function.</p>
+<p>Provides a handle() method. Designed to be used with <tt class="xref py py-class docutils literal"><span class="pre">UdpRequestServer</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>wallClock</strong> (<a class="reference internal" href="clock.html#dvbcss.clock.ClockBase" title="dvbcss.clock.ClockBase"><em>dvbcss.clock.ClockBase</em></a>) &#8211; The clock to be used as the wall clock for protocol interactions</li>
+<li><strong>precisionSecs</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The precision (in seconds) to be reported for the clock in protocol interactions</li>
+<li><strong>maxFreqErrorPpm</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The clock maximum frequency error in parts-per-million</li>
+<li><strong>followup</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Set to True if the Wall Clock Server should send follow-up responses</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="css-cii-and-css-ts">
+<h2><a class="toc-backref" href="#id6">CSS-CII and CSS-TS</a><a class="headerlink" href="#css-cii-and-css-ts" title="Permalink to this headline">¶</a></h2>
+<p>Module: <cite>dvbcss.protocol.server</cite></p>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id7">Overview</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The CSS-CII and CSS-TS servers subclass the WebSocket server functionality for cherrypy implemented
+by ws4py in the <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py.server/#module-ws4py.server.cherrypyserver" title="(in ws4py v0.3.5)"><tt class="xref py py-mod docutils literal"><span class="pre">cherrypyserver</span></tt></a> module.</p>
+<p><a class="reference internal" href="cii-server.html#dvbcss.protocol.server.cii.CIIServer" title="dvbcss.protocol.server.cii.CIIServer"><tt class="xref py py-class docutils literal"><span class="pre">CIIServer</span></tt></a> and <a class="reference internal" href="ts-server.html#dvbcss.protocol.server.ts.TSServer" title="dvbcss.protocol.server.ts.TSServer"><tt class="xref py py-class docutils literal"><span class="pre">TSServer</span></tt></a> both inherit from a common base implementation
+<a class="reference internal" href="#dvbcss.protocol.server.WSServerTool" title="dvbcss.protocol.server.WSServerTool"><tt class="xref py py-class docutils literal"><span class="pre">WSServerTool</span></tt></a> provided in the <cite>dvbcss.protocol.server</cite> module.</p>
+<p>The Tool provides the hook into cherrypy for handling the connection request and upgrading it to a
+WebSocket connection, spawning an object representing the WebSocket connection and which implements
+the WebSocket protocols.</p>
+<p>The base server object class is intended to manage all WebSocket connections for a particular server
+endpoint. It therefore provides its own customised WebScoket class that is bound to that particular
+server object instance.</p>
+<p>The tool is enabled via an &#8220;on&#8221; configuration when setting up the mount point in cherrypy.
+The tool also expects to a &#8220;handler_cls&#8221; property set in the configuration at the mount point.
+This property points to a WebSocket class which can be instantiated to handle the connection.</p>
+<p>Example usage: creating a server at &#8220;ws://&lt;host&gt;:80/endpoint&#8221; just using the base classes provided here:</p>
+<div class="highlight-python"><pre>import cherrypy
+from ws4py.server.cherrypyserver import WebSocketPlugin
+from dvbcss.protocol.server import WSServerBase, WSServerTool
+
+# plug the tool into cherrypy as "my_server"
+cherrypy.tools.my_server = WSServerTool()
+
+WebSocketPlugin(cherrypy.engine).subscribe()
+
+# create my server
+myServer = WSServerBase()
+
+# bind it to the URL path /endpoint in the cherrypy server
+class Root(object):
+    @cherrypy.expose
+    def endpoint(self):
+        pass
+
+cfg = {"/endpoint": {'tools.my_server.on': True,
+                'tools.my_server.handler_cls': myServer.handler
+               }
+      }
+
+cherrypy.tree.mount(Root(), "/", config=cfg)
+
+# activate cherrypy web server on port 80
+cherrypy.config.update({"server.socket_port":80})
+cherrypy.engine.start()</pre>
+</div>
+<p>See documentation for <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase" title="dvbcss.protocol.server.WSServerBase"><tt class="xref py py-class docutils literal"><span class="pre">WSServerBase</span></tt></a> for information on creating subclasses to implement specific endpoints.</p>
+</div>
+<div class="section" id="id2">
+<h3><a class="toc-backref" href="#id8">Classes</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="dvbcss.protocol.server.ConnectionIdGen">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.</tt><tt class="descname">ConnectionIdGen</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.ConnectionIdGen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object for generating unique connection id strings.</p>
+<dl class="classmethod">
+<dt id="dvbcss.protocol.server.ConnectionIdGen.next">
+<em class="property">classmethod </em><tt class="descname">next</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.ConnectionIdGen.next" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">new unique connection id string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dvbcss.protocol.server.WSServerTool">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.</tt><tt class="descname">WSServerTool</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of the <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py.server/#ws4py.server.cherrypyserver.WebSocketTool" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">ws4py.server.cherrypyserver.WebSocketTool</span></tt></a> tool to do a simultaneous connections limit check and enabled/disabled check for the end point before the handler is invoked</p>
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerTool.cleanup_headers">
+<tt class="descname">cleanup_headers</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerTool.cleanup_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some clients aren&#8217;t that smart when it comes to
+headers lookup.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerTool.complete">
+<tt class="descname">complete</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerTool.complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override of the base implementation of the code to install a callback to notify the websocket once
+the upgrade is complete.</p>
+<p>Cherrypy&#8217;s normal &#8220;completion&#8221; callbacks fire /before/ cherrypy has flushed outgoing data to the socket connection,
+creating a race-condition between the flush happening and the websocket class starting to write outgoing messages.</p>
+<p>This replacement handler is guaranteed to fire /after/ cherrypy has flushed and is no longer using the socket connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerTool.start_handler">
+<tt class="descname">start_handler</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerTool.start_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs at the end of the request processing by calling
+the opened method of the handler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerTool.upgrade">
+<tt class="descname">upgrade</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerTool.upgrade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override of base implementation of the code to handle a connection &#8220;upgrade&#8221; (part of the WebSocket handshake).</p>
+<p>The &#8220;handler_cls&#8221; for this tool is passed as an argument and it implements methods to check whether:</p>
+<ol class="arabic simple">
+<li>The end point is enabled. If not then a 403 &#8220;Forbidden&#8221; response is returned.</li>
+<li>A connection can be allocated (the connection limit is not yet reached). If not then a 503 &#8220;Service Unavailable&#8221; response is returned.</li>
+</ol>
+<p>If neither of these tests fail, then the superclass upgrade operation is allowed to proceed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dvbcss.protocol.server.WSServerBase">
+<em class="property">class </em><tt class="descclassname">dvbcss.protocol.server.</tt><tt class="descname">WSServerBase</tt><big>(</big><em>maxConnectionsAllowed=-1</em>, <em>enabled=True</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for WebSocket server endpoint implementation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>maxConnectionsAllowed</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; -1 to allow unlimited connections, otherwise sets the maximum number of concurrent connections from clients.</li>
+<li><strong>enabled</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether this server starts off enabled or disabled.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>When the server is &#8220;disabled&#8221; it will refuse attempts to connect by sending the HTTP status response 403 &#8220;Forbidden&#8221;.</p>
+<p>When the server has reached its connection limit, it will refuse attempts to connect by sending the HTTP status response 503 &#8220;Service unavailable&#8221;.</p>
+<p>Protocol specific implementations inherit from this base class and override stub methods and class attributes.
+When subclassing you will want to override:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#dvbcss.protocol.server.WSServerBase.getDefaultConnectionData" title="dvbcss.protocol.server.WSServerBase.getDefaultConnectionData"><tt class="xref py py-func docutils literal"><span class="pre">getDefaultConnectionData()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.server.WSServerBase.onClientConnect" title="dvbcss.protocol.server.WSServerBase.onClientConnect"><tt class="xref py py-func docutils literal"><span class="pre">onClientConnect()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.server.WSServerBase.onClientDisconnect" title="dvbcss.protocol.server.WSServerBase.onClientDisconnect"><tt class="xref py py-func docutils literal"><span class="pre">onClientDisconnect()</span></tt></a></li>
+<li><a class="reference internal" href="#dvbcss.protocol.server.WSServerBase.onClientMessage" title="dvbcss.protocol.server.WSServerBase.onClientMessage"><tt class="xref py py-func docutils literal"><span class="pre">onClientMessage()</span></tt></a></li>
+</ul>
+<p>The <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a> connection object representing each connection is used as a handle for
+the connection.</p>
+<p>This class stores per connection connection data. What that data is is entirely up to the subclass.
+The <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase.getDefaultConnectionData" title="dvbcss.protocol.server.WSServerBase.getDefaultConnectionData"><tt class="xref py py-func docutils literal"><span class="pre">getDefaultConnectionData()</span></tt></a> method provides the initial data for a connection when it is opened.
+The <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._connections" title="dvbcss.protocol.server.WSServerBase._connections"><tt class="xref py py-data docutils literal"><span class="pre">_connections</span></tt></a> instance variable then keeps a mapping from websocket connections to that data.</p>
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.WSServerBase.handler">
+<tt class="descname">handler</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler class for new connections. Should be provided as a configuration argument to cherrypy.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.WSServerBase._connections">
+<tt class="descname">_connections</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase._connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict mapping WebSocket objects to connection data. Connection data is for use by subclasses to store data specific to each individual connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase._addConnection">
+<tt class="descname">_addConnection</tt><big>(</big><em>webSock</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase._addConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal method. Called to notify this class of a newly connected websocket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>webSock</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a>) The newly connected Websocket.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase._makeHandlerClass">
+<tt class="descname">_makeHandlerClass</tt><big>(</big><em>connectionIdPrefix</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase._makeHandlerClass" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>connectionIdPrefix</strong> &#8211; (str) Human-readable prefix to be put on connection-ids</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#dvbcss.protocol.server..WebSocketHandler" title="dvbcss.protocol.server..WebSocketHandler"><tt class="xref py py-class docutils literal"><span class="pre">WebSocketHandler</span></tt></a> class, which is a subclass of <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">ws4py.websocket.WebSocket</span></tt></a> that is unique to this server instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase._receivedMessage">
+<tt class="descname">_receivedMessage</tt><big>(</big><em>webSock</em>, <em>message</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase._receivedMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal method. Called to notify this class of a websocket message arrival.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>webSock</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a>) The WebSocket connection on which the message arrived.</li>
+<li><strong>msg</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.messaging.Message" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>) WebSocket message that has been received. Will be either a <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.messaging.TextMessage" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">Text</span></tt></a> or a <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.messaging.BinaryMessage" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">Binary</span></tt></a> message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase._removeConnection">
+<tt class="descname">_removeConnection</tt><big>(</big><em>webSock</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase._removeConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal method. Called to notify this class of a websocket disconnection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>webSock</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a>) The now disconnected Websocket.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.WSServerBase.connectionIdPrefix">
+<tt class="descname">connectionIdPrefix</tt><em class="property"> = 'serverbase'</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.connectionIdPrefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>prefix to be used for connection ids</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.WSServerBase.enabled">
+<tt class="descname">enabled</tt><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read/write <a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">bool</span></tt></a>) Whether this server endpoint is enabled (True) or disabled (False).</p>
+<p>Set this property enable or disable the endpoint.</p>
+<p>When disabled, existing connections are closed with WebSocket closure reason code 1001
+and new attempts to connect will be refused with HTTP response status code 403 &#8220;Forbidden&#8221;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase.getConnections">
+<tt class="descname">getConnections</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.getConnections" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns dict:</th><td class="field-body">mapping a <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a> object to connection related data for all connections to this server. The dict can be updated.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase.getDefaultConnectionData">
+<tt class="descname">getDefaultConnectionData</tt><big>(</big><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.getDefaultConnectionData" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is called to create new server-specific connection data when a new client
+connects. This is stored against the websocket connection and can be retrieved using the
+<a class="reference internal" href="#dvbcss.protocol.server.WSServerBase.getConnections" title="dvbcss.protocol.server.WSServerBase.getConnections"><tt class="xref py py-func docutils literal"><span class="pre">getConnections()</span></tt></a> method.</p>
+<p>Override with your own function that returns data to be stored against new connections
+:returns: empty <a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a>, but can return anything you like.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dvbcss.protocol.server.WSServerBase.loggingName">
+<tt class="descname">loggingName</tt><em class="property"> = 'dvb-css.protocol.server.WSServerBase'</em><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.loggingName" title="Permalink to this definition">¶</a></dt>
+<dd><p>name used for logging messages</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase.onClientConnect">
+<tt class="descname">onClientConnect</tt><big>(</big><em>webSock</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.onClientConnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub method that is called when a new client connects. Implement in subclasses.</p>
+<p>:param webSock:(<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a>) The object representing the WebSocket connection of the newly connected client</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase.onClientDisconnect">
+<tt class="descname">onClientDisconnect</tt><big>(</big><em>webSock</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.onClientDisconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub method that is called when a client disconnects. Implement in subclasses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>webSock</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a>) The object representing the WebSocket connection of the now-disconnected client</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server.WSServerBase.onClientMessage">
+<tt class="descname">onClientMessage</tt><big>(</big><em>webSock</em>, <em>msg</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server.WSServerBase.onClientMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stub method that is called when a message is received from a client. Implement in subclasses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>webSock</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a>) The object representing the WebSocket connection from which the message has been received.</li>
+<li><strong>msg</strong> &#8211; (<a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.messaging.Message" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>) WebSocket message that has been received. Will be either a <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.messaging.TextMessage" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">Text</span></tt></a> or a <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.messaging.BinaryMessage" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">Binary</span></tt></a> message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dvbcss.protocol.server..WebSocketHandler">
+<em class="property">class </em><tt class="descclassname">.</tt><tt class="descname">WebSocketHandler</tt><big>(</big><em>WebSocket</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server..WebSocketHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is created and returned by the <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._makeHandlerClass" title="dvbcss.protocol.server.WSServerBase._makeHandlerClass"><tt class="xref py py-func docutils literal"><span class="pre">WSServerBase._makeHandlerClass()</span></tt></a> method
+and each class returned is bound to the instance of <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase" title="dvbcss.protocol.server.WSServerBase"><tt class="xref py py-class docutils literal"><span class="pre">WSServerBase</span></tt></a> that created it.</p>
+<p>It is intended to be provided to cherrypy as the &#8220;handler_cls&#8221; configuration parameter for the WebSocket tool.
+It is instantiated for every connection made.</p>
+<p>These are subclasses of the ws4py <a class="reference external" href="https://ws4py.readthedocs.org/en/latest/sources/ws4py/#ws4py.websocket.WebSocket" title="(in ws4py v0.3.5)"><tt class="xref py py-class docutils literal"><span class="pre">WebSocket</span></tt></a> class and represent an individual WebSocket connection.</p>
+<p>Instances of this class call through to <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._addConnection" title="dvbcss.protocol.server.WSServerBase._addConnection"><tt class="xref py py-func docutils literal"><span class="pre">WSServerBase._addConnection()</span></tt></a> and <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._removeConnection" title="dvbcss.protocol.server.WSServerBase._removeConnection"><tt class="xref py py-func docutils literal"><span class="pre">WSServerBase._removeConnection()</span></tt></a>
+and <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._receivedMessage" title="dvbcss.protocol.server.WSServerBase._receivedMessage"><tt class="xref py py-func docutils literal"><span class="pre">WSServerBase._receivedMessage()</span></tt></a> to inform the parent server of the WebSocket opening, closing and receiving messages.</p>
+<dl class="classmethod">
+<dt id="dvbcss.protocol.server..WebSocketHandler.isEnabled">
+<em class="property">classmethod </em><tt class="descname">isEnabled</tt><big>(</big><em>cls</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server..WebSocketHandler.isEnabled" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the server endpoint is enabled, otherwise False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="dvbcss.protocol.server..WebSocketHandler.canAllocateConnection">
+<em class="property">classmethod </em><tt class="descname">canAllocateConnection</tt><big>(</big><em>cls</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server..WebSocketHandler.canAllocateConnection" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True only if the connection limit of the parent server has not yet been reached. Otherwise False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dvbcss.protocol.server..WebSocketHandler.id">
+<tt class="descname">id</tt><big>(</big><em>self</em><big>)</big><a class="reference external" href="https://github.com/BBC/pydvbcss/tree/master/dvbcss/protocol/server.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dvbcss.protocol.server..WebSocketHandler.id" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A human readable connection ID</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="task-internals.html" class="btn btn-neutral float-right" title="How the dvbcss.task module works internally"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="internals.html" class="btn btn-neutral" title="Internal implementation details"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, British Broadcasting Corporation.
+      Last updated on Mar 17, 2015.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1-release',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
