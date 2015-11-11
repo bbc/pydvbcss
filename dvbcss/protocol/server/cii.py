@@ -193,7 +193,7 @@ class CIIServer(WSServerBase):
         """
         super(CIIServer,self).__init__(maxConnectionsAllowed=maxConnectionsAllowed, enabled=enabled)
         
-        self.cii = initialCII
+        self.cii = initialCII.copy()
         """\
         A :class:`dvbcss.protocol.cii.CII` message object representing current CII state.
         Set the attributes of this object to update that state.

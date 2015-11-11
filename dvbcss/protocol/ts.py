@@ -199,6 +199,9 @@ class SetupData(object):
     def __repr__(self):
         return 'SetupData(contentIdStem="%s", timelineSelector="%s", private=%s)' % (self.contentIdStem, self.timelineSelector, repr(self.private))
 
+    def copy(self):
+        """:returns: a copy of this SetupData object. Note that this does NOT deep copy any private data."""
+        return SetupData(self.contentIdStem, self.timelineSelector, self.private)
 
 
 class Timestamp(object):
@@ -234,6 +237,9 @@ class Timestamp(object):
     
     def __repr__(self):
         return 'Timestamp(contentTime=%s, wallClockTime=%s)' % (repr(self.contentTime), repr(self.wallClockTime))
+
+    def copy(self):
+        return Timestamp(self.contentTime, self.wallClockTime)
 
 
 class ControlTimestamp(object):
@@ -293,6 +299,10 @@ class ControlTimestamp(object):
     
     def __repr__(self):
         return 'ControlTimestamp(timestamp=%s, timelineSpeedMultiplier=%s)' % (repr(self.timestamp), repr(self.timelineSpeedMultiplier))
+
+    def copy(self):
+        """:returns: a deep copy of this Control Timestamp object"""
+        return ControlTimestamp(self.timestamp.copy(), self.timelineSpeedMultiplier)
 
 
 class AptEptLpt(object):
@@ -387,7 +397,18 @@ class AptEptLpt(object):
     def __repr__(self):
         return 'AptEptLpt(actual=%s, earliest=%s, latest=%s' % (repr(self.actual), repr(self.earliest), repr(self.latest))
 
-
+    def copy(self):
+        """:returns: a deep copy of this AptEptLpt object"""
+        actual = self.actual
+        earliest = self.earliest
+        latest = self.latest
+        if actual != OMIT:
+            actual = actual.copy()
+        if earliest != OMIT:
+            earliest = earliest.copy()
+        if latest != OMIT:
+            latest = latest.copy()
+        return AptEptLpt(actual, earliest, latest)
 
 
 __all__ = [
