@@ -508,7 +508,7 @@ def ciMatchesStem(ci, stem):
     """
     if ci == OMIT:
         return False
-    return ci.startswith(stem)
+    return (ci is not None) and ci.startswith(stem)
 
 
 def isControlTimestampChanged(prev, latest):
