@@ -4,7 +4,7 @@
 
 * Bugfix to constructor for CIIServer to ensure default value for `initialCII` is not corrupted if a 2nd CII server is instantiated, plus added copy() methods to all objects representing JSON messages.
 * Bugfix to TSClient to handle when contentId is null
-
+* Change to examples/TSClient.py so that it exits when the connection is closed.
 
 ## 0.3.1 : Packaging version fix (01 Sep 2015)
 

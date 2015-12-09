@@ -53,6 +53,7 @@ if __name__ == "__main__":
     import logging
     import argparse
     import dvbcss.util
+    import sys
     
     DEFAULT_WC_BIND=("0.0.0.0","random")
     
@@ -102,21 +103,26 @@ if __name__ == "__main__":
 
     ts = TSClientClockController(tsUrl, contentIdStem, timelineSelector, timelineClock, correlationChangeThresholdSecs=0.001)
     
+    exiting=False
     tsClientLogger = logging.getLogger("TSClient")
-    def reportCallback(msg):
+    def reportCallback(msg,exit=False):
         def callback(*a,**k):
-            #if not args.quiet:
-                tsClientLogger.info(msg+"\n")
+            global exiting
+            tsClientLogger.info(msg+"\n")
+            if exit:
+                exiting=True
+                wc_client.stop()
+                sys.exit(0)
         return callback
     
     ts.onConnected           = reportCallback("connected")
-    ts.onDisconnected        = reportCallback("disconnected")
+    ts.onDisconnected        = reportCallback("disconnected",exit=True)
     ts.onTimelineAvailable   = reportCallback("timeline became available")
     ts.onTimelineUnavailable = reportCallback("timeline became un-available")
     ts.onTimingChange        = reportCallback("change in timing and/or play speed")
     
     ts.connect()
-    while True:
+    while not exiting:
         time.sleep(0.4)
         print ts.getStatusSummary(),
-        print "   Uncertainty (dispersion) = +/- %0.3f milliseconds." % (algorithm.getCurrentDispersion()/1000000.0)
+        print "   Uncertainty (dispersion) = +/- %0.3f milliseconds" % (algorithm.getCurrentDispersion()/1000000.0)
