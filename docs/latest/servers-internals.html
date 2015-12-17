@@ -5,16 +5,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Protocol server implementation details &mdash; pydvbcss 0.3.1-latest documentation</title>
+  <title>Protocol server implementation details &mdash; pydvbcss 0.3.2-latest documentation</title>
   
 
   
   
 
   
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 
   
   
@@ -30,13 +30,13 @@
   
 
   
-    <link rel="top" title="pydvbcss 0.3.1-latest documentation" href="index.html"/>
+    <link rel="top" title="pydvbcss 0.3.2-latest documentation" href="index.html"/>
         <link rel="up" title="Internal implementation details" href="internals.html"/>
         <link rel="next" title="How the dvbcss.task module works internally" href="task-internals.html"/>
         <link rel="prev" title="Internal implementation details" href="internals.html"/> 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -46,11 +46,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
-          <a href="index.html" class="fa fa-home"> pydvbcss</a>
-        
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pydvbcss
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3.2-latest
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -58,44 +74,41 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-      </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
           
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#wallclockserver-py-and-wallclockclient-py"><strong>WallClockServer.py</strong> and <strong>WallClockClient.py</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#ciiserver-py-and-ciiclient-py"><strong>CIIServer.py</strong> and <strong>CIIClient.py</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#tsserver-py-and-tsclient-py"><strong>TSServer.py</strong> and <strong>TSClient.py</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples.html#tvdevice-py"><strong>TVDevice.py</strong></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cii.html">CSS-CII protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ts.html">CSS-TS protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wc.html">CSS-WC protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#common-types-and-objects">Common types and objects</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="monotonic_time.html">Montonic time functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="clock.html">Synthesised clocks (dvbcss.clock)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Task.html">Task scheduling for clocks</a></li>
-</ul>
-</li>
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Run the examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">DVB CSS Protocol modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timing.html">Clocks, Time and Scheduling modules</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="internals.html">Internal implementation details</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="">Protocol server implementation details</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Protocol server implementation details</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#css-wc">CSS-WC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#css-cii-and-css-ts">CSS-CII and CSS-TS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="task-internals.html">How the dvbcss.task module works internally</a></li>
 </ul>
 </li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -110,7 +123,13 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
@@ -119,13 +138,16 @@
     <li>Protocol server implementation details</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/servers-internals.txt" rel="nofollow"> View page source</a>
+          
+            <a href="_sources/servers-internals.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <span class="target" id="module-dvbcss.protocol.server"><span id="servers-internals"></span></span><div class="section" id="protocol-server-implementation-details">
 <h1>Protocol server implementation details<a class="headerlink" href="#protocol-server-implementation-details" title="Permalink to this headline">¶</a></h1>
@@ -606,15 +628,16 @@ and <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._re
 </div>
 
 
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="task-internals.html" class="btn btn-neutral float-right" title="How the dvbcss.task module works internally">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="task-internals.html" class="btn btn-neutral float-right" title="How the dvbcss.task module works internally" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="internals.html" class="btn btn-neutral" title="Internal implementation details"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="internals.html" class="btn btn-neutral" title="Internal implementation details" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -624,13 +647,14 @@ and <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._re
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, British Broadcasting Corporation.
-      Last updated on Sep 01, 2015.
+      Last updated on Dec 17, 2015.
+
     </p>
   </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-  
 </footer>
+
         </div>
       </div>
 
@@ -645,7 +669,7 @@ and <a class="reference internal" href="#dvbcss.protocol.server.WSServerBase._re
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.1-latest',
+            VERSION:'0.3.2-latest',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
