@@ -187,7 +187,7 @@ Upload to PyPI:
 
 ... first uploading to the test service to check everything is okay:
 
-    $ git checkout master
+    $ git checkout <<release-branch>>
     $ sudo python setup.py sdist upload -r pypitest
     
 ... then going live:
