@@ -3,6 +3,7 @@
 ![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.org/en/stable/?badge=stable)
 [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.org/en/latest/?badge=latest)
+[![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)]((https://pypi.python.org/pypi/pydvbcss))
 
 * **[How to install](#install)**
 * **[Read the documentation](#docs)**
@@ -62,7 +63,7 @@ release package from the Python Package Index (PyPI) using
 
     $ pip install pydvbcss
 
-See the [pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss).
+   * [![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg) See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
 
 #### From Github or a release tarball _(library and examples)_
 
