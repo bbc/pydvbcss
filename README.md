@@ -1,6 +1,8 @@
 # Python DVB Companion Screen Synchronisation protocol library
 
 ![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.org/en/stable/?badge=stable)
+[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.org/en/latest/?badge=latest)
 
 * **[How to install](#install)**
 * **[Read the documentation](https://bbc.github.io/pydvbcss/docs/latest/)**
@@ -38,8 +40,11 @@ successfully on Microsoft Windows 7 and Ubuntu 14.04.
 
 ### Read the Documentation (online)
 
-The latest docs for the library
-[can be read online here](https://BBC.github.io/pydvbcss/docs/latest/).
+The docs for the library can be read online on readthedocs.org:
+   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable) **Docs for latest stable release**](http://pydvbcss.readthedocs.org/en/stable/?badge=stable)
+   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest) Docs for latest commits to master](http://pydvbcss.readthedocs.org/en/latest/?badge=latest)
+
+Links are also available from those pages through to documentation for earlier releases.
 
 
 <a name="install"></a>
