@@ -1,11 +1,15 @@
 language: python
 
 os:
-#  - osx            ... not yet supported
+  - osx
   - linux
 
 python:
   - "2.7"
+
+before install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python  ; fi
 
 install:
   - pip install -r requirements.txt
