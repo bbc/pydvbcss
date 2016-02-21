@@ -1,6 +1,6 @@
 # Python DVB Companion Screen Synchronisation protocol library
 
-![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)
+![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=travis-osx)
 
 * **[How to install](#install)**
 * **[Read the documentation](https://bbc.github.io/pydvbcss/docs/latest/)**
