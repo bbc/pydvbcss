@@ -12,7 +12,7 @@ Make the following checks before performing a release:
    * Does documentation build?
 
 
-#### 2. Update VERSION and CHANGELOG
+#### 2. Update VERSION and CHANGELOG and README
 
 ##### Increment the version number.
    
@@ -31,6 +31,15 @@ Leave this as "latest" for the moment.
 ##### Update the change log
   
 The is in the [`CHANGELOG.md`](CHANGELOG.md) file. Ensure it mentions any noteworthy changes since the previous release.
+
+
+##### Update README
+
+In ['README.md'](README.md) change references to the "master" branch to the name
+of release branch that will be used in the next step (which will be the
+release version number). The places this occurs includes:
+
+   * the Travis CI build status image link at the beginning.
 
 
 #### 3. Create release branch 
