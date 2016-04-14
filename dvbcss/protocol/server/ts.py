@@ -345,21 +345,22 @@ class TSServer(WSServerBase):
         :param webSock: The connection from the client.
         :param connectionData: A :class:`dict` containing data relating to this (now closed) connection
         """
-                
-        # update list of timeline selectors being used
-        # if this one is no longer needed by any clients, then notify sources that this is the case
-        setupData = connectionData["setup"]
-        
-        if setupData is not None:
-            tSel = setupData.timelineSelector
-            self._timelineSelectors[tSel] -= 1
-        
-            if self._timelineSelectors[tSel] == 0:
-                del self._timelineSelectors[tSel]
-                for src in self._timelineSources:
-                    src.timelineSelectorNotNeeded(tSel) 
-    
-    
+
+        with self._lock:
+            # update list of timeline selectors being used
+            # if this one is no longer needed by any clients, then notify sources that this is the case
+            setupData = connectionData["setup"]
+
+            if setupData is not None:
+                tSel = setupData.timelineSelector
+                self._timelineSelectors[tSel] -= 1
+
+                if self._timelineSelectors[tSel] == 0:
+                    del self._timelineSelectors[tSel]
+                    for src in self._timelineSources:
+                        src.timelineSelectorNotNeeded(tSel)
+
+
     def onClientSetup(self, webSock):
         """\
         Called when a client has connected and submitted its SetupData message to provide context for the connection.
@@ -380,42 +381,44 @@ class TSServer(WSServerBase):
         :param msg: (:class:`Message <ws4py.messaging.Message>`) WebSocket message that has been received. Will be either a :class:`Text <ws4py.messaging.TextMessage>` or a :class:`Binary <ws4py.messaging.BinaryMessage>` message.
         """
         self.log.info("Received message on connection"+webSock.id()+" : "+str(message))
-        connection = self.getConnections()[webSock]
-        
-        if connection["setup"] is None:
-            # waiting for a SetupData message
-            try:
-                setupData = SetupData.unpack(str(message))
-            except ValueError, e:
-                self.log.info("Expected a valid SetupData message, but got this instead: "+str(message))
-                return
-            connection["setup"] = setupData
-            connection["webSocket"] = webSock
-            
-            # if no other clients already requesting this timeline selector, then notify sources it is now needed
-            tSel = setupData.timelineSelector
-            if tSel in self._timelineSelectors:
-                self._timelineSelectors[tSel] += 1
+
+        with self._lock:
+            connection = self.getConnections()[webSock]
+
+            if connection["setup"] is None:
+                # waiting for a SetupData message
+                try:
+                    setupData = SetupData.unpack(str(message))
+                except ValueError, e:
+                    self.log.info("Expected a valid SetupData message, but got this instead: "+str(message))
+                    return
+                connection["setup"] = setupData
+                connection["webSocket"] = webSock
+
+                # if no other clients already requesting this timeline selector, then notify sources it is now needed
+                tSel = setupData.timelineSelector
+                if tSel in self._timelineSelectors:
+                    self._timelineSelectors[tSel] += 1
+                else:
+                    self._timelineSelectors[tSel] = 1
+                if self._timelineSelectors[tSel] == 1:
+                    for src in self._timelineSources:
+                        src.timelineSelectorNeeded(tSel)
+
+                # notify of client now setup, and then try to send first control timestamp to it
+                self.onClientSetup(webSock)
+                self.updateClient(webSock)
+
             else:
-                self._timelineSelectors[tSel] = 1
-            if self._timelineSelectors[tSel] == 1:
-                for src in self._timelineSources:
-                    src.timelineSelectorNeeded(tSel)
-            
-            # notify of client now setup, and then try to send first control timestamp to it
-            self.onClientSetup(webSock)
-            self.updateClient(webSock)
-            
-        else:
-            # doing normal timestamp thing
-            # expect AptEptLpt message
-            try:
-                aptEptLpt = AptEptLpt.unpack(str(message))
-            except ValueError, e:
-                self.log.info("Expected a valid AptEptLpt message, but got this instead: "+str(message))
-                return
-            connection["aptEptLpt"] = aptEptLpt
-            self.onClientAptEptLpt(webSock, aptEptLpt)
+                # doing normal timestamp thing
+                # expect AptEptLpt message
+                try:
+                    aptEptLpt = AptEptLpt.unpack(str(message))
+                except ValueError, e:
+                    self.log.info("Expected a valid AptEptLpt message, but got this instead: "+str(message))
+                    return
+                connection["aptEptLpt"] = aptEptLpt
+                self.onClientAptEptLpt(webSock, aptEptLpt)
 
     def onClientAptEptLpt(self, webSock, apteptlpt):
         """\
@@ -463,29 +466,30 @@ class TSServer(WSServerBase):
         The value of the Control Timestamp is determined by searching all attached timeline sources to find one that
         can supply a Control Timestamp for this connection.
         """
-        connection = self._connections[webSock]
-        setup = connection["setup"]
-        if setup is None:
-            return
-            
-        prevCt = connection["prevCt"]
+        with self._lock:
+            connection = self._connections[webSock]
+            setup = connection["setup"]
+            if setup is None:
+                return
 
-        # default 'timeline is unavailable' control timestamp
-        ct = ControlTimestamp(Timestamp(None, self._wallClock.ticks), None)
+            prevCt = connection["prevCt"]
 
-        # check if contentIdStem matches current CI
-        if ciMatchesStem(self.contentId, setup.contentIdStem):
-            
-            for source in self._timelineSources:
-                if source.recognisesTimelineSelector(setup.timelineSelector):
-                    ct = source.getControlTimestamp(setup.timelineSelector)
+            # default 'timeline is unavailable' control timestamp
+            ct = ControlTimestamp(Timestamp(None, self._wallClock.ticks), None)
 
-        # if None, then a timeline source is saying "please don't send a control timestamp yet"
-        # otherwise, check if the Control Timestamp is basically the same as the previous one sent
-        # and only send if it is different
-        if ct is not None and isControlTimestampChanged(prevCt, ct):
-            connection["prevCt"] = ct
-            webSock.send(ct.pack())
+            # check if contentIdStem matches current CI
+            if ciMatchesStem(self.contentId, setup.contentIdStem):
+
+                for source in self._timelineSources:
+                    if source.recognisesTimelineSelector(setup.timelineSelector):
+                        ct = source.getControlTimestamp(setup.timelineSelector)
+
+            # if None, then a timeline source is saying "please don't send a control timestamp yet"
+            # otherwise, check if the Control Timestamp is basically the same as the previous one sent
+            # and only send if it is different
+            if ct is not None and isControlTimestampChanged(prevCt, ct):
+                connection["prevCt"] = ct
+                webSock.send(ct.pack())
 
                 
     def updateAllClients(self):
@@ -493,9 +497,10 @@ class TSServer(WSServerBase):
         Causes an update to be sent to all clients that need it
         (i.e. if the ControlTimestamp that would be sent now is different to the one most recently sent to that client)
         """
-        for webSock in self._connections:
-            self.updateClient(webSock)
-            
+        with self._lock:
+            for webSock in self._connections:
+                self.updateClient(webSock)
+
 def ciMatchesStem(ci, stem):
     """\
     Checks if a content identifier stem matches a content identifier.

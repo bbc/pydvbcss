@@ -21,7 +21,7 @@ from ws4py.server.cherrypyserver import WebSocketTool
 from cherrypy.wsgiserver import HTTPConnection
 
 import inspect
-
+import threading
 
 import logging
 
@@ -143,6 +143,9 @@ class WSServerBase(object):
         self.log = logging.getLogger(self.loggingName)
         self._pendingOpenCompletion = []
 
+        # re-entrant lock used for thread safety
+        self._lock = threading.RLock()
+
         self.handler = self._makeHandlerClass(connectionIdPrefix=self.connectionIdPrefix)
         """\
         Handler class for new connections. Should be provided as a configuration argument to cherrypy.
@@ -210,22 +213,23 @@ class WSServerBase(object):
 
     @enabled.setter
     def enabled(self, value):
-        self._enabled=value
-        if self._enabled:
-            cherrypy.engine.subscribe("stop", self.cleanup)
-        else:
-            cherrypy.engine.unsubscribe("stop", self.cleanup)
-            for webSock in self._connections.keys():
-                webSock.close(code=1001) # 1001 = code for closure because server is "going away"
-                del self._connections[webSock]
+        with self._lock:
+            self._enabled=value
+            if self._enabled:
+                cherrypy.engine.subscribe("stop", self.cleanup)
+            else:
+                cherrypy.engine.unsubscribe("stop", self.cleanup)
+                for webSock in self._connections.keys():
+                    webSock.close(code=1001) # 1001 = code for closure because server is "going away"
+                    del self._connections[webSock]
 
     def cleanup(self):
         self.enabled=False
 
     def getConnections(self):
         """\
-        :returns dict: mapping a :class:`WebSocket <ws4py.websocket.WebSocket>` object to connection related data for all connections to this server. The dict can be updated."""
-        return self._connections
+        :returns dict: mapping a :class:`WebSocket <ws4py.websocket.WebSocket>` object to connection related data for all connections to this server. This is a snapshot of the connections at the moment the call is made. The dictionary is not updated later if new clients connect or existing ones disconnect."""
+        return self._connections.copy()
 
     def _addConnection(self, webSock):
         """\
@@ -233,16 +237,17 @@ class WSServerBase(object):
 
         :param webSock: (:class:`WebSocket <ws4py.websocket.WebSocket>`) The newly connected Websocket.
         """
-        self.log.debug("Adding websocket connection "+webSock.id())
-        if webSock not in self._connections:
-            self.connectionsRemaining -= 1
-            self._connections[webSock] = self.getDefaultConnectionData()
-            try:
-                self.onClientConnect(webSock)
+        with self._lock:
+            self.log.debug("Adding websocket connection "+webSock.id())
+            if webSock not in self._connections:
+                self.connectionsRemaining -= 1
+                self._connections[webSock] = self.getDefaultConnectionData()
+                try:
+                    self.onClientConnect(webSock)
 
-            except Exception, e:
-                self.log.error(str(e))
-                print str(e)
+                except Exception, e:
+                    self.log.error(str(e))
+                    print str(e)
 
     def _removeConnection(self, webSock):
         """\
@@ -250,12 +255,13 @@ class WSServerBase(object):
 
         :param webSock: (:class:`WebSocket <ws4py.websocket.WebSocket>`) The now disconnected Websocket.
         """
-        self.log.debug("Removing websocket connection "+webSock.id())
-        if webSock in self._connections:
-            self.connectionsRemaining += 1
-            conn=self._connections[webSock]
-            del self._connections[webSock]
-            self.onClientDisconnect(webSock, conn)
+        with self._lock:
+            self.log.debug("Removing websocket connection "+webSock.id())
+            if webSock in self._connections:
+                self.connectionsRemaining += 1
+                conn=self._connections[webSock]
+                del self._connections[webSock]
+                self.onClientDisconnect(webSock, conn)
 
     def _receivedMessage(self, webSock, message):
         """\
@@ -265,7 +271,8 @@ class WSServerBase(object):
         :param msg: (:class:`Message <ws4py.messaging.Message>`) WebSocket message that has been received. Will be either a :class:`Text <ws4py.messaging.TextMessage>` or a :class:`Binary <ws4py.messaging.BinaryMessage>` message.
         """
         self.log.debug("Received message from connection "+webSock.id()+" : "+str(message))
-        self.onClientMessage(webSock,message)
+        with self._lock:
+            self.onClientMessage(webSock,message)
 
 
     def _makeHandlerClass(self,connectionIdPrefix):
