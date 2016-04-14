@@ -385,7 +385,7 @@ class CIIClient(object):
         self.connected=True
         self.onConnected()
         
-    def _onConnectionClose(self):
+    def _onConnectionClose(self, code, reason):
         self.connected=False
         self.onDisconnected()
             

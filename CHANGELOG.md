@@ -3,6 +3,7 @@
 ## Latest
 
 * Bugfix: improvements to thread safety
+* Bugfix: incorrect arguments on disconnect handler in CIIClient
 
 ## 0.3.2 : Bugfixes and minor API enhancements (17 Dec 2015)
 
