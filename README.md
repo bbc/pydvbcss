@@ -3,9 +3,10 @@
 ![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.org/en/stable/?badge=stable)
 [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.org/en/latest/?badge=latest)
+[![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss)
 
 * **[How to install](#install)**
-* **[Read the documentation](https://bbc.github.io/pydvbcss/docs/latest/)**
+* **[Read the documentation](#docs)**
 * **[Run the examples](#run-examples)**
 
 **pydvbcss** is a set of Python 2.7 libraries that implement some of the
@@ -38,6 +39,7 @@ for server implementations.  The steps below describe how to install these.
 successfully on Microsoft Windows 7 and Ubuntu 14.04.
 
 
+<a name="docs"></a>
 ### Read the Documentation (online)
 
 The docs for the library can be read online on readthedocs.org:
@@ -61,7 +63,7 @@ release package from the Python Package Index (PyPI) using
 
     $ pip install pydvbcss
 
-See the [pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss).
+   * [![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg) See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
 
 #### From Github or a release tarball _(library and examples)_
 

@@ -55,23 +55,14 @@ Put a shorter summary of the new changelog items into the release notes. Make th
 - the same as the branch name.
 
 
-#### 5. Update documentation builds on gh-pages
+#### 5. Check documentation builds
 
-Run the documentation build process to build documentation for:
+_The old process of manually building and pushing to gh-pages is deprecated._
 
-* This new "release" branch ("new")
-* *master* branch ("latest")
+Docs are built automatically by readthedocs.org when the new release tag is generated. Check that the new release
+has built correctly and is classified as the "stable" build, here: https://readthedocs.org/projects/pydvbcss/
 
-Note that these are slightly different (because of the 2nd line in the `VERSION` file)
 
-Checkout the [gh-pages](https://github.com/bbc/pydvbcss/tree/gh-pages) branch and make the following commits:
-
-* replace the contents of [`docs/latest`](https://github.com/bbc/pydvbcss/tree/gh-pages/docs/latest)
-  with the documentation build for the "latest" state of master.
-
-* put into `docs/XXXX` the documentation build for the "new" release branch, where XXXX is the version number
-
-Then push the commits up to GitHub.
 
 #### 6. Upload new package to python package index
 
