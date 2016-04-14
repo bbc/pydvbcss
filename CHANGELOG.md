@@ -2,6 +2,8 @@
 
 ## Latest
 
+* Bugfix: improvements to thread safety
+
 ## 0.3.2 : Bugfixes and minor API enhancements (17 Dec 2015)
 
 * Bugfix: Initialiser for `CIIServer` class to avoid corruption of default value for `initialCII` if a 2nd CII server is instantiated
