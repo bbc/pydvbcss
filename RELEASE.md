@@ -137,53 +137,13 @@ Push branch up to github (and set local repository to track the upstream branch 
 Now use the [new release](https://github.com/bbc/pydvbcss/releases/new) function on GitHub's web interface to
 mark the branch 'X.Y.Z' as a new release.
 
-### 5. Update documentation builds on gh-pages
-    
-First, build and copy the documentation for the release and stash it somewhere temporarily.
+### 5. Update documentation builds on gh-pages (deprecated)
 
-    $ git status
-    On branch X.Y.Z
-    Your branch is up-to-date with 'origin/master'.
-    nothing to commit, working directory clean
-    
-    $ python setup.py build_sphinx
-    $ cp -R build/sphinx/html /tmp/X.Y.Z
-    
-Now switch back to master and do the same for the latest state of master:
+Documentation is now automatically rebuilt and hosted by readthedocs.org. It
+will be picked up when the new release is tagged.
 
-    $ git checkout master
-    $ python setup.py build_sphinx
-    $ cp -R build/sphinx/html tmp/latest
     
-Now switch to gh-pages and ensure it is synced with GitHub:
-
-    $ git checkout gh-pages
-    $ git pull origin gh-pages
-    
-And put the new documentation builds in place:
-
-    $ cp -R /tmp/X.Y.Z docs/
-    $ git add docs/X.Y.Z
-
-    $ git rm docs/latest
-    $ cp -R /tmp/latest docs/
-    $ git add docs/latest
-    
-    $ git commit -m "Updated docs for new release and latest changes in master"
-    
-At this point the `docs` dir should contain:
-
-* a subdir `X.Y.Z` (named after the release version) containing the HTML documentation for
-  that version. `index.html` should should describe the release version as being *"X.Y.Z-release"*
-  
-* a subdir `latest` containing the HTML documentation built from *master*. `index.html` should describe the
-  release version as being *"X.Y.Z-latest"*
-  
-Push to GitHub:
-
-    $ git push origin gh-pages
-    
-Upload to PyPI:
+### 6. Upload to PyPI:
 
 ... first uploading to the test service to check everything is okay:
 
