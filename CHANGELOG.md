@@ -2,6 +2,11 @@
 
 ## Latest
 
+* 
+
+## 0.3.3 : Bugfixes and thread safety improvements (20 Apr 2016)
+
+* Build: Migrated to hosting documentation on readthedocs.org and doing build checks with travis-ci.org
 * Bugfix: improvements to thread safety
 * Bugfix: incorrect arguments on disconnect handler in CIIClient
 
