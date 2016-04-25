@@ -568,9 +568,10 @@ class TSClientClockController(object):
         text="Status: "
         if self.timelineAvailable:
             text += "AVAILABLE.    "
+            text += "  Speed = %5.2f  Timeline position = %10.3f secs" % (speed,pos)
         else:
             text += "NOT available."
-        text += "Speed = %5.2f   Timeline position = %10.3f secs" % (speed,pos)
+            text += "  Speed = -----  Timeline position = ----------     "
         return text
           
 
