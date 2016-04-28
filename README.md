@@ -1,8 +1,8 @@
 # Python DVB Companion Screen Synchronisation protocol library
 
 [![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)](https://travis-ci.org/bbc/pydvbcss)
-[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.org/en/stable/?badge=stable)
-[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.org/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
+[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
 [![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss)
 
 * **[How to install](#install)**
@@ -31,7 +31,7 @@ _The DVB CSS specification was formerly published as ["DVB Bluebook A167-2"](htt
 
 ## Getting started
 
-**pydvbcss** requires [ws4py](https://ws4py.readthedocs.org/en/latest/) for
+**pydvbcss** requires [ws4py](https://ws4py.readthedocs.io/en/latest/) for
 use in clients and servers, and also [cherrypy](http://www.cherrypy.org)
 for server implementations.  The steps below describe how to install these.
 
@@ -43,8 +43,8 @@ successfully on Microsoft Windows 7 and Ubuntu 14.04.
 ### Read the Documentation (online)
 
 The docs for the library can be read online on readthedocs.org:
-   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable) **Docs for latest stable release**](http://pydvbcss.readthedocs.org/en/stable/?badge=stable)
-   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest) Docs for latest commits to master](http://pydvbcss.readthedocs.org/en/latest/?badge=latest)
+   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable) **Docs for latest stable release**](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
+   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest) Docs for latest commits to master](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
 
 Links are also available from those pages through to documentation for earlier releases.
 
