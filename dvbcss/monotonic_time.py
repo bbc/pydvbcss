@@ -250,8 +250,10 @@ def _Linux_init(raw=False):
 		CLOCK = CLOCK_MONOTONIC_RAW
 	else:
 		CLOCK = CLOCK_MONOTONIC
-	
-	librt = ctypes.CDLL('librt.so.1', use_errno=True)
+	try:
+		librt = ctypes.CDLL('librt.so.1', use_errno=True)
+	except OSError:
+		librt = ctypes.CDLL('libc.so', use_errno=True)
 	clock_gettime = librt.clock_gettime
 	clock_nanosleep = librt.clock_nanosleep
 
