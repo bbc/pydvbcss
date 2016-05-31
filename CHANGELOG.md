@@ -2,7 +2,8 @@
 
 ## Latest
 
-* 
+* Improvement: Support for monotonic clock on Android.
+  [P-R #5](https://github.com/bbc/pydvbcss/pull/5) by [Jack Jansen](https://github.com/jackjansen) (03 May 2016)
 
 ## 0.3.3 : Bugfixes and thread safety improvements (20 Apr 2016)
 
