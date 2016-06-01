@@ -108,7 +108,7 @@ another represents a timeline related to the first by a correlation:
     
     # create a clock representing another timeline, where time zero corresponds to time 100
     # on the parent timeline
-    subTimeline = CorrelatedClock(parentClock=baseTimeline, tickRate=25, correlation=(100,0)
+    subTimeline = CorrelatedClock(parentClock=baseTimeline, tickRate=25, correlation=(100,0))
     
 At some point later in time during the program, we query the values of all the clocks,
 confirming that the sub timeline is always 100 ticks ahead of the base timeline.
