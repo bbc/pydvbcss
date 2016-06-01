@@ -374,7 +374,7 @@ class ClockBase(object):
         clock = self
         while clock is not None:
             s = s*clock.speed;
-            clock = self.getParent()
+            clock = clock.getParent()
         return s
 
     @property

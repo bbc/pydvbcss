@@ -482,7 +482,23 @@ class Test_HierarchyTickConversions(unittest.TestCase):
         b4 = CorrelatedClock(b3, tickRate=2000, correlation=(15,90))
         
         at1, a1t1, a2t1, a3t1, a4t1, b3t1, b4t1 = [x.ticks for x in [a,a1,a2,a3,a4,b3,b4]]
+        a3.speed = 0.5
+        a4.speed = 0.2
+        self.assertEquals(1.0, a.getEffectiveSpeed())
+        self.assertEquals(1.0, a1.getEffectiveSpeed())
+        self.assertEquals(1.0, a2.getEffectiveSpeed())
+        self.assertEquals(0.5, a3.getEffectiveSpeed())
+        self.assertEquals(0.1, a4.getEffectiveSpeed())
+
+
         a3.speed = 0
+        a4.speed = 1.0
+        self.assertEquals(1.0, a.getEffectiveSpeed())
+        self.assertEquals(1.0, a1.getEffectiveSpeed())
+        self.assertEquals(1.0, a2.getEffectiveSpeed())
+        self.assertEquals(0.0, a3.getEffectiveSpeed())
+        self.assertEquals(0.0, a4.getEffectiveSpeed())
+
         mockTime.timeNow = 6 # advance time 1 second
         
         at2, a1t2, a2t2, a3t2, a4t2, b3t2, b4t2 = [x.ticks for x in [a,a1,a2,a3,a4,b3,b4]]
