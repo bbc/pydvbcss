@@ -26,7 +26,6 @@ from mock_time import MockTime
 from mock_dependent import MockDependent
 
 
-
 class Test_SysClock(unittest.TestCase):
 
     def setUp(self):
@@ -66,6 +65,28 @@ class Test_SysClock(unittest.TestCase):
     def test_getParent(self):
         sysClock = SysClock()
         self.assertEqual(sysClock.getParent(), None)
+        
+    def test_available(self):
+        sysClock = SysClock()
+        self.assertTrue(sysClock.isAvailable())
+        
+    def test_cannotChangeAvailability(self):
+        sysClock = SysClock()
+        self.assertRaises(NotImplementedError, sysClock.setAvailability, True)
+        self.assertRaises(NotImplementedError, sysClock.setAvailability, False)
+
+    def test_getRootReturnsSelf(self):
+        sysClock = SysClock()
+        self.assertEquals(sysClock, sysClock.getRoot())
+
+    def test_ancestry(self):
+        sysClock = SysClock()
+        self.assertEquals([sysClock], sysClock.getAncestry())
+
+    def test_toFromRootTicks(self):
+        sysClock = SysClock()
+        self.assertEquals(12345, sysClock.toRootTicks(12345))
+        self.assertEquals(12345, sysClock.fromRootTicks(12345))
 
 class Test_ClockBase(unittest.TestCase):
     
@@ -92,7 +113,6 @@ class Test_ClockBase(unittest.TestCase):
     def test_readSpeed(self):
         b = ClockBase()
         self.assertEquals(b.speed, 1.0, "Speed is 1.0")
-        
         
 class Test_CorrelatedClock(unittest.TestCase):
     
@@ -241,6 +261,38 @@ class Test_CorrelatedClock(unittest.TestCase):
         c = CorrelatedClock(b, 1000, correlation=(50,300))
         self.assertEqual(c.getParent(), b)
 
+    def test_getRoot(self):
+        a = SysClock()
+        b = CorrelatedClock(a, 1000)
+        c = CorrelatedClock(b, 2000)
+        d = CorrelatedClock(c, 3000)
+        
+        self.assertEquals(a.getRoot(), a)
+        self.assertEquals(b.getRoot(), a)
+        self.assertEquals(c.getRoot(), a)
+        self.assertEquals(d.getRoot(), a)
+
+    def test_setCorrelationAndSpeed(self):
+        a = SysClock(tickRate=1000000)
+        b = CorrelatedClock(a, 1000, correlation=(0,0))
+        b.speed = 1.0
+        
+        db = MockDependent()
+        b.bind(db)
+        
+        b.setCorrelationAndSpeed((5,0),2)
+        db.assertNotificationsEqual([b])
+        self.assertEqual(b.toParentTicks(10), 5005)
+
+    def test_quantifyChange(self):
+        a = SysClock()
+        b = CorrelatedClock(a, 1000, correlation=(0,0))
+        
+        self.assertEquals(float('inf'), b.quantifyChange( (0,0), 1.01))        
+        self.assertEquals(1.0, b.quantifyChange( (0, 1000), 1.0))
+        
+        b.speed = 0.0
+        self.assertEquals(0.005, b.quantifyChange( (0, 5), 0.0))
 
 class Test_RangeCorrelatedClock(unittest.TestCase):
     
@@ -510,6 +562,74 @@ class Test_HierarchyTickConversions(unittest.TestCase):
         self.assertEquals(a4t2, 10.5)        # a4 is speed zero, a3.ticks is 3 ticks from correlation point for a4, translating to 1.5 ticks from a4 correlation point at its tickRate
         self.assertEquals(b3t2, b3t1 + 1000) # b3 still advances
         self.assertEquals(b4t2, b4t1 + 2000) # b4 is paused
+        
+    def test_availabilityPropagation(self):
+        a = SysClock()
+        b = CorrelatedClock(a, 1000)
+        c = CorrelatedClock(b, 2000)
+        d = CorrelatedClock(c, 3000)
+        
+        da = MockDependent()
+        db = MockDependent()
+        dc = MockDependent()
+        dd = MockDependent()
+
+        a.bind(da)
+        b.bind(db)
+        c.bind(dc)
+        d.bind(dd)
+        
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertTrue(c.isAvailable())
+        self.assertTrue(d.isAvailable())
+
+        c.setAvailability(False)
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertFalse(c.isAvailable())
+        self.assertFalse(d.isAvailable())
+        da.assertNotNotified()
+        db.assertNotNotified()
+        dc.assertNotificationsEqual([c])
+        dd.assertNotificationsEqual([d])
+
+        d.setAvailability(False)
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertFalse(c.isAvailable())
+        self.assertFalse(d.isAvailable())
+        da.assertNotNotified()
+        db.assertNotNotified()
+        dc.assertNotNotified()
+        dd.assertNotNotified()
+
+        c.setAvailability(True)
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertTrue(c.isAvailable())
+        self.assertFalse(d.isAvailable())
+        da.assertNotNotified()
+        db.assertNotNotified()
+        dc.assertNotificationsEqual([c])
+        dd.assertNotificationsEqual([d])
+
+    def test_clockDiff(self):
+        a = SysClock()
+        b = CorrelatedClock(a, 1000, correlation=(0,0))
+        c = CorrelatedClock(b, 2000, correlation=(0,0))
+        d = CorrelatedClock(c, 3000, correlation=(0,0))
+        e = RangeCorrelatedClock(d, 1000, (5,0), (5005,15000))
+    
+        self.assertEquals(float('inf'), b.clockDiff(c))
+        self.assertEquals(float('inf'), b.clockDiff(d))
+        self.assertEquals(0.015, b.clockDiff(e))
+        
+        c.tickRate = 1000
+        self.assertEquals(0, b.clockDiff(c))
+
+        c.speed = 1.01
+        self.assertEquals(float('inf'), b.clockDiff(c))
         
 if __name__ == "__main__":
     unittest.main()

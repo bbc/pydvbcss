@@ -340,6 +340,7 @@ class ClockBase(object):
     def __init__(self,**kwargs):
         super(ClockBase,self).__init__(**kwargs)
         self.dependents = {}
+        self._availability = True
         
     @property    
     def ticks(self):
@@ -401,7 +402,35 @@ class ClockBase(object):
         :returns: number of ticks equivalent to the supplied nanosecond value
         """
         return nanos*self.tickRate/1000000000
+
+    def isAvailable(self):
+        """\
+        Returns whether this clock is available, taking into account the availability of any (parent) clocks on which it depends.
         
+        :returns: True if available, otherwise False.
+        """
+        parent = self.getParent()
+        return self._availability and (parent is None or parent.isAvailable())
+        
+    def setAvailability(self, availability):
+        """\
+        Set the availability of this clock.
+        
+        :param availability: True if this clock is available, otherwise False.
+        
+        If setting the availability of this clock changes the overall availability of this clock (as returned by :func:`isAvailable`) then
+        dependents will be notified of the change.
+        """
+        isChange = self._availability != availability
+        parent = self.getParent()
+        if parent is not None:
+            isChange = isChange and parent.isAvailable()
+        
+        self._availability = availability
+        
+        if isChange:
+            self.notify(self)
+
     def notify(self,cause):
         """\
         Call to notify this clock that the clock on which it is based (its parent) has changed relative to the underlying timing source.
@@ -437,6 +466,45 @@ class ClockBase(object):
         |stub-method|
         """
         raise NotImplemented
+        
+    def getRoot(self):
+        """\
+        :return: The root clock for this clock (or itself it has no parent).
+        """
+        p=self
+        p2=p.getParent()
+        while p2:
+            p=p2
+            p2=p.getParent() 
+        return p
+        
+    def fromRootTicks(self, t):
+        """\
+        Return the time for this clock corresponding to a given time of the root clock.
+        
+        :param t: Tick value of the root clock.
+        :returns: Corresponding tick value of this clock.
+        """
+        p=self.getParent()
+        if p is None:
+            return t
+        else:
+            x = p.fromRootTicks(t)
+            return self.fromParentTicks(x)
+            
+    def toRootTicks(self, t):
+        """\
+        Return the time for the root clock corresponding to a given time of this clock.
+        
+        :param t: Tick value for this clock.
+        :returns: Corresponding tick value of the root clock.
+        """
+        p=self.getParent()
+        if p is None:
+            return t
+        else:
+            x = self.toParentTime(t)
+            return p.toRootTime(x)
     
     def toOtherClockTicks(self, otherClock, ticks):
         """\
@@ -450,17 +518,8 @@ class ClockBase(object):
         :throws NoCommonClock: if there is no common ancestor clock (meaning it is not possible to convert
         """
         # establish the ancestry of both clocks up to a root
-        selfAncestry=[self]
-        for c in selfAncestry:
-            p=c.getParent()
-            if p is not None:
-                selfAncestry.append(p)
-        
-        otherAncestry=[otherClock]
-        for c in otherAncestry:
-            p=c.getParent()
-            if p is not None:
-                otherAncestry.append(p)
+        selfAncestry = self.getAncestry()
+        otherAncestry = otherClock.getAncestry()
         
         # work out if there is a common ancestor and eliminate common ancestors
         common=False
@@ -485,6 +544,19 @@ class ClockBase(object):
             
         return ticks
         
+        
+    def getAncestry(self):
+        """\
+        Retrieve the ancestry of this clock as a list.
+        
+        :returns: A list of clocks, starting with this clock, and proceeding to its parent, then its parent's parent etc, ending at the root clock.
+        """
+        ancestry = [self]
+        for c in ancestry:
+            p=c.getParent()
+            if p is not None:
+                ancestry.append(p)
+        return ancestry
         
     def toParentTicks(self, ticks):
         """\
@@ -521,6 +593,31 @@ class ClockBase(object):
         :returns: :class:`ClockBase` representing the immediate parent of this clock, or None if it is a root clock.
         """
         raise NotImplemented
+        
+    def clockDiff(self, otherClock):
+        """\
+        Calculate the potential for difference between this clock and another clock.
+        
+        :param otherClock: The clock to compare with.
+        :returns: The potential difference in units of seconds. If effective speeds or  tick rates differ, this will always be :class:`float` ("+inf").
+        
+        If the clocks differ in effective speed or tick rate, even slightly, then this
+        means that the clocks will eventually diverge to infinity, and so the returned 
+        difference will equal +infinity.
+        """
+        thisSpeed = self.getEffectiveSpeed()
+        otherSpeed = otherClock.getEffectiveSpeed()
+        
+        if thisSpeed != otherSpeed:
+            return float('inf')
+        elif self.tickRate != otherClock.tickRate:
+            return float('inf')
+        else:
+            root = self.getRoot()
+            t = root.ticks
+            t1 = self.fromRootTicks(t)
+            t2 = otherClock.fromRootTicks(t)
+            return abs(t1-t2) / self.tickRate
     
     
         
@@ -567,6 +664,13 @@ class SysClock(ClockBase):
     def getParent(self):
         return None
     
+    def setAvailability(self, availability):
+        """\
+        SysClock is always available, and so availability cannot be set.
+        
+        :raise NotImplementedError: Always raised.
+        """
+        raise NotImplementedError("Changing availability is not supported for this clock.")
 
 
 
@@ -692,6 +796,19 @@ class CorrelatedClock(ClockBase):
         self._correlation=value
         self.notify(self)
         
+    def setCorrelationAndSpeed(self, newCorrelation, newSpeed):
+        """\
+        Set both the correlation and the speed to new values in a single operation. Generates a single notification for descendents as a result.
+        
+        :param newCorrelation: A new tuple `(parentTicks, selfTicks)` representing the new correlation. Must be a tuple. Not a list.
+        :param newSpeed: New speed as a :class:`float`. 
+        """
+        if not isinstance(newCorrelation,tuple) or len(newCorrelation) != 2:
+            raise ValueError("Correlation must be a 2-tuple of tick values")
+        self._correlation = newCorrelation
+        self._speed = float(newSpeed)
+        self.notify(self)
+        
     def calcWhen(self,ticksWhen):
         if self.speed == 0:
             refticks=self._correlation[0]   # return any arbitrary position if the speed of this clock is zero (pause)
@@ -711,6 +828,42 @@ class CorrelatedClock(ClockBase):
     def getParent(self):
         return self._parent
     
+    def quantifyChange(self, newCorrelation, newSpeed):
+        """\
+        Calculate the potential for difference in tick values of this clock if a different correlation and speed were to be used.
+
+        :param newCorrelation: A correlation tuple `(parentTicks, selfTicks)`
+        :param newSpeed: New speed as a :class:`float`. 
+        :returns: The potential difference in units of seconds. If speeds differ, this will always be :class:`float` ("+inf").
+        
+        If the new speed is different, even slightly, then this means that the ticks reported by this clock will eventually differ by infinity,
+        and so the returned value will equal +infinity. If the speed is unchanged then the returned value reflects the difference between
+        old and new correlations.
+        """
+        if newSpeed != self._speed:
+            return float('inf')
+        else:
+            nx, nt = newCorrelation
+            if newSpeed != 0:
+                ox = self.toParentTicks(nt)
+                return abs(nx-ox) / self.getParent().tickRate
+            else:
+                ot = self.fromParentTicks(nx)
+                return abs(nt-ot) / self.tickRate
+
+    def isChangeSignificant(self, newCorrelation, newSpeed, thresholdSecs):
+        """\
+        Returns True if the potential for difference in tick values of this clock (using a new correlation and speed) exceeds a specified threshold.
+        
+        :param newCorrelation: A correlation tuple `(parentTicks, selfTicks)`
+        :param newSpeed: New speed as a :class:`float`. 
+        :returns: True if the potential difference can/will eventually exceed the threshold.
+
+        This is implemented by applying a threshold to the output of :func:`quantifyChange`.
+        """
+        delta = self.quantifyChange(newCorrelation, newSpeed)
+        return delta > thresholdSecs
+
 
 
 @dvbcss._inheritDocs(ClockBase)
