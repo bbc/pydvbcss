@@ -46,6 +46,10 @@ Classes
 **CorrelatedClock** - Clock correlated to another clock
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+.. autoclass:: dvbcss.clock.correlation
+   :members:
+   :inherited-members:
+
 .. autoclass:: dvbcss.clock.CorrelatedClock
    :members:
    :inherited-members:

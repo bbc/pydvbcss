@@ -99,16 +99,19 @@ another represents a timeline related to the first by a correlation:
 
     from dvbcss.clock import SysClock
     from dvbcss.clock import CorrelatedClock
+    from dvbcss.clock import Correlation
     
     # create a clock based on dvbcss.monotonic_time.time() that ticks in milliseconds
     sysClock = SysClock(tickRate=1000)
     
     # create a clock to represent a timeline 
-    baseTimeline = CorrelatedClock(parentClock=sysClock, tickRate=25, correlation=(0,0))
+    corr = Correlation(parentTicks=0, childTicks=0)
+    baseTimeline = CorrelatedClock(parentClock=sysClock, tickRate=25, correlation=corr)
     
     # create a clock representing another timeline, where time zero corresponds to time 100
     # on the parent timeline
-    subTimeline = CorrelatedClock(parentClock=baseTimeline, tickRate=25, correlation=(100,0))
+    corr2 = Correlation(parentTicks=100, childTicks=0)
+    subTimeline = CorrelatedClock(parentClock=baseTimeline, tickRate=25, correlation=corr2)
     
 At some point later in time during the program, we query the values of all the clocks,
 confirming that the sub timeline is always 100 ticks ahead of the base timeline.
@@ -135,7 +138,7 @@ and both the base timeline and the sub timeline reflect this:
 
 .. code-block:: python
     
-    >>> baseTimeline.correlation = (0,25)
+    >>> baseTimeline.correlation = Correlation(0,25)
     >>> printTimes()
     SysClock      ticks = 30000
     Base timeline ticks = 775
@@ -212,6 +215,7 @@ with a common ancestor to this one.
 
     from dvbcss.clock import SysClock
     from dvbcss.clock import CorrelatedClock
+    from dvbcss.clock import Correlation
     
     # create a clock based on dvbcss.monotonic_time.time() that ticks in milliseconds
     sysClock = SysClock(tickRate=1000)
@@ -224,9 +228,9 @@ with a common ancestor to this one.
     #                                   '-- | otherMediaClock |
     #                                       +-----------------+
 
-    wallClock = CorrelatedClock(parentClock=sysClock, tickRate=1000000000, correlation=(0,0))
-    mediaClock = CorrelatedClock(parentClock=wallClock, tickRate=25, correlation=(500021256, 0))
-    otherMediaClock = CorrelatedClock(parentClock=wallClock, tickRate=30, correlation=(21093757, 0))
+    wallClock = CorrelatedClock(parentClock=sysClock, tickRate=1000000000, correlation=Correlation(0,0))
+    mediaClock = CorrelatedClock(parentClock=wallClock, tickRate=25, correlation=Correlation(500021256, 0))
+    otherMediaClock = CorrelatedClock(parentClock=wallClock, tickRate=30, correlation=Correlation(21093757, 0))
     
     # calculate wall clock time 'w' corresponding to a mediaClock time 1582:
     t = 1582
@@ -674,12 +678,105 @@ class SysClock(ClockBase):
 
 
 
+class Correlation(object):
+    r"""\
+    Object representing a correlation. This can also optionally include bounds
+    for the potential for error if the correlation is used to model a clock.
+    
+    The correlation (`parentTicks`, `ticks`) represents a relationship between
+    a (child) clock and its parent. The time `parentTicks` of the parent
+    corresponds to the time `ticks` of the child.
+    
+    :param parentTicks: Time of the parent clock.
+    :param childTcks: Corresponding time of the clock using this correlation.
+    :param initialError: Optional (default=0). The amount of potential error (in seconds) at the moment represented by the correlation. 
+    :param errorGrowthRate: Optional (default=0). The amount that the potential for error will grow by for every tick of the parent clock.
+
+    The attributes of the object have the same name as the corresponding message properties:
+    
+    * :data:`parentTicks`
+    * :data:`childTicks`
+    * :data:`initialError`
+    * :data:`errorGrowthRate`
+        
+    """
+    def __init__(self, parentTicks, childTicks, initialError=0, errorGrowthRate=0):
+        self._parentTicks = parentTicks 
+        self._childTicks = childTicks
+        self._initialError = initialError
+        self._errorGrowthRate = errorGrowthRate
+
+    @property
+    def parentTicks(self):
+        """\
+        Number representing a time of the parent clock.
+        """
+        return self._parentTicks
+
+    @property
+    def childTicks(self):
+        """\
+        Number representing a time of the child clock, that corresponds to the `parentTicks` time of the parent clock.
+        """
+        return self._childTicks
+
+    @property
+    def initialError(self):
+        """\
+        Number representing the amount of potential error (in seconds) at the moment represented by the correlation. Default value is 0 if not set.
+        """
+        return self._initialError
+
+    @property
+    def errorGrowthRate(self):
+        """\
+        Number representing the amount that the potential for error will grow by for every tick of the parent clock. Default value is 0 if not set.
+        """
+        return self._errorGrowthRate
+
+    @property
+    def correlationOnlyAsTuple(self):
+        """\
+        :returns: the correlation as a tuple `(parentTicks, childTicks)`
+        """
+        return (self._parentTicks, self._childTicks)
+        
+    def errorAtParentTicks(self, pt):
+        """\
+        Returns the error at a given parent clock time.
+        
+        :param pt: Time of the parent clock
+        :returns: Error attributable to this correlation
+        """
+        delta = pt - self._parentTicks
+        return self._initialError + delta * self._errorGrowthRate
+        
+        
+    def __str__(self):
+        return "(%s, %s, %s, %s)" %\
+            (str(self._parentTicks), str(self._childTicks), str(self._initialError), str(self._errorGrowthRate))
+    
+    def __repr__(self):
+        return "Correlation(parentTicks=%s, childticks=%s, initialError=%s, errorGrowthRate=%s)" %\
+            (repr(self._parentTicks), repr(self._childTicks), repr(self._initialError), repr(self._errorGrowthRate))
+            
+    def __eq__(self, obj):
+        if isinstance(obj, Correlation):
+            return obj._parentTicks == self._parentTicks \
+                and obj._childTicks == self._childTicks \
+                and obj._initialError == self._initialError \
+                and obj._errorGrowthRate == self._errorGrowthRate
+        else:
+            return False
+
 @dvbcss._inheritDocs(ClockBase)
 class CorrelatedClock(ClockBase):
     r"""\
     A clock locked to the tick count of the parent clock by a correlation and frequency setting.
     
-    Correlation is a tuple `(parentTicks, selfTicks)`
+    Correlation is either a :class:`Correlation` object or a simple tuple
+    `(parentTicks, selfTicks)`. The object form also allows you to specify error
+    bounds information that this clock will track and propagate to other clocks.
     
     When the parent clock ticks property has the value `parentTicks`, the ticks property of this clock
     shall have the value `selfTicks`.
@@ -714,7 +811,7 @@ class CorrelatedClock(ClockBase):
         c.speed = 0
     
         # now resume the clock but at half speed, but again without the tick value jumping
-        c.correlation = ( parent.ticks, c.ticks )
+        c.correlation = Correlation( parent.ticks, c.ticks )
         c.speed = 0.5
     
     .. note::
@@ -725,11 +822,12 @@ class CorrelatedClock(ClockBase):
     
     """
     
-    def __init__(self, parentClock, tickRate, correlation=(0,0), **kwargs):
+    def __init__(self, parentClock, tickRate, correlation=Correlation(0,0), **kwargs):
         """\
         :param parentClock: The parent clock for this clock.
         :param tickRate: (int) tick rate for this clock (in ticks per second)
-        :param correlation: (tuple(int, int)) The intial correlation for this clock. A tuple (parent tick value, this clock tick value)
+        :param correlation: (:class:`Correlation`) The intial correlation for this clock.
+        
         """
         super(CorrelatedClock,self).__init__(**kwargs)
         if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
@@ -737,17 +835,15 @@ class CorrelatedClock(ClockBase):
         self._freq = tickRate
         self._parent=parentClock
         self._speed = 1.0
-        if not isinstance(correlation,tuple) or len(correlation) != 2:
-            raise ValueError("Correlation must be a 2-tuple of tick values")
         self._correlation=correlation
         parentClock.bind(self)
     
     @property
     def ticks(self):
-        return self.correlation[1] + (self._parent.ticks - self._correlation[0])*self._freq*self.speed/self._parent.tickRate
+        return self._correlation.childTicks + (self._parent.ticks - self._correlation.parentTicks)*self._freq*self.speed/self._parent.tickRate
         
     def __repr__(self):
-        return "CorrelatedClock(t=%d, freq=%f, correlation=(%d,%d)) at speed=%f" % (self.ticks, self._freq, self._correlation[0], self._correlation[1], self.speed)
+        return "CorrelatedClock(t=%d, freq=%f, correlation=%s) at speed=%f" % (self.ticks, self._freq, str(self._correlation), self.speed)
 
     @property
     def tickRate(self):
@@ -775,8 +871,9 @@ class CorrelatedClock(ClockBase):
         Changes the :data:`correlation` property to an equivalent correlation (that does not change the timing relationship between
         parent clock and this clock) where the tick value for this clock is the provided tick value.
         """
-        parentTickValue = self.toParentTicks(tickValue)   
-        self._correlation = (parentTickValue, tickValue)
+        parentTickValue = self.toParentTicks(tickValue)
+        initError = self._correlation.errorAtParentTicks(parentTickValue)
+        self._correlation = Correlation(parentTickValue, tickValue, initError, self._correlation.errorGrowthRate)
         # no need to 'notify' because we have not changed the timing relationship
 
     @property
@@ -791,8 +888,6 @@ class CorrelatedClock(ClockBase):
     
     @correlation.setter
     def correlation(self,value):
-        if not isinstance(value,tuple) or len(value) != 2:
-            raise ValueError("Correlation must be a 2-tuple of tick values")
         self._correlation=value
         self.notify(self)
         
@@ -800,30 +895,28 @@ class CorrelatedClock(ClockBase):
         """\
         Set both the correlation and the speed to new values in a single operation. Generates a single notification for descendents as a result.
         
-        :param newCorrelation: A new tuple `(parentTicks, selfTicks)` representing the new correlation. Must be a tuple. Not a list.
+        :param newCorrelation: A :class:`Correlation` representing the new correlation. Must be a tuple. Not a list.
         :param newSpeed: New speed as a :class:`float`. 
         """
-        if not isinstance(newCorrelation,tuple) or len(newCorrelation) != 2:
-            raise ValueError("Correlation must be a 2-tuple of tick values")
         self._correlation = newCorrelation
         self._speed = float(newSpeed)
         self.notify(self)
         
     def calcWhen(self,ticksWhen):
         if self.speed == 0:
-            refticks=self._correlation[0]   # return any arbitrary position if the speed of this clock is zero (pause)
+            refticks=self._correlation.parentTicks   # return any arbitrary position if the speed of this clock is zero (pause)
         else:
-            refticks=self._correlation[0] + (ticksWhen - self._correlation[1])*self._parent.tickRate/self._freq/self.speed
+            refticks=self._correlation.parentTicks + (ticksWhen - self._correlation.childTicks)*self._parent.tickRate/self._freq/self.speed
         return self._parent.calcWhen(refticks)
 
     def toParentTicks(self, ticks):
         if self.speed == 0:
-            return self._correlation[0]   # return any arbitrary position if the speed of this clock is zero (pause)
+            return self._correlation.parentTicks   # return any arbitrary position if the speed of this clock is zero (pause)
         else:
-            return self._correlation[0] + (ticks - self._correlation[1])*self._parent.tickRate/self._freq/self.speed
+            return self._correlation.parentTicks + (ticks - self._correlation.childTicks)*self._parent.tickRate/self._freq/self.speed
 
     def fromParentTicks(self, ticks):
-        return self._correlation[1] + (ticks - self._correlation[0])*self._freq*self.speed/self._parent.tickRate
+        return self._correlation.childTicks + (ticks - self._correlation.parentTicks)*self._freq*self.speed/self._parent.tickRate
     
     def getParent(self):
         return self._parent
@@ -832,7 +925,7 @@ class CorrelatedClock(ClockBase):
         """\
         Calculate the potential for difference in tick values of this clock if a different correlation and speed were to be used.
 
-        :param newCorrelation: A correlation tuple `(parentTicks, selfTicks)`
+        :param newCorrelation: A :class:`Correlation`
         :param newSpeed: New speed as a :class:`float`. 
         :returns: The potential difference in units of seconds. If speeds differ, this will always be :class:`float` ("+inf").
         
@@ -843,7 +936,7 @@ class CorrelatedClock(ClockBase):
         if newSpeed != self._speed:
             return float('inf')
         else:
-            nx, nt = newCorrelation
+            nx, nt = newCorrelation.parentTicks, newCorrelation.childTicks
             if newSpeed != 0:
                 ox = self.toParentTicks(nt)
                 return abs(nx-ox) / self.getParent().tickRate
@@ -855,7 +948,7 @@ class CorrelatedClock(ClockBase):
         """\
         Returns True if the potential for difference in tick values of this clock (using a new correlation and speed) exceeds a specified threshold.
         
-        :param newCorrelation: A correlation tuple `(parentTicks, selfTicks)`
+        :param newCorrelation: A :class:`Correlation`
         :param newSpeed: New speed as a :class:`float`. 
         :returns: True if the potential difference can/will eventually exceed the threshold.
 
@@ -1000,8 +1093,6 @@ class RangeCorrelatedClock(ClockBase):
     r"""\
     A clock locked to the tick count of the parent clock by two different points of correlation.
     
-    Each correlation is a tuple `(parentTicks, selfTicks)`
-    
     This relationship can be illustrated as follows:
     
     .. image:: range-correlated-clock.png
@@ -1016,28 +1107,24 @@ class RangeCorrelatedClock(ClockBase):
         """\
         :param parentClock: The parent clock for this clock.
         :param tickRate: The advisory tick rate (ticks per second) for this clock.
-        :param correlation1: (tuple(int, int)) The first point of correlation for this clock. A tuple (parent tick value, this clock tick value)
-        :param correlation2: (tuple(int, int)) The second point of correlation for this clock. A tuple (parent tick value, this clock tick value)
+        :param correlation1: (:class:`Correlation`) The first point of correlation for this clock.
+        :param correlation2: (:class:`Correlation`) The second point of correlation for this clock.
         """
         super(RangeCorrelatedClock,self).__init__(**kwargs)
         if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
             raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._parent=parentClock
         self._freq = tickRate
-        if not isinstance(correlation1,tuple) or len(correlation1) != 2:
-            raise ValueError("correlation1 must be a 2-tuple of tick values")
-        if not isinstance(correlation2,tuple) or len(correlation2) != 2:
-            raise ValueError("correlations2 must be a 2-tuple of tick values")
         self._correlation1=correlation1
         self._correlation2=correlation2
         parentClock.bind(self)
     
     @property
     def ticks(self):
-        return (self._parent.ticks - self._correlation1[0]) * (self._correlation2[1] - self._correlation1[1]) / (self._correlation2[0] - self._correlation1[0]) + self._correlation1[1]
+        return (self._parent.ticks - self._correlation1.parentTicks) * (self._correlation2.childTicks - self._correlation1.childTicks) / (self._correlation2.parentTicks - self._correlation1.parentTicks) + self._correlation1.childTicks
         
     def __repr__(self):
-        return "CorrelatedClock(t=%d, freq=%f, correlation=(%d,%d)) at speed=%f" % (self.ticks, self._freq, self._correlation[0], self._correlation[1], self.speed)
+        return "CorrelatedClock(t=%d, freq=%f, correlation=(%d,%d)) at speed=%f" % (self.ticks, self._freq, self._correlation.parentTicks, self._correlation.childTicks, self.speed)
 
     @property
     def tickRate(self):
@@ -1054,35 +1141,29 @@ class RangeCorrelatedClock(ClockBase):
     @property
     def correlation1(self):
         """\
-        Read or change the first correlation tuple `(parentTicks, selfTicks)` of this clock to its parent clock.
+        Read or change the first correlation of this clock to its parent clock.
         
-        Assign a new tuple `(parentTicks, selfTicks)` to change the correlation. 
-        This value must be a tuple, not a list.
+        Assign a new :class:`Correlation` to change the correlation. 
         """
         return self._correlation1
     
     @correlation1.setter
     def correlation1(self,value):
-        if not isinstance(value,tuple) or len(value) != 2:
-            raise ValueError("Correlation must be a 2-tuple of tick values")
         self._correlation1=value
         self.notify(self)
         
     @property
     def correlation2(self):
         """\
-        Read or change the first correlation tuple `(parentTicks, selfTicks)` of this clock to its parent clock.
+        Read or change the first correlation of this clock to its parent clock.
         
-        Assign a new tuple `(parentTicks, selfTicks)` to change the correlation. 
-        This value must be a tuple, not a list.
+        Assign a new :class:`Correlation` to change the correlation. 
         """
         return self._correlation2
     
     @correlation2.setter
     def correlation2(self,value):
-        if not isinstance(value,tuple) or len(value) != 2:
-            raise ValueError("Correlation must be a 2-tuple of tick values")
-        self._correlation1=value
+        self._correlation2=value
         self.notify(self)
         
 
@@ -1091,10 +1172,10 @@ class RangeCorrelatedClock(ClockBase):
         return self._parent.calcWhen(refticks)
 
     def toParentTicks(self, ticks):
-        return (ticks - self._correlation1[1]) / (self._correlation2[1] - self._correlation1[1]) * (self._correlation2[0] - self._correlation1[0]) + self._correlation1[0]
+        return (ticks - self._correlation1.childTicks) / (self._correlation2.childTicks - self._correlation1.childTicks) * (self._correlation2.parentTicks - self._correlation1.parentTicks) + self._correlation1.parentTicks
 
     def fromParentTicks(self, ticks):
-        return (ticks - self._correlation1[0]) / (self._correlation2[0] - self._correlation1[0]) * (self._correlation2[1] - self._correlation1[1]) + self._correlation1[1]
+        return (ticks - self._correlation1.parentTicks) / (self._correlation2.parentTicks - self._correlation1.parentTicks) * (self._correlation2.childTicks - self._correlation1.childTicks) + self._correlation1.childTicks
         
     def getParent(self):
         return self._parent
@@ -1102,6 +1183,7 @@ class RangeCorrelatedClock(ClockBase):
 __all__ = [
     "ClockBase",
     "SysClock",
+    "Correlation",
     "CorrelatedClock",
     "RangeCorrelatedClock",
     "TunableClock",
