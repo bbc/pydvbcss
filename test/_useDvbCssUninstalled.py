@@ -15,13 +15,10 @@
 # limitations under the License.
 
 
-# allow tests to run from the package directory, if dvbcss isn't yet installed
-try:
-    import dvbcss
-except ImportError:
-    import sys, os
-    parentDir= os.path.dirname(os.path.abspath(__file__))+os.sep+".."
-    sys.path.append(parentDir)
+# prioritise using dvbcss from here, not any instance that might already be installed
+import sys, os
+parentDir= os.path.dirname(os.path.abspath(__file__))+os.sep+".."
+sys.path.insert(0,parentDir)
 
 if __name__ == "__main__":
     import sys
@@ -30,7 +27,6 @@ if __name__ == "__main__":
 This is a support file and is designed to be imported, not run on its own.
 
 This module amends the import path to include the parent directory,
-thereby allowing the example code to run without installing dvbcss
-modules first.
-
+thereby ensuring that dvbcss from this package will be used, instead of any installed
+instance.
 """
