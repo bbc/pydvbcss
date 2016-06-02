@@ -702,7 +702,7 @@ class Correlation(object):
         self._initialError = initialError
         self._errorGrowthRate = errorGrowthRate
     
-    def butWith(self, arentTicks=None, childTicks=None, initialError=None, errorGrowthRate=None):
+    def butWith(self, parentTicks=None, childTicks=None, initialError=None, errorGrowthRate=None):
         """\
         Return a new correlation the same as this one but with the specified changes.
         
@@ -717,13 +717,13 @@ class Correlation(object):
         is taken from this correlation object.
         """
         if parentTicks is None:
-            parentTicks = existingCorrelation.parentTicks
+            parentTicks = self.parentTicks
         if childTicks is None:
-            childTicks = existingCorrelation.childTicks
+            childTicks = self.childTicks
         if initialError is None:
-            initialError = existingCorrelation.initialError
+            initialError = self.initialError
         if errorGrowthRate is None:
-            errorGrowthRate = existingCorrelation.errorGrowthRate
+            errorGrowthRate = self.errorGrowthRate
         return Correlation(parentTicks, childTicks, initialError, errorGrowthRate)
 
     @property
@@ -766,7 +766,7 @@ class Correlation(object):
         
         
     def __str__(self):
-        return "(%s, %s, %s, %s)" %\
+        return "Correlation(%s, %s, %s, %s)" %\
             (str(self._parentTicks), str(self._childTicks), str(self._initialError), str(self._errorGrowthRate))
     
     def __repr__(self):
@@ -885,8 +885,13 @@ class CorrelatedClock(ClockBase):
         parent clock and this clock) where the tick value for this clock is the provided tick value.
         """
         parentTickValue = self.toParentTicks(tickValue)
-        initError = self._correlation.errorAtParentTicks(parentTickValue)
-        self._correlation = Correlation(parentTickValue, tickValue, initError, self._correlation.errorGrowthRate)
+        initError = self._correlation.calcErrorAtParentTicks(parentTickValue)
+
+        self._correlation = self._correlation.butWith( \
+            parentTicks = parentTickValue, \
+            childTicks = tickValue, \
+            initialError = initError
+            )
         # no need to 'notify' because we have not changed the timing relationship
 
     @property
