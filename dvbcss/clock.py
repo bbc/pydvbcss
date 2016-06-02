@@ -692,19 +692,39 @@ class Correlation(object):
     :param initialError: Optional (default=0). The amount of potential error (in seconds) at the moment represented by the correlation. 
     :param errorGrowthRate: Optional (default=0). The amount that the potential for error will grow by for every tick of the parent clock.
 
-    The attributes of the object have the same name as the corresponding message properties:
-    
-    * :data:`parentTicks`
-    * :data:`childTicks`
-    * :data:`initialError`
-    * :data:`errorGrowthRate`
-        
+    This class is intended to be immutable. Instead of modifying a correlation,
+    create a new one based on an existing one.
     """
     def __init__(self, parentTicks, childTicks, initialError=0, errorGrowthRate=0):
+        super(Correlation,self).__init__()
         self._parentTicks = parentTicks 
         self._childTicks = childTicks
         self._initialError = initialError
         self._errorGrowthRate = errorGrowthRate
+    
+    def butWith(self, arentTicks=None, childTicks=None, initialError=None, errorGrowthRate=None):
+        """\
+        Return a new correlation the same as this one but with the specified changes.
+        
+        :param parentTicks: Optional. A new Time of the parent clock.
+        :param childTcks: Optional. The corresponding time of the clock using this correlation.
+        :param initialError: Optional. The amount of potential error (in seconds) at the moment represented by the correlation. 
+        :param errorGrowthRate: Optional. The amount that the potential for error will grow by for every tick of the parent clock.
+        
+        :returns: New :class:`Correlation` based on this one, but with the changes specified by the parameters.
+        
+        If a parameter is set to `None` or not provided, then the existing value
+        is taken from this correlation object.
+        """
+        if parentTicks is None:
+            parentTicks = existingCorrelation.parentTicks
+        if childTicks is None:
+            childTicks = existingCorrelation.childTicks
+        if initialError is None:
+            initialError = existingCorrelation.initialError
+        if errorGrowthRate is None:
+            errorGrowthRate = existingCorrelation.errorGrowthRate
+        return Correlation(parentTicks, childTicks, initialError, errorGrowthRate)
 
     @property
     def parentTicks(self):
@@ -734,14 +754,7 @@ class Correlation(object):
         """
         return self._errorGrowthRate
 
-    @property
-    def correlationOnlyAsTuple(self):
-        """\
-        :returns: the correlation as a tuple `(parentTicks, childTicks)`
-        """
-        return (self._parentTicks, self._childTicks)
-        
-    def errorAtParentTicks(self, pt):
+    def calcErrorAtParentTicks(self, pt):
         """\
         Returns the error at a given parent clock time.
         

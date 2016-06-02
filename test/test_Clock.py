@@ -25,7 +25,6 @@ from dvbcss.clock import ClockBase, SysClock, CorrelatedClock, TunableClock, NoC
 from mock_time import MockTime
 from mock_dependent import MockDependent
 
-
 class Test_SysClock(unittest.TestCase):
 
     def setUp(self):
@@ -113,6 +112,69 @@ class Test_ClockBase(unittest.TestCase):
     def test_readSpeed(self):
         b = ClockBase()
         self.assertEquals(b.speed, 1.0, "Speed is 1.0")
+        
+
+class Test_Correlation(unittest.TestCase):
+    def test_createNeedsTwoArguments(self):
+        self.assertRaises(TypeError, Correlation)
+        self.assertRaises(TypeError, Correlation, 1)
+        Correlation(1,2)
+        
+    def test_createTwoArgsZeroError(self):
+        c = Correlation(1,2)
+        self.assertEquals(1, c.parentTicks)
+        self.assertEquals(2, c.childTicks)
+        self.assertEquals(0, c.initialError)
+        self.assertEquals(0, c.errorGrowthRate)
+        
+    def test_createWithErr(self):
+        c = Correlation(1,2,3,4)
+        self.assertEquals(1, c.parentTicks)
+        self.assertEquals(2, c.childTicks)
+        self.assertEquals(3, c.initialError)
+        self.assertEquals(4, c.errorGrowthRate)
+        
+    def test_immutable(self):
+        c = Correlation(1,2,3,4)
+        try:
+            c.parentTicks = 5
+            self.fail(msg="Assignment of parentTicks property")
+        except:
+            pass
+        try:
+            c.childTicks = 5
+            self.fail(msg="Assignment of childTicks property")
+        except:
+            pass
+        try:
+            c.initialError = 5
+            self.fail(msg="Assignment of initialError property")
+        except:
+            pass
+        try:
+            c.errorGrowthRate = 5
+            self.fail(msg="Assignment of errorGrowthRate property")
+        except:
+            pass
+        
+    def test_mutate(self):
+        c=Correlation(1,2,3,4)
+
+        c2 = c.butWith()
+        self.assertEquals(c2, Correlation(1,2,3,4))
+
+        c3 = c.butWith(parentTicks=7)
+        self.assertEquals(c3, Correlation(7,2,3,4))
+
+        c4 = c.butWith(childTicks=99)
+        self.assertEquals(c4, Correlation(1,99,3,4))
+
+        c5 = c.butWith(initialError=888)
+        self.assertEquals(c5, Correlation(1,2,888,4))
+
+        c6 = c.butWith(errorGrowthRate=1000)
+        self.assertEquals(c6, Correlation(1,2,3,1000))
+
         
 class Test_CorrelatedClock(unittest.TestCase):
     

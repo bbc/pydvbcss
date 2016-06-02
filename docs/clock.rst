@@ -46,10 +46,6 @@ Classes
 **CorrelatedClock** - Clock correlated to another clock
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-.. autoclass:: dvbcss.clock.correlation
-   :members:
-   :inherited-members:
-
 .. autoclass:: dvbcss.clock.CorrelatedClock
    :members:
    :inherited-members:
@@ -65,6 +61,13 @@ Classes
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 .. autoclass:: dvbcss.clock.RangeCorrelatedClock
+   :members:
+   :inherited-members:
+
+**Correlation** - represents a Correlation
+''''''''''''''''''''''''''''''''''''''''''
+
+.. autoclass:: dvbcss.clock.Correlation
    :members:
    :inherited-members:
 
