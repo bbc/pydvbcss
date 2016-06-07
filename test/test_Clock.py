@@ -248,6 +248,22 @@ class Test_CorrelatedClock(unittest.TestCase):
         self.assertEqual(c.correlation, Correlation(50000,320))
         self.assertAlmostEqual(c.ticks, (int(5020.8*1000000) - 50000) / 1000 + 320, places=5)
         
+    def test_changeCorrelationToTuple(self):
+        mockTime = self.mockTime
+
+        b = self.newSysClock()
+        mockTime.timeNow = 5020.8
+        c = CorrelatedClock(b, 1000, correlation=(0,300))
+        self.assertAlmostEqual(c.ticks, 5020.8*1000 + 300, places=5)
+        
+        c.correlation = (50000,320)
+        self.assertEqual(c.correlation, Correlation(50000,320))
+        self.assertAlmostEqual(c.ticks, (int(5020.8*1000000) - 50000) / 1000 + 320, places=5)
+        
+        c.setCorrelationAndSpeed((50000, 400), 1.0)
+        self.assertEqual(c.correlation, Correlation(50000,400))
+        self.assertAlmostEqual(c.ticks, (int(5020.8*1000000) - 50000) / 1000 + 400, places=5)
+        
     def test_changeCorrelationNotifies(self):
         """Check a change to the correlation propagates notifications to dependents of this clock"""
         b = self.newSysClock()
@@ -423,6 +439,27 @@ class Test_RangeCorrelatedClock(unittest.TestCase):
         mockTime.timeNow = b.calcWhen(150)
         self.assertEqual(c.ticks, 1055)
         
+    def test_withTuples(self):
+        mockTime = self.mockTime
+        
+        b = self.newSysClock(tickRate=1000)
+
+        mockTime.timeNow = 0.0
+        c = RangeCorrelatedClock(b, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        self.assertEqual(Correlation(100,1000), c.correlation1)
+        self.assertEqual(Correlation(200,1110), c.correlation2)
+        
+        mockTime.timeNow = b.calcWhen(100)
+        self.assertEqual(c.ticks, 1000)
+       
+        mockTime.timeNow = b.calcWhen(200)
+        self.assertEqual(c.ticks, 1110)
+
+        c.correlation1 = (100, 2000)
+        c.correlation2 = (200, 2110)
+        self.assertEqual(Correlation(100,2000), c.correlation1)
+        self.assertEqual(Correlation(200,2110), c.correlation2)
+        self.assertEqual(c.ticks, 2110)
       
 class Test_TunableClock(unittest.TestCase):
     

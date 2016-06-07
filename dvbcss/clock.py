@@ -956,7 +956,7 @@ class CorrelatedClock(ClockBase):
         """\
         :param parentClock: The parent clock for this clock.
         :param tickRate: (int) tick rate for this clock (in ticks per second)
-        :param correlation: (:class:`Correlation`) The intial correlation for this clock.
+        :param correlation: (:class:`Correlation`) or tuple `(parentTicks, selfTicks)`. The intial correlation for this clock.
         
         """
         super(CorrelatedClock,self).__init__(**kwargs)
@@ -965,6 +965,8 @@ class CorrelatedClock(ClockBase):
         self._freq = tickRate
         self._parent=parentClock
         self._speed = 1.0
+        if isinstance(correlation, tuple):
+            correlation = Correlation(*correlation)
         self._correlation=correlation
         parentClock.bind(self)
     
@@ -1014,15 +1016,20 @@ class CorrelatedClock(ClockBase):
     @property
     def correlation(self):
         """\
-        Read or change the correlation tuple `(parentTicks, selfTicks)` of this clock to its parent clock.
+        Read or change the correlation of this clock to its parent clock.
         
-        Assign a new tuple `(parentTicks, selfTicks)` to change the correlation. 
-        This value must be a tuple, not a list.
+        Assign a new :class:`Correlation` object to change the correlation.
+        
+        You can also pass a tuple `(parentTicks, selfTicks)` which will be converted
+        to a correlation automatically. Reading this property after setting it with 
+        a tuple will return the equivalent :class:`Correlation`.
         """
         return self._correlation
     
     @correlation.setter
     def correlation(self,value):
+        if isinstance(value, tuple):
+            value = Correlation(*value)
         self._correlation=value
         self.notify(self)
         
@@ -1030,9 +1037,11 @@ class CorrelatedClock(ClockBase):
         """\
         Set both the correlation and the speed to new values in a single operation. Generates a single notification for descendents as a result.
         
-        :param newCorrelation: A :class:`Correlation` representing the new correlation. Must be a tuple. Not a list.
+        :param newCorrelation: A :class:`Correlation` representing the new correlation. Or a tuple `(parentTicks, selfTicks)` representing the correlation.
         :param newSpeed: New speed as a :class:`float`. 
         """
+        if isinstance(newCorrelation, tuple):
+            newCorrelation = Correlation(*newCorrelation)
         self._correlation = newCorrelation
         self._speed = float(newSpeed)
         self.notify(self)
@@ -1265,14 +1274,18 @@ class RangeCorrelatedClock(ClockBase):
         """\
         :param parentClock: The parent clock for this clock.
         :param tickRate: The advisory tick rate (ticks per second) for this clock.
-        :param correlation1: (:class:`Correlation`) The first point of correlation for this clock.
-        :param correlation2: (:class:`Correlation`) The second point of correlation for this clock.
+        :param correlation1: (:class:`Correlation`) or tuple `(parentTicks, selfTicks)`. The first point of correlation for this clock.
+        :param correlation2: (:class:`Correlation`) or tuple `(parentTicks, selfTicks)`. The second point of correlation for this clock.
         """
         super(RangeCorrelatedClock,self).__init__(**kwargs)
         if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
             raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._parent=parentClock
         self._freq = tickRate
+        if isinstance(correlation1, tuple):
+            correlation1=Correlation(*correlation1)
+        if isinstance(correlation2, tuple):
+            correlation2=Correlation(*correlation2)
         self._correlation1=correlation1
         self._correlation2=correlation2
         parentClock.bind(self)
@@ -1301,12 +1314,14 @@ class RangeCorrelatedClock(ClockBase):
         """\
         Read or change the first correlation of this clock to its parent clock.
         
-        Assign a new :class:`Correlation` to change the correlation. 
+        Assign a new :class:`Correlation` or tuple `(parentTicks, childTicks)` to change the correlation. 
         """
         return self._correlation1
     
     @correlation1.setter
     def correlation1(self,value):
+        if isinstance(value, tuple):
+            value=Correlation(*value)
         self._correlation1=value
         self.notify(self)
         
@@ -1315,12 +1330,14 @@ class RangeCorrelatedClock(ClockBase):
         """\
         Read or change the first correlation of this clock to its parent clock.
         
-        Assign a new :class:`Correlation` to change the correlation. 
+        Assign a new :class:`Correlation` or tuple `(parentTicks, childTicks)` to change the correlation. 
         """
         return self._correlation2
     
     @correlation2.setter
     def correlation2(self,value):
+        if isinstance(value, tuple):
+            value=Correlation(*value)
         self._correlation2=value
         self.notify(self)
         
