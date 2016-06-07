@@ -86,6 +86,31 @@ measured by these clocks.
 
 
 
+Accounting for error (dispersion)
+---------------------------------
+
+These clocks also support tracking and calculating error bounds on the values
+they report. This is known as dispersion. It is useful if, for example, a clock
+hierarchy is being used to estimate time based on imperfect measurements - such
+as when a companion tries to estimate the Wall Clock of a TV.
+
+Each clock in a hierarchy makes its own contribution to the overall dispersion.
+When a clock is asked to calculate dispersion (using the :func:`dispersionAtTime`
+method), the answer it gives is the sum of the error contributions from itself
+and its parents, all the way back up to the root system clock.
+
+A system clock has error bounds determined by the precision with which it can be measured (the smallest amount by which its values change).
+
+When using a dependent clock, such as a :class:`CorrelatedClock`, the
+correlation being used to set its relationship to its parent might also have some uncertainty in it. This information can be included in the :class:`Correlation`.
+Uncertainty based on measurements/estimates can grow over time - e.g. because
+the clocks in a TV and companion gradually drift. So there are two parameters
+that you can provide in a :class:`Correlation` - the *initial error* and the
+*growth rate*. As time passes, the error for the clock using this correlation
+is calculated as the initial error plus the growth rate multiplied by how much
+time has passed since the point of correlation.
+
+
 Usage examples
 --------------
 
@@ -246,6 +271,26 @@ with a common ancestor to this one.
     t = 2248
     o = mediaClock.toOtherClockTicks(otherMediaClock, t)
     print "When MediaClock ticks =", t, " other media clock ticks =", o
+
+
+Let us now suppose that the wall clock is actually an estimate of a Wall Clock
+on another device. When we set the correlation we therefore include error
+information that is calculated from the proces by which the Wall Clock of the
+other device is estimated:
+
+.. code-block:: python
+
+    wallClock.correlation = Correlation(24524535, 34342, initialError=0.012, errorGrowthRate=0.00005)
+
+Here we are saying that the error bounds of the estimate at the point in time
+represented by the correlation is +/- 0.012 seconds. This will grow by 0.00005
+seconds for every tick of the parent clock.
+
+.. code-block:: python
+
+    print "Dispersion is +/-", wallClock.dispersionAtTime(wallClock.ticks), "seconds"
+    
+    print "In 1000 ticks from now, dispersion will be +/-", wallClock.dispersionAtTime(wallClock.ticks + 1000), "seconds"
 
 
 
@@ -509,8 +554,8 @@ class ClockBase(object):
         if p is None:
             return t
         else:
-            x = self.toParentTime(t)
-            return p.toRootTime(x)
+            x = self.toParentTicks(t)
+            return p.toRootTicks(x)
     
     def toOtherClockTicks(self, otherClock, ticks):
         """\
@@ -637,7 +682,7 @@ class ClockBase(object):
         
         p = self.getParent()
         if p is not None:
-            pt = self.toParentTime(t)
+            pt = self.toParentTicks(t)
             disp += p.dispersionAtTime(pt)
         
         return disp
@@ -1090,6 +1135,9 @@ class TunableClock(ClockBase):
         self._last=self._parent.ticks
         parentClock.bind(self)
         # self._last and self.ticks constitute a correlation
+        self._baseErr = 0
+        self._baseErrParentTime = self._last
+        self._errGrowthRate = 0
             
     def _rebase(self):
         now = self._parent.ticks
@@ -1179,9 +1227,22 @@ class TunableClock(ClockBase):
     def getParent(self):
         return self._parent
         
+    def setError(self, current, growthRate=0):
+        """\
+        Set the current error bounds of this clock and the rate at which it grows
+        per tick of the parent clock.
+        
+        :param current: Potential error (in seconds) of the clock at this time.
+        :param growthRate: Amount by which error will grow for every tick of the parent clock.
+        """
+        self._baseErr = current
+        self._baseErrParentTime = self.getParent().ticks
+        self._errGrowthRate = growthRate
+        
     def _errorAtTime(self, f):
-        # XXXX NOT SURE YET
-        raise NotImplemented
+        tDelta = self.getParent().ticks - self._baseErrParentTime
+        growth = abs(tDelta) * self._errGrowthRate
+        return self._baseErr + growth
         
 
 

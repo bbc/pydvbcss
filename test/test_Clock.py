@@ -554,6 +554,40 @@ class Test_TunableClock(unittest.TestCase):
         c = TunableClock(b, tickRate=1000, ticks=5)
         self.assertEqual(c.getParent(), b)
 
+    def test_errorInitiallyZero(self):
+        """Initially, the contribution to error/dispersion is zero and does not grow"""
+        b = self.newSysClock()
+        c = TunableClock(b, tickRate=1000, ticks=5)
+        
+        t = b.ticks
+        parentDisp = b.dispersionAtTime(t)
+        thisDisp = c.dispersionAtTime(c.fromParentTicks(t))
+        self.assertEqual(0, parentDisp - thisDisp)
+        
+        thisDispLater = c.dispersionAtTime(c.fromParentTicks(t+1000000))
+        self.assertEqual(thisDisp, thisDispLater)
+
+    def test_errorSettable(self):
+        mockTime = self.mockTime
+        
+        b = self.newSysClock(tickRate=1000)
+        c = TunableClock(b, tickRate=1000, ticks=5)
+
+        sysClockErr = b.dispersionAtTime(0) # will be constant
+
+        mockTime.timeNow = 1000
+        c.setError(0.1, growthRate = 0.01/1000) # 0.1, increasing by 0.01 every second
+        self.assertAlmostEquals(0.1 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+        
+        mockTime.timeNow += 5
+        self.assertAlmostEquals(0.15 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+
+        c.setError(0.2, growthRate = 0.001/1000) # 0.2, increasing by 0.001 every second
+        self.assertAlmostEquals(0.2 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+        
+        mockTime.timeNow += 5
+        self.assertAlmostEquals(0.205 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+
 
 class Test_HierarchyTickConversions(unittest.TestCase):
     """\
