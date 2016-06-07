@@ -288,6 +288,9 @@ current tick value differs by a fixed offset.
         def toParentTicks(self, ticks):
             return ticks - self._offset
 
+        def _errorAtTime(self,t):
+            return 0
+
 In use:
 
 .. code-block:: python
@@ -321,7 +324,6 @@ def measurePrecision(clock,sampleSize=10000):
     
     Works by empirically looking for the smallest observable difference in the tick count.
     
-    :param clock: (:class:dvbcss.clock.ClockBase) Clock to measure
     :param sampleSize: (int) Number of iterations (sample size) to estimate the precision over
     :return: (float) estimate of clock measurement precision (in seconds)
     """
@@ -623,8 +625,56 @@ class ClockBase(object):
             t2 = otherClock.fromRootTicks(t)
             return abs(t1-t2) / self.tickRate
     
-    
+    def dispersionAtTime(self, t):
+        """\
+        Calculates the dispersion (maximum error bounds) at the specified
+        clock time. This takes into account the contribution to error of this
+        clock and its ancestors.
         
+        :returns: Dispersion (in seconds) at the specified clock time.
+        """
+        disp = self._errorAtTime(t)
+        
+        p = self.getParent()
+        if p is not None:
+            pt = self.toParentTime(t)
+            disp += p.dispersionAtTime(pt)
+        
+        return disp
+    
+    def _errorAtTime(self, t):
+        """\
+        |stub-method|
+        
+        :param t: Time of this clock.
+
+        :returns: the potential for error (in seconds) arising from this clock
+        at a given time of this clock. Does not include the contribution of
+        any parent clocks.
+        
+        This is an internal method that is used by :func:`dispersionAtTime`.
+        """
+        raise NotImplemented
+
+    def getRootMaxFreqError(self):
+        """\
+        Return potential error of underlying clock (e.g. system clock).
+        
+        :returns: The maximum potential frequency error (in parts-per-million) of the underlying root clock.
+        
+        *This is a partial stub method. It must be re-implemented by root clocks.*
+        
+        For a clock that is not the root clock, this method will pass through
+        the call to the same method of the root clock.
+        """
+        root = self.getRoot()
+        if root == self:
+            raise NotImplemented
+        else:
+            return self.getRoot().getRootMaxFreqErrPpm()
+
+
+
 @dvbcss._inheritDocs(ClockBase)
 class SysClock(ClockBase):
     """\
@@ -633,10 +683,19 @@ class SysClock(ClockBase):
     
     The default tick rate is 1 million ticks per second, but a different tick rate can be chosen during initialisation.
     
+    :param tickRate: Optional (default=1000000). The tick rate of this clock (ticks per second).
+    :param maxFreqErrorPpm: Optional (default=500). The maximum frequency error (in units of parts-per-million) of the clock, or an educated best-estimate of it.
+    
+    The precision is automatically estimated using the :func:`measurePrecision`
+    function when this clock is created. So creating a SysClock, particularly
+    one with a low tickrate, may incur a noticeable delay at initialisation.
+    
+    The measured precision is then reported as the dispersion of this clock.
+    
     It is not permitted to change the :data:`tickRate` or :data:`speed` property of this clock because it directly represents a system clock.
     """
     
-    def __init__(self,tickRate=1000000, **kwargs):
+    def __init__(self,tickRate=1000000, maxFreqErrorPpm=500, **kwargs):
         """\
         :param tickRate: (int) tick rate for this clock (in ticks per second)
         """
@@ -644,6 +703,9 @@ class SysClock(ClockBase):
         if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
             raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._freq = tickRate
+        s = min(10000,max(10,tickRate/10))
+        self._precision = measurePrecision(self, sampleSize=s)
+        self._maxFreqErrorPpm = maxFreqErrorPpm
         
     @property
     def ticks(self):
@@ -676,11 +738,19 @@ class SysClock(ClockBase):
         """
         raise NotImplementedError("Changing availability is not supported for this clock.")
 
+    def _errorAtTime(self, t):
+        """\
+        :returns: The precision of the clock
+        """
+        return self._precision
+
+    def getRootMaxFreqError(self):
+        return self._maxFreqErrorPpm
 
 
 class Correlation(object):
     r"""\
-    Object representing a correlation. This can also optionally include bounds
+    Immutable object representing a correlation. This can also optionally include bounds
     for the potential for error if the correlation is used to model a clock.
     
     The correlation (`parentTicks`, `ticks`) represents a relationship between
@@ -693,7 +763,8 @@ class Correlation(object):
     :param errorGrowthRate: Optional (default=0). The amount that the potential for error will grow by for every tick of the parent clock.
 
     This class is intended to be immutable. Instead of modifying a correlation,
-    create a new one based on an existing one.
+    create a new one based on an existing one. The :func:`butWith` method is
+    designed to assist with this.
     """
     def __init__(self, parentTicks, childTicks, initialError=0, errorGrowthRate=0):
         super(Correlation,self).__init__()
@@ -743,14 +814,15 @@ class Correlation(object):
     @property
     def initialError(self):
         """\
-        Number representing the amount of potential error (in seconds) at the moment represented by the correlation. Default value is 0 if not set.
+        Number representing the amount of potential error (in units of seconds) at the moment represented by the correlation. Default value is 0 if not set.
         """
         return self._initialError
 
     @property
     def errorGrowthRate(self):
         """\
-        Number representing the amount that the potential for error will grow by for every tick of the parent clock. Default value is 0 if not set.
+        Number representing the amount that the potential for error will grow by
+        (in units of seconds) for every tick of the parent clock. Default value is 0 if not set.
         """
         return self._errorGrowthRate
 
@@ -975,6 +1047,9 @@ class CorrelatedClock(ClockBase):
         delta = self.quantifyChange(newCorrelation, newSpeed)
         return delta > thresholdSecs
 
+    def _errorAtTime(self, t):
+        return self._correlation.calcErrorAtParentTicks(self.toParentTicks(t))
+
 
 
 @dvbcss._inheritDocs(ClockBase)
@@ -1103,7 +1178,11 @@ class TunableClock(ClockBase):
     
     def getParent(self):
         return self._parent
-    
+        
+    def _errorAtTime(self, f):
+        # XXXX NOT SURE YET
+        raise NotImplemented
+        
 
 
 @dvbcss._inheritDocs(ClockBase)
@@ -1197,6 +1276,13 @@ class RangeCorrelatedClock(ClockBase):
         
     def getParent(self):
         return self._parent
+
+    def _errorAtTime(self, t):
+        pt = self.toParentTicks(t)
+        c1err = self._correlation1.calcErrorAtParentTicks(pt)
+        c2err = self._correlation2.calcErrorAtParentTicks(pt)
+        return min(c1err, c2err)
+
 
 __all__ = [
     "ClockBase",
