@@ -613,13 +613,13 @@ class Test_TunableClock(unittest.TestCase):
         sysClockErr = b.dispersionAtTime(0) # will be constant
 
         mockTime.timeNow = 1000
-        c.setError(0.1, growthRate = 0.01/1000) # 0.1, increasing by 0.01 every second
+        c.setError(0.1, growthRate = 0.01) # 0.1, increasing by 0.01 every second
         self.assertAlmostEquals(0.1 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
         
         mockTime.timeNow += 5
         self.assertAlmostEquals(0.15 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
 
-        c.setError(0.2, growthRate = 0.001/1000) # 0.2, increasing by 0.001 every second
+        c.setError(0.2, growthRate = 0.001) # 0.2, increasing by 0.001 every second
         self.assertAlmostEquals(0.2 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
         
         mockTime.timeNow += 5

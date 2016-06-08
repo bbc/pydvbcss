@@ -805,7 +805,7 @@ class Correlation(object):
     :param parentTicks: Time of the parent clock.
     :param childTcks: Corresponding time of the clock using this correlation.
     :param initialError: Optional (default=0). The amount of potential error (in seconds) at the moment represented by the correlation. 
-    :param errorGrowthRate: Optional (default=0). The amount that the potential for error will grow by for every tick of the parent clock.
+    :param errorGrowthRate: Optional (default=0). The rate of growth of error (e.g. how many seconds error increases by per second of the parent clock)
 
     This class is intended to be immutable. Instead of modifying a correlation,
     create a new one based on an existing one. The :func:`butWith` method is
@@ -825,7 +825,7 @@ class Correlation(object):
         :param parentTicks: Optional. A new Time of the parent clock.
         :param childTcks: Optional. The corresponding time of the clock using this correlation.
         :param initialError: Optional. The amount of potential error (in seconds) at the moment represented by the correlation. 
-        :param errorGrowthRate: Optional. The amount that the potential for error will grow by for every tick of the parent clock.
+        :param errorGrowthRate: Optional. The rate of growth of error (e.g. how many seconds error increases by per second of the parent clock)
         
         :returns: New :class:`Correlation` based on this one, but with the changes specified by the parameters.
         
@@ -871,17 +871,6 @@ class Correlation(object):
         """
         return self._errorGrowthRate
 
-    def calcErrorAtParentTicks(self, pt):
-        """\
-        Returns the error at a given parent clock time.
-        
-        :param pt: Time of the parent clock
-        :returns: Error attributable to this correlation
-        """
-        delta = pt - self._parentTicks
-        return self._initialError + delta * self._errorGrowthRate
-        
-        
     def __str__(self):
         return "Correlation(%s, %s, %s, %s)" %\
             (str(self._parentTicks), str(self._childTicks), str(self._initialError), str(self._errorGrowthRate))
@@ -1003,14 +992,15 @@ class CorrelatedClock(ClockBase):
         Changes the :data:`correlation` property to an equivalent correlation (that does not change the timing relationship between
         parent clock and this clock) where the tick value for this clock is the provided tick value.
         """
-        parentTickValue = self.toParentTicks(tickValue)
-        initError = self._correlation.calcErrorAtParentTicks(parentTickValue)
-
-        self._correlation = self._correlation.butWith( \
-            parentTicks = parentTickValue, \
-            childTicks = tickValue, \
+        pt = self.toParentTicks(tickValue)
+        deltaSecs = (pt - self._correlation.parentTicks) / self._parent.tickRate
+        initError = self._correlation.initialError + deltaSecs * self._correlation.errorGrowthRate
+        
+        self._correlation = self._correlation.butWith(
+            parentTicks = pt,
+            childTicks = tickValue,
             initialError = initError
-            )
+        )
         # no need to 'notify' because we have not changed the timing relationship
 
     @property
@@ -1102,8 +1092,9 @@ class CorrelatedClock(ClockBase):
         return delta > thresholdSecs
 
     def _errorAtTime(self, t):
-        return self._correlation.calcErrorAtParentTicks(self.toParentTicks(t))
-
+        pt = self.toParentTicks(t)
+        deltaSecs = (pt - self._correlation.parentTicks) / self._parent.tickRate
+        return self._correlation.initialError + deltaSecs * self._correlation.errorGrowthRate
 
 
 @dvbcss._inheritDocs(ClockBase)
@@ -1248,8 +1239,8 @@ class TunableClock(ClockBase):
         self._baseErrParentTime = self.getParent().ticks
         self._errGrowthRate = growthRate
         
-    def _errorAtTime(self, f):
-        tDelta = self.getParent().ticks - self._baseErrParentTime
+    def _errorAtTime(self, t):
+        tDelta = (self.toParentTicks(t) - self._baseErrParentTime) / self.getParent().tickRate
         growth = abs(tDelta) * self._errGrowthRate
         return self._baseErr + growth
         
@@ -1357,8 +1348,10 @@ class RangeCorrelatedClock(ClockBase):
 
     def _errorAtTime(self, t):
         pt = self.toParentTicks(t)
-        c1err = self._correlation1.calcErrorAtParentTicks(pt)
-        c2err = self._correlation2.calcErrorAtParentTicks(pt)
+        deltaSecs1 = (pt - self._correlation1.parentTicks) / self._parent.tickRate
+        c1err = self._correlation1.initialError + deltaSecs1 * self._correlation1.errorGrowthRate
+        deltaSecs2 = (pt - self._correlation2.parentTicks) / self._parent.tickRate
+        c2err = self._correlation2.initialError + deltaSecs2 * self._correlation2.errorGrowthRate
         return min(c1err, c2err)
 
 
