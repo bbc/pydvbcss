@@ -727,6 +727,8 @@ class SimpleClockTimelineSource(TimelineSource):
     speed property of this clock (e.g. in situations where a single clock represents timeline progress but there
     are multiple clocks as children of that to represent the timeline on different scales - e.g. PTS, TEMI etc).
     
+    The availability of the clock is mapped to whether the timeline is available.
+    
     SimpleClockTimelineSource generates its correlation by observing the current tick value of the wallClock and the provided
     clock whenever a ControlTimestamp needs to be provided.
     """
@@ -788,7 +790,10 @@ class SimpleClockTimelineSource(TimelineSource):
     def getControlTimestamp(self, timelineSelector):
         if self._changed:
             self._changed=False
-            self._latestCt = ControlTimestamp(Timestamp(self._clock.ticks, self._wallClock.ticks), timelineSpeedMultiplier=self._speedSource.speed)
+            if self._clock.isAvailable():
+                self._latestCt = ControlTimestamp(Timestamp(self._clock.ticks, self._wallClock.ticks), timelineSpeedMultiplier=self._speedSource.speed)
+            else:
+                self._latestCt = ControlTimestamp(Timestamp(None, self._wallClock.ticks), None)
         return self._latestCt
         
         

@@ -36,7 +36,6 @@ import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... 
 if __name__ == '__main__':
     from dvbcss.clock import SysClock
     from dvbcss.protocol.server.wc import WallClockServer
-    from dvbcss.clock import measurePrecision
     import dvbcss.util
     
     import dvbcss.monotonic_time as time
@@ -67,9 +66,8 @@ if __name__ == '__main__':
         print "CSS-WC endpoint bound to host %s on port %d" % (args.wc_addr, args.wc_port)
         print "----"
 
-    clock=SysClock()
-    precisionSecs=measurePrecision(clock)
-    wc_server=WallClockServer(clock, precisionSecs, args.maxFreqError, args.wc_addr, args.wc_port, followup=args.followup)
+    clock=SysClock(maxFreqErrorPpm=args.maxFreqError)
+    wc_server=WallClockServer(clock, args.wc_addr, args.wc_port, followup=args.followup)
     wc_server.start()
     
     while True:

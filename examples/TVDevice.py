@@ -34,7 +34,7 @@
     and provides the following timelines:
     
     * `urn:dvb:css:timeline:pts` ... a PTS timeline
-    * `urn:dvb:css:timelime:temi:1:1` ... a TEMI timeline ticking at 1kHz
+    * `urn:dvb:css:timelime:temi:1:1` ... a TEMI timeline ticking at 1kHz that toggles availability every 30 seconds
     
     The PTS and TEMI timelines both start ticking up from zero the moment the server starts.
     
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     import logging
     import dvbcss.monotonic_time as time
 
-    from dvbcss.clock import SysClock, CorrelatedClock, measurePrecision
+    from dvbcss.clock import SysClock, CorrelatedClock, Correlation
 
     from dvbcss.protocol import OMIT
     from dvbcss.protocol.cii import CII, TimelineOption
@@ -105,18 +105,14 @@ if __name__ == '__main__':
     WebSocketPlugin(cherrypy.engine).subscribe()
     
     
-    systemClock= SysClock(tickRate=1000000000)
-    wallClock = CorrelatedClock(parentClock=systemClock, tickRate=1000000000, correlation=(0,0))
-    
-    precision = measurePrecision(wallClock)
-    maxFreqError = 500
-    
+    systemClock= SysClock(tickRate=1000000000, maxFreqErrorPpm = 500)
+    wallClock = CorrelatedClock(parentClock=systemClock, tickRate=1000000000, correlation=Correlation(0,0))
     
     cherrypy.config.update({"server.socket_host":args.ws_addr})
     cherrypy.config.update({"server.socket_port":args.ws_port})
     cherrypy.config.update({"engine.autoreload.on":False})
 
-    wcServer = WallClockServer(wallClock, precision, maxFreqError, bindaddr=args.wc_addr, bindport=args.wc_port)
+    wcServer = WallClockServer(wallClock, bindaddr=args.wc_addr, bindport=args.wc_port)
 
     ciiServer = CIIServer(maxConnectionsAllowed=5, enabled=True)
     tsServer  = TSServer(CONTENT_ID, wallClock, maxConnectionsAllowed=10, enabled=True)
@@ -152,8 +148,8 @@ if __name__ == '__main__':
         ]
     )
 
-    ptsTimeline = CorrelatedClock(parentClock=wallClock, tickRate=90000, correlation=(wallClock.ticks, 0))
-    temiTimeline = CorrelatedClock(parentClock=ptsTimeline, tickRate=50, correlation=(0,0))
+    ptsTimeline = CorrelatedClock(parentClock=wallClock, tickRate=90000, correlation=Correlation(wallClock.ticks, 0))
+    temiTimeline = CorrelatedClock(parentClock=ptsTimeline, tickRate=50, correlation=Correlation(0,0))
 
     ptsSource = SimpleClockTimelineSource("urn:dvb:css:timeline:pts", wallClock=wallClock, clock=ptsTimeline, speedSource=ptsTimeline)
     temiSource = SimpleClockTimelineSource("urn:dvb:css:timeline:temi:1:1", wallClock=wallClock, clock=temiTimeline, speedSource=ptsTimeline)
@@ -167,7 +163,13 @@ if __name__ == '__main__':
 
     try:
         while True:
-            time.sleep(1)
+            time.sleep(30)
+            temiTimeline.setAvailability(False)
+            tsServer.updateAllClients()
+
+            time.sleep(30)
+            temiTimeline.setAvailability(True)
+            tsServer.updateAllClients()
 
     except KeyboardInterrupt:
         pass

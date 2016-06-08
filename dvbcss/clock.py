@@ -716,7 +716,7 @@ class ClockBase(object):
         if root == self:
             raise NotImplemented
         else:
-            return self.getRoot().getRootMaxFreqErrPpm()
+            return self.getRoot().getRootMaxFreqError()
 
 
 
@@ -1330,7 +1330,7 @@ class RangeCorrelatedClock(ClockBase):
         """\
         Read or change the first correlation of this clock to its parent clock.
         
-        Assign a new :class:`Correlation` or tuple `(parentTicks, childTicks)` to change the correlation. 
+        Assign a new :class:`Correlation` to change the correlation. 
         """
         return self._correlation2
     

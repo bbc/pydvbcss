@@ -30,32 +30,40 @@ To use it, you need to provide a :mod:`~dvbcss.clock` object that represents the
 Although it is not required, it is recommended to set the tick rate of that clock to
 match the required tick rate of the wall clock (1e9 ticks per second).
 
-First, create the clock and measure its precision:
+First, create the clock:
 
 .. code-block:: python
 
-    from dvbcss.clock import SysClock, measurePrecision
+    from dvbcss.clock import SysClock
     
-    sysClock = SysClock(tickRate=1000000000)
+    mfe = 45
+    
+    sysClock = SysClock(tickRate=1000000000, maxFreqErrorPpm=mfe)
     wallClock = sysClock
     
-    precisionSecs = measurePrecision(wallClock)
-    
-Next create and start the wall clock server. You must provide information on the maximum range of
-frequency error of the hardware clock underpinning the wall clock. This will depend on oscillator
-accuracy in the hardware the code is running on, and whether an NTP client is running (and
-which therefore may slew the clock).
+The server will need to know the potential maximum frequency error and measurement
+precision of the clock. Fortunately the SysClock already estimates this and it
+is passed through any dependent clocks.
 
-For example, here we assume the combined worst case of NTP client slew and hardware oscillator accuracy
-is approx 500 ppm:
+Fortunately the SysClock internally estimates the measurement precision automatically
+when it is created. It also defaults to assuming the maximum frequency error is
+500ppm, unless you specify otherwise.
+
+Maximum frequency error will depend on oscillator accuracy in the hardware the
+code is running on, and whether an NTP client is running (and which therefore
+may slew the clock).
+
+For example, above we have guessed that
+the combined worst case of NTP client slew and hardware oscillator accuracy
+is approx 45 ppm:
+
+So next we create and start the wall clock server.
 
 .. code-block:: python
 
     from dvbcss.protocol.wc.server import WallClockServer
     
-    mfe = 500
-    
-    wcServer = WallClockServer(wallClock, precisionSecs, mfe)
+    wcServer = WallClockServer(wallClock)
     wcServer.start()
     
 """
@@ -156,19 +164,15 @@ class WallClockServerHandler(object):
     
     """
     
-    def __init__(self, wallClock, precisionSecs, maxFreqErrorPpm, followup=False, **kwargs):
+    def __init__(self, wallClock, followup=False, **kwargs):
         """\
         
         :param dvbcss.clock.ClockBase wallClock: The clock to be used as the wall clock for protocol interactions
-        :param float precisionSecs: The precision (in seconds) to be reported for the clock in protocol interactions
-        :param float maxFreqErrorPpm: The clock maximum frequency error in parts-per-million
         :param bool followup: Set to True if the Wall Clock Server should send follow-up responses
         """
         super(WallClockServerHandler,self).__init__(**kwargs)
         self.log=logging.getLogger("dvbcss.protocol.server.wc.WallClockServerHandler")
         self.clock=wallClock
-        self.precision=precisionSecs
-        self.maxFreqErrorPpm=maxFreqErrorPpm
         self.followup=followup
         
     def handle(self, socket, data, srcaddr):
@@ -183,8 +187,8 @@ class WallClockServerHandler(object):
                 reply.msgtype = WCMessage.TYPE_RESPONSE_WITH_FOLLOWUP
             else:
                 reply.msgtype = WCMessage.TYPE_RESPONSE
-            reply.setPrecision(self.precision)
-            reply.setMaxFreqError(self.maxFreqErrorPpm)
+            reply.setPrecision(self.clock.dispersionAtTime(recv_ticks))
+            reply.setMaxFreqError(self.clock.getRootMaxFreqError())
             reply.transmitNanos = self.clock.ticks * 1000000000 / tickrate
             socket.sendto(reply.pack(), srcaddr)
             
@@ -226,17 +230,15 @@ class WallClockServer(UdpRequestServer):
     This option exists primarily to check whether a Wall Clock Client has implemennted handling of *follow-up*
     responses at all.
     """
-    def __init__(self, wallClock, precision, maxFreqError, bindaddr="0.0.0.0", bindport=6677, followup=False):
+    def __init__(self, wallClock, bindaddr="0.0.0.0", bindport=6677, followup=False):
         """\
         :param wallClock:       (:class:dvbcss.clock.ClockBase) The clock to be used as the wall clock for protocol interactions
-        :param precisionSecs:   (float) The precision (in seconds) to be reported for the clock in protocol interactions
-        :param maxFreqErrorPpm: (float) The clock maximum frequency error in parts-per-million
         :param bindaddr:        (str, ip address) The ip address of the network interface to bind to, e.g. "127.0.0.1". Defaults to "0.0.0.0" which binds to all interfaces.
         :param bindport:        (int) The port number to bind to (defaults to 6677)
         :param followup:        (bool) Set to True if the Wall Clock Server should send follow-up responses. Defaults to False.
         """
         socket=_createUdpSocket((bindaddr,bindport))
-        handler=WallClockServerHandler(wallClock,precision,maxFreqError, followup)
+        handler=WallClockServerHandler(wallClock, followup)
         super(WallClockServer,self).__init__(socket, handler, WCMessage.MSG_SIZE)
         self.log = logging.getLogger("dvbcss.protocol.server.wc.WallClockServer")
 

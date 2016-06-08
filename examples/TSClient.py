@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
     from dvbcss.clock import SysClock
     from dvbcss.clock import CorrelatedClock
+    from dvbcss.clock import Correlation
     from dvbcss.clock import TunableClock
     from dvbcss.protocol.client.wc import WallClockClient
     from dvbcss.protocol.client.wc.algorithm import LowestDispersionCandidate
@@ -95,6 +96,7 @@ if __name__ == "__main__":
     wc_client.start()
     
     timelineClock = CorrelatedClock(wallClock, timelineFreq)
+    timelineClock.setAvailability(False)
 
     print "Connecting, requesting timeline for:"
     print "   Any contentId beginning with:",contentIdStem
