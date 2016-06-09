@@ -18,7 +18,7 @@
 import dvbcss.monotonic_time as time
 import logging
 
-from dvbcss.clock import measurePrecision
+from dvbcss.clock import Correlation, CorrelatedClock
 
 class LowestDispersionCandidate(object):
     """\
@@ -49,22 +49,23 @@ class LowestDispersionCandidate(object):
     before and after the adjustment and gives information needed to extrapolate future
     dispersions. You can use this, for example, to record the clock dispersion over time. 
     """
-    def __init__(self,clock,repeatSecs=1.0,timeoutSecs=0.2,localMaxFreqErrorPpm=500):
+    def __init__(self,clock,repeatSecs=1.0,timeoutSecs=0.2):
         """\
         *Initialisation takes the following parameters:*
         
-        :param clock: A :class:`~dvbcss.clock.TunableClock` object representing that will be adjusted to match the Wall Clock.
+        :param clock: A :class:`~dvbcss.clock.Correlated` object representing that will be adjusted to match the Wall Clock.
         :param repeatSecs: (:class:`float`) The rate at which Wall Clock protocol requests are to be sent (in seconds).
         :param timeoutSecs: (:class:`float`) The timeout on waiting for responses to requests (in seconds).
-        :param localMaxFreqErrorPpm: (:class:`float`) The maximum frequency error of the local oscillator that underpins the clock object provided (in ppm).
         """
         super(LowestDispersionCandidate,self).__init__()
         self.log=logging.getLogger("dvbcss.protocol.client.wc.algorithm.BestCandidateByDispersion")
         self.clock = clock
         self.repeatSecs = repeatSecs
         self.timeoutSecs = timeoutSecs
-        self.dispCalc = DispersionCalculator(clock, measurePrecision(clock), localMaxFreqErrorPpm)
-        self.worstDispersion = (2**64)-1 ## an arbitrary very big number :-)
+        
+        # force clock to register infinite dispersion initially
+        self.clock.correlation = self.clock.correlation.butWith(initialError = float("+inf"))
+        self.worstDispersion = float("+inf")
         
     def onClockAdjusted(self, timeAfterAdjustment, adjustment, oldDispersionNanos, newDispersionNanos, dispersionGrowthRate):
         """\
@@ -88,48 +89,46 @@ class LowestDispersionCandidate(object):
         """\
         :returns: Current dispersion at this moment in time in units of nanoseconds.
         """
-        x=self.bestCandidate["nanos"]
-        if x is None:
-            return self.worstDispersion
-        else:
-            return self.dispCalc.calc(x)
+        return self.clock.dispersionAtTime(self.clock.ticks)*1000000000
     
     def algorithm(self):
-        cumulativeOffset=None
-        self.bestCandidate={"nanos":None,"ticks":None}
+        candidateClock = CorrelatedClock(self.clock.getParent(), tickRate=self.clock.tickRate, correlation=self.clock.correlation)
+
         while True:
-            update=False
+            update = False
+            cumulativeOffset = None
             candidate=(yield self.timeoutSecs)
     
-            currentDispersion = self.getCurrentDispersion()
-    
+            t = self.clock.ticks
+            currentDispersion = self.clock.dispersionAtTime(t)
+
             if candidate is not None:
-                cn=candidate['nanos']
-                ct=candidate['ticks']
-                candidateDispersion=self.dispCalc.calc(cn)
+
+                candidateClock.correlation = candidate.calcCorrelationFor(self.clock)
+                candidateDispersion = candidateClock.dispersionAtTime(t)
                 
-                if currentDispersion >= candidateDispersion:
-                    self.bestCandidate = candidate
-                    update=True
-                    self.clock.adjustTicks(ct.offset)
+                update = candidateDispersion < currentDispersion
+                if update:
+                    pt = self.clock.toParentTicks(t)
+                    adjustment = candidateClock.fromParentTicks(pt) - t
                     if cumulativeOffset is None:
                         cumulativeOffset=0
                     else:
-                        cumulativeOffset+=ct.offset
-                        
-                    # notify of the change
-                    growthRate = self.dispCalc.getGrowthRate(cn)
-                    self.onClockAdjusted(self.clock.ticks, ct.offset, currentDispersion, candidateDispersion, growthRate)
+                        cumulativeOffset+=adjustment
                     
+                    self.clock.correlation = candidateClock.correlation
+                    self.onClockAdjusted(self.clock.ticks, adjustment, 1000000000*currentDispersion, 1000000000*candidateDispersion, self.clock.correlation.errorGrowthRate)
+                
                 else:
                     pass
 
                 # update worst dispersion seen so far
                 self.worstDispersion = max(self.worstDispersion, currentDispersion, candidateDispersion)
 
-                self.log.info("Old / New dispersion (millis) is %.5f / %.5f ... offset=%20d  new best candidate? %s\n" % (currentDispersion/1000000.0, candidateDispersion/1000000.0, cumulativeOffset, str(update)))
+                co = cumulativeOffset or 0 # convert None to 0
+                self.log.info("Old / New dispersion (millis) is %.5f / %.5f ... offset=%20d  new best candidate? %s\n" % (1000*currentDispersion, 1000*candidateDispersion, co, str(update)))
             else:
-                self.log.info("Timeout.  Dispersion (millis) is %.5f\n" % (currentDispersion/1000000.0))
+                self.log.info("Timeout.  Dispersion (millis) is %.5f\n" % (1000*currentDispersion,))
             # retry more quickly if we didn't get an improved candidate
             if update:
                 time.sleep(self.repeatSecs)
@@ -159,22 +158,3 @@ class LowestDispersionCandidate(object):
         return answer
             
             
-            
-class DispersionCalculator(object):
-    def __init__(self, clock, localPrecisionSecs, localMaxFreqErrorPpm):
-        super(DispersionCalculator,self).__init__()
-        self.clock = clock
-        self.precision = localPrecisionSecs
-        self.maxFreqError = localMaxFreqErrorPpm
-        
-    def calc(self, candidate):
-        return 1000000000*(candidate.precision + self.precision) \
-             + ( candidate.maxFreqError*(candidate.t3-candidate.t2)    \
-               + self.maxFreqError*(candidate.t4-candidate.t1)
-               + (candidate.maxFreqError+self.maxFreqError)*(self.clock.nanos - candidate.t4) \
-               ) / 1000000 + \
-               candidate.rtt/2
-               
-    def getGrowthRate(self, candidate):
-        return (candidate.maxFreqError+self.maxFreqError) / 1000000.0
-        

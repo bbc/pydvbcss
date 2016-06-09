@@ -35,7 +35,7 @@ import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... 
 
 if __name__ == "__main__":
     from dvbcss.clock import SysClock as SysClock
-    from dvbcss.clock import TunableClock as TunableClock
+    from dvbcss.clock import CorrelatedClock as CorrelatedClock
     from dvbcss.protocol.client.wc import WallClockClient
     from dvbcss.protocol.client.wc.algorithm import LowestDispersionCandidate
 
@@ -69,8 +69,8 @@ if __name__ == "__main__":
         logging.basicConfig(level=args.loglevel[0])
 
     #first we'll create a clock to represent the wall clock
-    sysclock=SysClock()
-    wallClock=TunableClock(sysclock,tickRate=1000000000)
+    sysclock=SysClock(tickRate=1000000000)
+    wallClock=CorrelatedClock(sysclock,tickRate=1000000000)
     
     # we'll also create the algorithm object that adjusts the clock and controls
     # how often requests are made to the server.
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     n=0
     while True:
         time.sleep(0.2)
-        print "Time=%20d microseconds. Dispersion = %15.3f milliseconds" % (wallClock.ticks/1000, wc_client.algorithm.getCurrentDispersion()/1000000.0)
+        print "Time=%20d microseconds. Dispersion = %15.3f milliseconds" % (wallClock.ticks*1000000/wallClock.tickRate, wc_client.algorithm.getCurrentDispersion()/1000000)
         n=n+1
         if n>=25:
-            print "*** Worst dispersion over previous 5 seconds = %15.3f milliseconds" % (wc_client.algorithm.getWorstDispersion()/1000000.0)
+            print "*** Worst dispersion over previous 5 seconds = %15.3f milliseconds" % (wc_client.algorithm.getWorstDispersion()/1000000)
             n=0
             

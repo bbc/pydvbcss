@@ -24,7 +24,7 @@ Using a Wall Clock Client
 -------------------------
 
 Recommended simplest use is to instantiate a :class:`~dvbcss.protocol.client.wc.WallClockClient` and provide it with an
-instance of the :class:`LowestDispersionCandidate` algorithm to control how it updates a clock.
+instance of the :class:`~dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate` algorithm to control how it updates a clock.
 
 
 :class:`WallClockClient` is used by providing it with an object implementing the clock
@@ -33,21 +33,27 @@ protocol interaction (sending the requests and parsing the responses) at the tim
 specified by the algorithm and passes the results of each request-response measurement
 (known as a 'candidate') to the algorithm. The algorithm then adjusts the clock.
 
+
 The type of Clock class that can be used for the wall clock will depend on the algorithm.
 Some algorithms require that the tick rate of the clock be 1 tick per nanosecond (tick rate = 1000000000).
 The WallClockClient class does not require this, but it is recommended to use this tick rate.
+
+The measurement process involves taking a reading from the local clock when
+the request is about to be sent, and when the response is received. This measurement
+is taken from the *parent* of the clock you provide. The candidate represents the
+relationship between that (parent) clock and the Wall Clock of the server.
+
 
 A simple example that connects to a wall clock server at 192.168.0.115 port 6677 and sends requests once per second:
 
 .. code-block:: python
 
     from dvbcss.clock import SysClock as SysClock
-    from dvbcss.clock import TunableClock as TunableClock
     from dvbcss.protocol.client.wc import WallClockClient
     from dvbcss.protocol.client.wc.algorithm import LowestDispersionCandidate
     
     sysClock=SysClock()
-    wallClock=TunableClock(sysClock,tickRate=1000000000)
+    wallClock=CorrelatedClock(sysClock,tickRate=1000000000)
     
     algorithm = LowestDispersionCandidate(wallClock,repeatSecs=1,timeoutSecs=0.5)
     
@@ -198,6 +204,10 @@ class WallClockClient(UdpRequestResponseClient):
 
     Use by initialising and supplying with an algorithm object and Clock object.
     
+    The :class:`~dvbcss.protocol.wc.Candidate` objects provided to the algorithm
+    represent the relationship between the parent of the provided clock and the
+    server's Wall Clock.
+    
     """
     def __init__(self, (bindaddr,bindport), (dstaddr,dstport), wallClock, wcAlgorithm):
         """\
@@ -205,7 +215,7 @@ class WallClockClient(UdpRequestResponseClient):
         
         :param (bindaddr,bindport): (:class:`str`, :class:`int`) A tuple containing the IP address (as a string) and port (as an int) to bind to to listen for incoming packets
         :param (dstaddr,dstport): (:class:`str`, :class:`int`) A tuple containing the IP address (as a string) and port (as an int) of the Wall Clock server
-        :param wallClock: (:mod:`~dvbcss.clock`) The local clock that will be controlled to be a Wall Clock
+        :param wallClock: (:mod:`~dvbcss.clock`) The local clock that will be controlled to be a Wall Clock. Measurements will be taken from its parent and candidates provided to the algorithm will represent the relationship between that (parent) clock and the server's wall clock.
         :param wcAlgorithm: (:ref:`algorithm <algorithms>`) The algorithm for the client to use to update the clock.
         
         It is recommended to use the :class:`~dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate` algorithm.
@@ -214,7 +224,7 @@ class WallClockClient(UdpRequestResponseClient):
         algGenerator = self.algorithm.algorithm()
         socket=_createUdpSocket((bindaddr,bindport))
         msgSize=WCMessage.MSG_SIZE
-        handler = algorithm.algorithmWrapper((dstaddr,dstport), wallClock, algGenerator)
+        handler = algorithm.algorithmWrapper((dstaddr,dstport), wallClock.getParent(), algGenerator)
         super(WallClockClient, self).__init__(socket, handler, msgSize)
 
 

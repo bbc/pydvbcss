@@ -18,7 +18,7 @@
 
 The algorithm object determines when (and how often) a WallClockClient sends CSS-WC protocol requests
 and processes the results of requests and responses to adjust the :mod:`~dvbcss.clock` object representing
-the wall clock.
+the Wall Clock.
 
 
 Dispersion algorithm
@@ -52,25 +52,17 @@ An algorithm is an object that has the following method:
     The yield must pass a timeout in seconds. This is the maximum amount of time the Wall Clock client will
     wait for a response to its request before timing out.
     
-    The yield statement will return either :class:`None` or a :class:`dict` containing two
-    :class:`~dvbcss.protocol.wc.Candidate` object representing the result of the measurement in units of ticks
-    and units of nanoseconds:
-    
-    .. code-block:: python
-    
-        {
-            "ticks" : candidate,    # in units of ticks
-            "nanos" : candidate,    # same, but in units of nanoseconds
-        }
+    The yield statement will return either :class:`None` or a :class:`~dvbcss.protocol.wc.Candidate` object representing
+    the result of the measurement.
     
     The algorithm can then use the Candidate object in its algorithm for estimating the wall clock (and in
-    the case of most practical implementations: adjusting a :mod:`~dvbcss:Clock` object).
+    the case of most practical implementations: adjusting a :mod:`~dvbcss.clock` object).
 
     
-Here is an example of a simple naive algorithm that adjusts a :class:`~dvbcss.clock.TunableClock` object
+Here is an example of a simple naive algorithm that adjusts a :class:`~dvbcss.clock.CorrelatedClock` object
 using the most recent measurement, irrespective of influencing factors such as previous measurements or
 network latency (round trip time). It makes requests at most once per second and has a timeout on waiting
-for responses of half a second:
+for responses of 0.5 seconds:
 
 .. code-block:: python
 
@@ -83,15 +75,15 @@ for responses of half a second:
             while True:
                 candidate=(yield 0.5)
                 if candidate is not None:
-                    candidate=candidate["ticks"]
-                    self.clock.adjustTicks(candidate.offset)
+                    self.clock.correlation = candidate.calcCorrelationFor(self.clock)
                     time.sleep(1.0)
 
+    
 """
 
 from dvbcss.protocol.wc import WCMessage, Candidate
 
-from dvbcss.protocol.client.wc.algorithm._dispersion import LowestDispersionCandidate, DispersionCalculator
+from dvbcss.protocol.client.wc.algorithm._dispersion import LowestDispersionCandidate
 from dvbcss.protocol.client.wc.algorithm._simple import MostRecent
 from dvbcss.protocol.client.wc.algorithm._filterpredict import FilterAndPredict, PredictSimple, FilterRttThreshold, FilterLowestDispersionCandidate
 
@@ -99,7 +91,7 @@ import dvbcss.monotonic_time as time
 
 
 
-def algorithmWrapper(dest,clock,algorithm):
+def algorithmWrapper(dest,measureClock,algorithm):
     """\
     UdpRequestResponseClient handler function that wraps up the act of sending and receiving a WallClockMessage.
     Also handles the optional "follow-up" response type of message. If a response is received that indicates
@@ -108,29 +100,37 @@ def algorithmWrapper(dest,clock,algorithm):
     then that is what shall be returned.
     
     In turn, you plug an algorithm into it that is also a generator function. However that algorithm
-    need only yield the timeout, and the return value will be a dict containing 2 candidate objects. One in
-    nanoseconds, and the other the same but converted to tick units according to the tick rate of the
-    supplied clock object. If timeout occurs the return value is None instead of a dict.
+    need only yield the timeout, and the return value will be a :class:`~dvbcss.protocol.wc.Candidate`
+    object in units of nanoseconds. If timeout occurs the return value is None instead of a dict.
     
-    Arguments:
-    dest = ("<ip-addr>",port)
-    clock = clock that will be used for tick rate conversion
-    algorithm = a generator that yields to request a WallClock request be sent, and supplies the timeout
-                for waiting for a response as the yield value
-                then expects to be sent the candidate object representing the result of the request response
+    :param dest: ("<ip-addr>",port) The destination address of the server (to which the requests should be sent)
+    :param measureClock: The :mod:`~dvbcss:Clock` from which the readings are taken (being `t1` and `t4` in the resulting candidate)
+    :param algorithm: A generator that yields to request a WallClock request be sent, and acts on the responses.
+    
+    The generator function you provide, should use `yield` as follows:
+    * to pass the timeout for waiting for a response as the yield value
+    * to receive a :class:`~dvbcss.protocol.wc.Candidate` object representing the response.
                 
     Example algorithm:
+    
+    .. code-block:: python
     
       def algorithm():
           timeoutSecs=0.2
           while True:
               candidate=(yield timeoutSecs)
               if candidate is not None:
-                  print "Candidate received! ",candidate["ticks"]
+                  print "Candidate received! ",candidate
               else:
                   print "Timeout"
               print "Now waiting 1 second"
               time.sleep(1)
+              
+       sysClock = SysClock()
+       wallClock = CorrelatedClock(sysClock, tickRate=1000000000)
+              
+       algWrapper = algorithmWrapper(destIpPort, sysClock, wallClock, algorithm())
+       
     """
     try:
         # hand control to the algorithm. when it wants a request sent, it will
@@ -138,7 +138,7 @@ def algorithmWrapper(dest,clock,algorithm):
         timeoutSecs = algorithm.next()
         while True:
             # assemble a request
-            reqMsg=WCMessage(WCMessage.TYPE_REQUEST, 0, 0, clock.nanos, 0, 0)
+            reqMsg=WCMessage(WCMessage.TYPE_REQUEST, 0, 0, measureClock.nanos, 0, 0)
             toSend=reqMsg.pack(), dest
             
             # we'll send the request then seek the best quality response
@@ -164,7 +164,7 @@ def algorithmWrapper(dest,clock,algorithm):
                 toSend=None      
                 
                 # note when response was received
-                latestResponseNanos=clock.nanos
+                latestResponseNanos=measureClock.nanos
                 
                 
                 # did we get a response? did it come from the server we sent
@@ -186,7 +186,6 @@ def algorithmWrapper(dest,clock,algorithm):
 
             if responseMsg is not None:
                 candidate=Candidate(responseMsg,responseRecvNanos)
-                candidate={"nanos":candidate, "ticks":candidate.toTicks(clock)}
             else:
                 # no message, no candidate
                 candidate=None
@@ -232,6 +231,4 @@ __all__ = [
     "FilterRttThreshold",
     "FilterAndPredict",
     "FilterLowestDispersionCandidate",
-    
-    "DispersionCalculator",
 ]

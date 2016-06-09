@@ -40,13 +40,15 @@ Here is a simple example that uses a simple predictor and a round-trip-time thre
 
 .. code-block:: python
 
-    from dvbcss.protocol.wc.algorithm import FilterAndPredict, FilterRttThreshold, PredictSimple
+    from dvbcss.clock import CorrelatedClock, SysClock
+    from dvbcss.protocol.client.wc.algorithm import FilterAndPredict, FilterRttThreshold, PredictSimple
+    from dvbcss.protocol.client.wc import WallClockClient
     
     sysClock = SysClock(tickRate=1000000000)
-    wallClock = CorrelatedClock(parentClock=sysClock, tickRate=1000000000, correlation=(0,0))
+    wallClock = CorrelatedClock(parentClock=sysClock, tickRate=1000000000)
     
-    filters = [ FilterRttTreshold(thresholdMillis=10.0) ]
-    predictor = PredictSimple()
+    filters = [ FilterRttThreshold(thresholdMillis=10.0) ]
+    predictor = PredictSimple(wallClock)
     
     algorithm = FilterAndPredict(wallClock, repeatSecs, timeoutSecs, filters, predictor)
     
@@ -124,18 +126,24 @@ You can write your own Predictor by creating a class with the following methods 
 import logging
 import dvbcss.monotonic_time as time
 
-from dvbcss.protocol.client.wc.algorithm import DispersionCalculator
+from dvbcss.clock import CorrelatedClock, Correlation
 
 class PredictSimple(object):
     """\
-    Simple naive predictor that uses the offset calculated by the most recent candidate.
+    Simple naive predictor that chooses the correlation represented by the most recent candidate
     """
-    def __init__(self):
-        self.offset=None
+    def __init__(self, clock):
+        """\
+        :param clock: The :class:`~dvbcss.clock.CorrelatedClock` that is to be set.
+        
+        Note that this predictor does not actually set the clock. It just needs it in order to calculate the correct correlation for it.
+        """
+        self.clock = clock
+        self.correlation = Correlation(0,0,0,float("+inf"))
     def addCandidate(self, candidate):
-        self.offset=candidate.offset
-    def predictOffset(self):
-        return self.offset
+        self.correlation = candidate.calcCorrelationFor(self.clock)
+    def predictCorrelation(self):
+        return self.correlation
         
 class FilterRttThreshold(object):
     """\
@@ -145,36 +153,35 @@ class FilterRttThreshold(object):
         """\
         :param thresholdMillis: (:class:`float`) The threshold to use (in milliseconds)
         """
-        self.thresholdNanos = thresholdMillis*1000000
+        self.thresholdSecs = thresholdMillis/1000
     def checkCandidate(self, candidate):
-        return candidate.rtt <= self.thresholdNanos
+        return candidate.rtt <= self.thresholdSecs
             
 
 class FilterLowestDispersionCandidate(object):
     """\
-    Simple filter that will reject a candidate unless its dispersion is lower than any candidate seen
-    previously.
+    Simple filter that will reject a candidate unless its dispersion is lower than that currently
+    being used by the clock.
+    
+    Note that at initialisation, the clock's dispersion is forced to +infinity.
     """
-    def __init__(self, clock, precisionSecs, maxFreqErrorPpm):
+    def __init__(self, clock):
         """\
         :param clock: A :class:`~dvbcss.clock.TunableClock` object representing that will be adjusted to match the Wall Clock.
-        :param precisionSecs: (:class:`float`) The measurement precision of the local clock (in units of seconds).
-        :param maxFreqErrorPpm: (:class:`float`) The maximum frequency error of the local oscillator that underpins the clock object provided (in ppm).
         """
-        self.dispCalc = DispersionCalculator(clock,precisionSecs,maxFreqErrorPpm)
-        self.bestCandidate = None
+        self.clock = clock
+        self.clock.correlation = clock.correlation.butWith(initialError=float("+inf"))
+        self.tmpClock = CorrelatedClock(self.clock.getParent(), self.clock.tickRate)
     def checkCandidate(self, candidate):
-        if self.bestCandidate is None:
-            self.bestCandidate = candidate
-            return True
-        elif self.dispCalc.calc(self.bestCandidate) > self.dispCalc(candidate):
-            self.bestCandidate = candidate
+        self.tmpClock.correlation = candidate.calcCorrelationFor(self.clock)
+        t = self.clock.ticks
+        if self.clock.dispersionAtTime(t) > self.tmpClock.dispersionAtTime(t):
             return True
         else:
             return False
     
 
-def FilterAndPredict(clock,repeatSecs=1.0,timeoutSecs=0.2,filters=[],predictor=PredictSimple()):
+class FilterAndPredict(object):
     """\
     Combines zero, one or more Filters and a Predictor and returns an algorithm for a WallClockClient.
     
@@ -182,16 +189,13 @@ def FilterAndPredict(clock,repeatSecs=1.0,timeoutSecs=0.2,filters=[],predictor=P
     :param repeatSecs: (:class:`float`) The rate at which Wall Clock protocol requests are to be sent (in seconds).
     :param timeoutSecs: (:class:`float`) The timeout on waiting for responses to requests (in seconds).
     :param filters: (:class:`list` of Filters) A list of zero, one or more Filters
-    :param predictor: (Predictor) The Predictor to use.
-    
-    :returns: An algorithm object embodying the filtering and prediction process, that is suitable to be passed to a
-            :class:`~dvbcss.protocol.client.wc.WallClockClient`.
+    :param predictor: (Predictor) The Predictor to use, or None to default to :class:`PredictSimple``clock`
     
     This algorithm controls the :class:`~dvbcss.clock.CorrelatedClock` object by settings its
     :data:`~dvbcss.clock.CorrelatedClock.correlation` property to (0,offset) where `offset` is provided by the
     predictor. The parent of this clock is the clock used by the :class:`~dvbcss.protocol.client.wc.WallClockClient`
-    in generating the measurement candidates. So the job of the predictor is always to estimate the current absolute
-    offset between that clock and the wall clock of the server.
+    in generating the measurement candidates. So the job of the predictor is always to estimate the 
+    :class:`~dvbcss.clock.Correlation` needed by the `clock`.
     
     Requests are made at the repetition rate specified. If a response is received within the timeout period it
     is then it is transformed into a measurement candidate and passed to the filters.
@@ -200,42 +204,71 @@ def FilterAndPredict(clock,repeatSecs=1.0,timeoutSecs=0.2,filters=[],predictor=P
     the previous offset.
     
     .. note:: The Clock object must be :mod:`~dvbcss.clock.CorrelatedClock` whose parent is the clock object
-              provided to the WallClockClient object with which this algorithm is used.
-              
-              *It must not be the same clock object.* However both must have
-              the same tick rate. If the same clock object is used or different tick rates are used then
-              the Wall Clock will not synchronise correctly..
+              that is measured when generating the candidates.
     
     The tick rate of the Clock can be any tick rate (it does not have to be one tick per nanosecond),
     but too low a tick rate will limit clock synchronisation precision.
     
     
     """
-    log=logging.getLogger("dvbcss.protocol.client.wc.algorithm.FilterAndPredict")
-    prevOffset=0
-    while True:
-        candidate=(yield timeoutSecs)
-        if candidate is not None:
-            
-            # apply filters
-            if None in [f.checkCandidate(candidate['nanos']) for f in filters]:
-                log.debug("Candidate filtered out\n")
-                time.sleep(repeatSecs)
-            else:
-                
-                # filters passed, so now feed the candidate into the predictor
-                # and retrieve a new estimate of the offset
-                predictor.addCandidate(candidate['nanos'])
-                offsetNanos=predictor.predictOffset()
-                offsetTicks=round(offsetNanos * clock.tickRate / 1000000000.0)
-
-                # act on it
-                log.debug("Candidate accepted. Predicted offset (ticks)=%20d   delta (ticks)=%20d\n" % (offsetTicks, offsetTicks-prevOffset))
-                clock.correlation=(0,offsetTicks)
-                prevOffset=offsetTicks
-
-                time.sleep(repeatSecs)
+    def __init__(self,clock,repeatSecs=1.0,timeoutSecs=0.2,filters=[],predictor=None):
+        self.clock = clock
+        self.repeatSecs = repeatSecs
+        self.timeoutSecs = timeoutSecs
+        self.filters = filters
+        if predictor is None:
+            self.predictor = PredictSimple(clock)
         else:
-            log.debug("Response timeout\n")
+            self.predictor = predictor
+        self.log=logging.getLogger("dvbcss.protocol.client.wc.algorithm.FilterAndPredict")
+
+    def onClockAdjusted(self, timeAfterAdjustment, adjustment, oldDispersionNanos, newDispersionNanos, dispersionGrowthRate):
+        """\
+        This method is called immediately after a clock adjustment has been made,
+        and gives details on how the clock was changed and the effect on the dispersion.
+        
+        :param timeAfterAdjustment: The wall clock time (in ticks) immedaitely after the adjustment took place
+        :param adjustment: The amount by which the wall clock instaneously changed (in ticks)
+        :param oldDispersionNanos: The dispersion (in nanoseconds) just prior to adjustment
+        :param newDispersionNanos: The dispersion (in nanoseconds) immediately after adjustment
+        :param dispersionGrowthRate: The rate at which dispersion will continue to grow.
+        
+        To calculate a future dispersion at time T:
+            futureDispersion = newDispersionNanos + (t-timeOfAdjustment) * dispersionGrowthRate
+            
+        |stub-method|
+        """
+        pass
+        
+    def getCurrentDispersion(self):
+        """\
+        :returns: Current dispersion at this moment in time in units of nanoseconds.
+        """
+        return self.clock.dispersionAtTime(self.clock.ticks)*1000000000
+    
+
+
+    def algorithm(self):
+        while True:
+            candidate=(yield self.timeoutSecs)
+            if candidate is not None:
+                
+                # apply filters
+                if None in [f.checkCandidate(candidate) for f in self.filters]:
+                    self.log.debug("Candidate filtered out\n")
+                    time.sleep(self.repeatSecs)
+                else:
+                    
+                    # filters passed, so now feed the candidate into the predictor
+                    # and retrieve a new estimate of the correlation
+                    self.predictor.addCandidate(candidate)
+                    self.clock.correlation = self.predictor.predictCorrelation()
+
+                    # act on it
+                    self.log.debug("Candidate accepted. New Correlation = ", self.clock.correlation)
+
+                    time.sleep(self.repeatSecs)
+            else:
+                self.log.debug("Response timeout\n")
                 
 

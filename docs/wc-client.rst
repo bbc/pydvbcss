@@ -88,10 +88,10 @@ Predictors
 General helper classes
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Dispersion calculator
-'''''''''''''''''''''
+Calculating correlation from a Candidate
+''''''''''''''''''''''''''''''''''''''''
 
-.. autoclass:: dvbcss.protocol.client.wc.algorithm.DispersionCalculator
+.. autofunction:: dvbcss.protocol.client.wc.algorithm.calcCorrelationFor
    :members:
    :inherited-members:
 
