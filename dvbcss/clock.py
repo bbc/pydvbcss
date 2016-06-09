@@ -1097,8 +1097,8 @@ class CorrelatedClock(ClockBase):
         return self._correlation.initialError + deltaSecs * self._correlation.errorGrowthRate
 
 
-@dvbcss._inheritDocs(ClockBase)
-class TunableClock(ClockBase):
+@dvbcss._inheritDocs(CorrelatedClock)
+class TunableClock(CorrelatedClock):
     """\
     A clock whose tick offset and speed can be adjusted on the fly.
     Must be based on another clock.
@@ -1115,6 +1115,12 @@ class TunableClock(ClockBase):
        The maths to calculate and convert tick values will be performed, by default, as integer maths
        unless the parameters controlling the clock (tickRate etc) are floating point, or the ticks property
        of the parent clock supplies floating point values.
+       
+    .. note::
+    
+       TunableClock has been reimplemented as a subclass of :class:`CorrelatedClock`. The behaviour is
+       the same as before, however it now also includes all the methods defined for :class:`CorrelatedClock`
+       too.
     """
 
     def __init__(self, parentClock, tickRate, ticks=0, **kwargs):
@@ -1125,50 +1131,24 @@ class TunableClock(ClockBase):
         
         The specified starting tick value applies from the moment this object is initialised.
         """
-        super(TunableClock,self).__init__(**kwargs)
         if tickRate <= 0 or not isinstance(tickRate, numbers.Number):
             raise ValueError("Cannot set tickRate to "+repr(tickRate))
-        self._parent = parentClock
-        self._freq = tickRate
-        self._ticks = ticks
-        self._speed = 1.0
-        self._last=self._parent.ticks
-        parentClock.bind(self)
-        # self._last and self.ticks constitute a correlation
-        self._baseErr = 0
-        self._baseErrParentTime = self._last
-        self._errGrowthRate = 0
+        super(TunableClock,self).__init__(parentClock, tickRate)
+        self.correlation = Correlation(self._parent.ticks, ticks)
+        self.speed = 1.0
             
     def _rebase(self):
-        now = self._parent.ticks
-        delta = now-self._last
-        
-        self._ticks += delta*self._freq*self._speed/self._parent.tickRate
-        
-        self._last = now
+        self.rebaseCorrelationAtTicks(self.ticks)
     
-    @property
-    def tickRate(self):
-        """\
-        Read or change the tick rate (in ticks per second) of this clock. The value read is not affected by the value of the :data:`speed` property.
-        """
-        return self._freq
-    
-    @tickRate.setter
+    @CorrelatedClock.tickRate.setter
     def tickRate(self,value):
-        self._rebase()
-        self._freq = value
-        self.notify(self)
+        self.rebaseCorrelationAtTicks(self.ticks)
+        CorrelatedClock.tickRate.fset(self, value)
 
-    @property
-    def speed(self):
-        return self._speed
-    
-    @speed.setter
+    @CorrelatedClock.speed.setter
     def speed(self, newSpeed):
-        self._rebase()
-        self._speed = float(newSpeed)
-        self.notify(self)
+        self.rebaseCorrelationAtTicks(self.ticks)
+        CorrelatedClock.speed.fset(self, newSpeed)
 
     @property
     def slew(self):
@@ -1187,43 +1167,16 @@ class TunableClock(ClockBase):
     def slew(self, slew):  
         self.speed = (float(slew) / self._freq) + 1.0
         
-    @property
-    def ticks(self):
-        now = self._parent.ticks
-        delta = now - self._last
-        
-        return self._ticks + delta*self._freq*self.speed/self._parent.tickRate
-        
     def adjustTicks(self,offset):
         """\
         Change the tick count of this clock by the amount specified.
         """
-        self._ticks=self._ticks+offset
-        self.notify(self)
+        self.correlation = self.correlation.butWith(childTicks = self.correlation.childTicks + offset)
     
 
-    def calcWhen(self,ticksWhen):
-        if self._speed == 0:
-            refticks = self._last
-        else:
-            refticks=self._last + (ticksWhen - self._ticks)*self._parent.tickRate/self._freq/self._speed
-        return self._parent.calcWhen(refticks)
-        
     def __repr__(self):
         return "TunableClock( t=%d, freq=%d ) at speed %f" % (self.ticks, self.tickRate, self._speed)
 
-    def toParentTicks(self, ticks):
-        if self._speed == 0:
-            return self._last
-        else:
-            return self._last + (ticks - self._ticks)*self._parent.tickRate/self._freq/self._speed
-
-    def fromParentTicks(self, ticks):
-        if self._speed == 0:
-            return self._ticks
-        else:
-            return self._ticks + (ticks - self._last)*self._freq*self._speed/self._parent.tickRate
-    
     def getParent(self):
         return self._parent
         
@@ -1235,14 +1188,9 @@ class TunableClock(ClockBase):
         :param current: Potential error (in seconds) of the clock at this time.
         :param growthRate: Amount by which error will grow for every tick of the parent clock.
         """
-        self._baseErr = current
-        self._baseErrParentTime = self.getParent().ticks
-        self._errGrowthRate = growthRate
-        
-    def _errorAtTime(self, t):
-        tDelta = (self.toParentTicks(t) - self._baseErrParentTime) / self.getParent().tickRate
-        growth = abs(tDelta) * self._errGrowthRate
-        return self._baseErr + growth
+        t=self.ticks
+        self.rebaseCorrelationAtTicks(t)
+        self.correlation = self.correlation.butWith(initialError=current, errorGrowthRate=growthRate)
         
 
 
