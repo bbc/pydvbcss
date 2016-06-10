@@ -250,7 +250,7 @@ class Candidate(object):
     def __str__(self):
         return "Candidate: offset=%20d, rtt=%20d, t1=%20d, t2=%20d, t3=%20d, t4=%20d" % (self.offset, self.rtt, self.t1, self.t2, self.t3, self.t4)
 
-    def calcCorrelationFor(self, clock):
+    def calcCorrelationFor(self, clock, localMaxFreqErrorPpm=None):
         r"""\
         Calculates the :class:`~dvbcss.clock.Correlation` for a
         :class:`~dvbcss.clock.CorrelatedClock` that is equivalent to this candidate.
@@ -260,6 +260,7 @@ class Candidate(object):
         enable the clock to correctly calculate dispersion.
 
         :param clock: :class:`~dvbcss.clock.CorrelatedClock` that will model the server clock. Its parent must be the one that was measured for `t1` and `t4` this candidate.
+        :param localMaxFreqErrorPpm: Optional. By defeault the :func:`~dvbcss.clock.ClockBase.getRootMaxFreqError` of the `clock` is used. Provide this value to override that.
         
         :returns: :class:`~dvbcss.clock.Correlation` representing this `candidate`, and that can be used with the :class:`~dvbcss.clock.CorrelatedClock`.
         
@@ -285,7 +286,10 @@ class Candidate(object):
         t2 = clock.nanosToTicks(self.t2)
         t3 = clock.nanosToTicks(self.t3)
         
-        mfeC = clock.getRootMaxFreqError()/1000000.0   # ppm to fraction
+        if localMaxFreqErrorPpm is None:
+            localMaxFreqErrorPpm = clock.getRootMaxFreqError()
+            
+        mfeC = localMaxFreqErrorPpm/1000000.0   # ppm to fraction
         mfeS = self.maxFreqError/1000000.0   # ppm to fraction
         
         return Correlation(

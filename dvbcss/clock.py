@@ -810,6 +810,19 @@ class Correlation(object):
     This class is intended to be immutable. Instead of modifying a correlation,
     create a new one based on an existing one. The :func:`butWith` method is
     designed to assist with this.
+    
+    ..note::
+
+        For backwards compatibility with pydvbcss v0.3 and earlier, this object can
+        also be accessed as if it is a tuple (parentTicks, childTicks), for example:
+    
+        ..code-block:: python
+        
+            c = Correlation(1,5, 0.1, 0.005)
+            parentTicks, childTicks = c
+            parentTicks = c[0]
+            childTicks = c[1]
+        
     """
     def __init__(self, parentTicks, childTicks, initialError=0, errorGrowthRate=0):
         super(Correlation,self).__init__()
@@ -870,6 +883,12 @@ class Correlation(object):
         (in units of seconds) for every tick of the parent clock. Default value is 0 if not set.
         """
         return self._errorGrowthRate
+
+    def __len__(self):
+        return 2
+        
+    def __getitem__(self,index):
+        return (self._parentTicks, self._childTicks)[index]
 
     def __str__(self):
         return "Correlation(%s, %s, %s, %s)" %\

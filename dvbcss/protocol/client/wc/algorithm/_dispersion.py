@@ -49,19 +49,21 @@ class LowestDispersionCandidate(object):
     before and after the adjustment and gives information needed to extrapolate future
     dispersions. You can use this, for example, to record the clock dispersion over time. 
     """
-    def __init__(self,clock,repeatSecs=1.0,timeoutSecs=0.2):
+    def __init__(self,clock,repeatSecs=1.0,timeoutSecs=0.2,localMaxFreqErrorPpm=None):
         """\
         *Initialisation takes the following parameters:*
         
         :param clock: A :class:`~dvbcss.clock.Correlated` object representing that will be adjusted to match the Wall Clock.
         :param repeatSecs: (:class:`float`) The rate at which Wall Clock protocol requests are to be sent (in seconds).
         :param timeoutSecs: (:class:`float`) The timeout on waiting for responses to requests (in seconds).
+        :param localMaxFreqErrorPpm: Optional. Override using the :func:`~dvbcss.clock.ClockBase.getRootMaxFreqError` of the clock as the max freq error of the local clock, and instead use this value. It is the clock maximum frequency error in parts-per-million
         """
         super(LowestDispersionCandidate,self).__init__()
         self.log=logging.getLogger("dvbcss.protocol.client.wc.algorithm.BestCandidateByDispersion")
         self.clock = clock
         self.repeatSecs = repeatSecs
         self.timeoutSecs = timeoutSecs
+        self.localMaxFreqErrorPpm = localMaxFreqErrorPpm
         
         # force clock to register infinite dispersion initially
         self.clock.correlation = self.clock.correlation.butWith(initialError = float("+inf"))
@@ -104,7 +106,7 @@ class LowestDispersionCandidate(object):
 
             if candidate is not None:
 
-                candidateClock.correlation = candidate.calcCorrelationFor(self.clock)
+                candidateClock.correlation = candidate.calcCorrelationFor(self.clock, self.localMaxFreqErrorPpm)
                 candidateDispersion = candidateClock.dispersionAtTime(t)
                 
                 update = candidateDispersion < currentDispersion
