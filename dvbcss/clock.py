@@ -814,12 +814,16 @@ class Correlation(object):
     ..note::
 
         For backwards compatibility with pydvbcss v0.3 and earlier, this object can
-        also be accessed as if it is a tuple (parentTicks, childTicks), for example:
+        also be treated as if it is a tuple (parentTicks, childTicks), for example:
     
         ..code-block:: python
         
             c = Correlation(1,5, 0.1, 0.005)
+            
+            # unapacking using an expression assignment
             parentTicks, childTicks = c
+            
+            # accessing by index
             parentTicks = c[0]
             childTicks = c[1]
         
@@ -904,6 +908,8 @@ class Correlation(object):
                 and obj._childTicks == self._childTicks \
                 and obj._initialError == self._initialError \
                 and obj._errorGrowthRate == self._errorGrowthRate
+        elif isinstance(obj, tuple):
+            return len(obj) == 2 and obj[0] == self._parentTicks and obj[1] == self._childTicks
         else:
             return False
 

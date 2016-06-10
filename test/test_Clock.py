@@ -174,6 +174,7 @@ class Test_Correlation(unittest.TestCase):
             pass
         
     def test_equality(self):
+        """Correlations can be compared for equivalence using the equality operator"""
         self.assertEqual(Correlation(1,2,3,4), Correlation(1,2,3,4))
         self.assertEqual(Correlation(1,2,0,0), Correlation(1,2))
         self.assertNotEqual(Correlation(1,2), Correlation(1,2,3,4))
@@ -181,6 +182,15 @@ class Test_Correlation(unittest.TestCase):
         self.assertNotEqual(Correlation(1,9,3,4), Correlation(1,9,3,4))
         self.assertNotEqual(Correlation(1,2,9,4), Correlation(1,2,9,4))
         self.assertNotEqual(Correlation(1,2,3,9), Correlation(1,2,3,9))
+        
+    def test_tupleEquivEquality(self):
+        """Correlations can be compared with 2-tuples for equality of the parentTicks and childTicks"""
+        self.assertEqual(Correlation(1,2,3,4), (1,2))
+        self.assertEqual((1,2), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(9,2,3,4), (1,2))
+        self.assertNotEqual(Correlation(1,9,3,4), (1,2))
+        self.assertNotEqual((1,2), Correlation(9,2,3,4))
+        self.assertNotEqual((1,2), Correlation(1,9,3,4))
         
     def test_mutate(self):
         c=Correlation(1,2,3,4)
@@ -199,6 +209,20 @@ class Test_Correlation(unittest.TestCase):
 
         c6 = c.butWith(errorGrowthRate=1000)
         self.assertEquals(c6, Correlation(1,2,3,1000))
+
+    def test_tupleStyleUnpacking(self):
+        """A correlation can be unpacked as if it is a 2-tuple by assignment-unpacking"""
+        c = Correlation(1,2,3,4)
+        x,y = c
+        self.assertEquals(1,x)
+        self.assertEquals(2,y)
+        
+    def test_tuppleStyleIndexing(self):
+        """A correlation can be unpacked as if it is a 2-tuple by indexing"""
+        c = Correlation(1,2,3,4)
+        self.assertEquals(1,c[0])
+        self.assertEquals(2,c[1])
+        self.assertRaises(IndexError, lambda: c[2])
 
         
 class Test_CorrelatedClock(unittest.TestCase):
