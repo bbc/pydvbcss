@@ -7,10 +7,11 @@ pydvbcss
 
 **DVB protocols for synchronisation between TV Devices and Companion Screen Applications.**
 
-:Release: |version|
+:Release: |release|
 :Licence: `Apache License v2.0 <http://www.apache.org/licenses/LICENSE-2.0>`_.
-:Latest Source: :repo:`/`
+:Source: :repo:`/`
 :How to install: :repo:`/README.md`
+:Changelog: :repo:`/CHANGELOG.md`
 
 .. toctree::
    :maxdepth: 1
@@ -33,6 +34,7 @@ for testing and prototyping.
 *To use this library you need to have a working understanding of these protocols and, of course, the Python programming language.*
 
 
+.. _gettingstarted:
 
 Getting started
 ===============
@@ -51,6 +53,13 @@ State of implementation
 This library does not currently implement the `CSS-TE` or `CSS-MRS` protocols (from the DVB specification).
 
 There are some unit tests but these mainly only cover the calculations done within clock objects and the packing and unpacking of JSON messages.
+
+
+Upgrading from previous versions
+================================
+
+See the :repo:`release notes / change log </CHANGELOG.md>` for details of what is new in this version of pydvbcss.
+
 
 
 License and Contributing
