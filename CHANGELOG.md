@@ -16,7 +16,7 @@ the same clock (representing the wall clock) to instead measuring its parent
 and setting the correlation. Any custom wall clock client algorithms will
 not work and will need to be updated.
 
-### How to 'upgrade' existing code
+#### How to 'upgrade' existing code
 
 * Use a `CorrelatedClock` instead of a `TunableClock` to model a wall clock.
   and set the "maximum frequency error" when initialising the `SysClock`
@@ -75,7 +75,7 @@ Equivalent new way (0.4 and later):
     ts = TSClientClockController(tsUrl, contentIdStem, timelineSelector, timeline)
     print timeline.isAvailable()
 
-### Summary of changes:
+#### Summary of changes:
 
 * API change: All clock objects modified to be able to track error values and calculate dispersions and clock `availability`
 * API change: `CorrelatedClock` class modified to use a `Correlation` object instead of a tuple.
@@ -87,6 +87,8 @@ Equivalent new way (0.4 and later):
 * Improvement: Support for monotonic clock on Android.
   [P-R #5](https://github.com/bbc/pydvbcss/pull/5) by [Jack Jansen](https://github.com/jackjansen) (03 May 2016)
 * Bugfix: `clock.getEffectiveSpeed()` stuck in infinite loop.
+* Docs: Now correctly links to github source for correct branch/version.
+* Docs: Improvements to setup/release process to format PyPI description correctly (by converting to ReStructuredText)
 
 ## 0.3.3 : Bugfixes and thread safety improvements (20 Apr 2016)
 

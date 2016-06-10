@@ -145,11 +145,22 @@ will be picked up when the new release is tagged.
     
 ### 6. Upload to PyPI:
 
+To upload, you must have [pandoc](http://pandoc.org/) installed as a command
+line tool. This is needed to convert the README from [Markdown](https://daringfireball.net/projects/markdown/)
+to [ReStructuredText](http://docutils.sourceforge.net/docs/ref/rst/introduction.html) because PyPI
+requires it.
+
+    $ sudo apt-get install pandoc       # Debian/ubuntu Linux
+    $ sudo port install pandoc          # Mac Ports
+
 ... first uploading to the test service to check everything is okay:
 
     $ git checkout <<release-branch>>
-    $ sudo python setup.py sdist upload -r pypitest
+    $ sudo python setup.py sdist register upload -r pypitest
     
 ... then going live:
 
-    $ sudo python setup.py sdist upload -r pypi
+    $ sudo python setup.py sdist register upload -r pypi
+
+The conversion of the README alone can be checked by doing a 'register' without
+an 'upload'.
