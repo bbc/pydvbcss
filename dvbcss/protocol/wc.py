@@ -304,4 +304,23 @@ class Candidate(object):
             errorGrowthRate = (mfeC+mfeS)
         )
 
+    def toTicks(self,clock):
+        """\
+        Returns a new Candidate object the same as this one but whose measurements have been converted to match the timescale of a clock.
+
+        :raises NotImplementedError: This function has been deprecated.
+
+        .. warning::
+            .. deprecated:: 0.4
+            
+               This function has been deprecated because of the architectural
+               change to taking taking readings from a different clock to the
+               one that is adjusted.
+               
+               Use :func:`calcCorrelationFor` instead as this will perform the
+               necessary conversion to clock tick rate units as well as creating
+               the correlation needed to configure that clock.
+        """
+        raise NotImplementedError("This method has been deprecated in v0.4")
+        
 __all__ = [ "WCMessage", "Candidate" ]
