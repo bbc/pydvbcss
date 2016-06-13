@@ -459,6 +459,8 @@ class ClockBase(object):
         Returns whether this clock is available, taking into account the availability of any (parent) clocks on which it depends.
         
         :returns: True if available, otherwise False.
+        
+        .. versionadded:: 0.4
         """
         parent = self.getParent()
         return self._availability and (parent is None or parent.isAvailable())
@@ -471,6 +473,8 @@ class ClockBase(object):
         
         If setting the availability of this clock changes the overall availability of this clock (as returned by :func:`isAvailable`) then
         dependents will be notified of the change.
+        
+        .. versionadded:: 0.4
         """
         isChange = self._availability != availability
         parent = self.getParent()
@@ -655,6 +659,8 @@ class ClockBase(object):
         If the clocks differ in effective speed or tick rate, even slightly, then this
         means that the clocks will eventually diverge to infinity, and so the returned 
         difference will equal +infinity.
+
+        .. versionadded:: 0.4
         """
         thisSpeed = self.getEffectiveSpeed()
         otherSpeed = otherClock.getEffectiveSpeed()
@@ -677,6 +683,8 @@ class ClockBase(object):
         clock and its ancestors.
         
         :returns: Dispersion (in seconds) at the specified clock time.
+
+        .. versionadded:: 0.4
         """
         disp = self._errorAtTime(t)
         
@@ -698,6 +706,8 @@ class ClockBase(object):
         any parent clocks.
         
         This is an internal method that is used by :func:`dispersionAtTime`.
+
+        .. versionadded:: 0.4
         """
         raise NotImplemented
 
@@ -711,6 +721,8 @@ class ClockBase(object):
         
         For a clock that is not the root clock, this method will pass through
         the call to the same method of the root clock.
+
+        .. versionadded:: 0.4
         """
         root = self.getRoot()
         if root == self:
@@ -827,6 +839,7 @@ class Correlation(object):
             parentTicks = c[0]
             childTicks = c[1]
         
+    .. versionadded:: 0.4
     """
     def __init__(self, parentTicks, childTicks, initialError=0, errorGrowthRate=0):
         super(Correlation,self).__init__()
@@ -1091,6 +1104,8 @@ class CorrelatedClock(ClockBase):
         If the new speed is different, even slightly, then this means that the ticks reported by this clock will eventually differ by infinity,
         and so the returned value will equal +infinity. If the speed is unchanged then the returned value reflects the difference between
         old and new correlations.
+
+        .. versionadded:: 0.4
         """
         if newSpeed != self._speed:
             return float('inf')
@@ -1112,6 +1127,8 @@ class CorrelatedClock(ClockBase):
         :returns: True if the potential difference can/will eventually exceed the threshold.
 
         This is implemented by applying a threshold to the output of :func:`quantifyChange`.
+
+        .. versionadded:: 0.4
         """
         delta = self.quantifyChange(newCorrelation, newSpeed)
         return delta > thresholdSecs
@@ -1135,17 +1152,16 @@ class TunableClock(CorrelatedClock):
     E.g. if you are observing the rate of increase of the ticks property, then doubling the speed wil cause
     the ticks property to start increasing faster but will not cause it to suddenly jump value.
     
-    .. note::
-    
-       The maths to calculate and convert tick values will be performed, by default, as integer maths
-       unless the parameters controlling the clock (tickRate etc) are floating point, or the ticks property
-       of the parent clock supplies floating point values.
-       
-    .. note::
+    .. versionchanged:: 0.4
     
        TunableClock has been reimplemented as a subclass of :class:`CorrelatedClock`. The behaviour is
        the same as before, however it now also includes all the methods defined for :class:`CorrelatedClock`
        too.
+
+    The maths to calculate and convert tick values will be performed, by default, as integer maths
+    unless the parameters controlling the clock (tickRate etc) are floating point, or the ticks property
+    of the parent clock supplies floating point values.
+       
     """
 
     def __init__(self, parentClock, tickRate, ticks=0, **kwargs):
@@ -1212,6 +1228,8 @@ class TunableClock(CorrelatedClock):
         
         :param current: Potential error (in seconds) of the clock at this time.
         :param growthRate: Amount by which error will grow for every tick of the parent clock.
+
+        .. versionadded:: 0.4
         """
         t=self.ticks
         self.rebaseCorrelationAtTicks(t)

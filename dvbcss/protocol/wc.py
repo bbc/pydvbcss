@@ -17,9 +17,12 @@
 r"""\
 The :class:`WCMessage` class represents a CSS-WC protocol message.
 
-The :class:`Candidate` class represents a measurement "candidate"
-for use by a Wall Clock Client algorithm and is calculated from a :class:`WCMessage`
-that represents a Wall Clock protocol response message received from a server.
+The :class:`Candidate` class represents the measurement resulting from a
+request-response exchange of messages with a server. This is a "candidate"
+that could be used to update the client's estimate of the Wall Clock and is
+therefore used by a Wall Clock Client algorithm. A candidate is calculated
+from a :class:`WCMessage` that represents a Wall Clock protocol response
+message received from a server.
 
 A candidate can calculate the correlation needed to set a
 :class:`~dvbcss.clock.CorrelatedClock` to model the server's Wall Clock.
@@ -57,6 +60,14 @@ Processing a received response message at a Wall Clock Client:
     >>> c.rtt
     459734573
     
+Creating a correlation to configure a :class:``dvbcss.clock.CorrelatedClock`
+representing the client estimate of the server's wall clock:
+
+.. code-block:: python
+
+    >>> corr = c.calcCorrelationFor(wallClock, localMaxFreqErrorPpm=wallClock.getRootMaxFreqError())
+    >>> wallClock.correlation = corr
+
 """
 import logging
 
@@ -203,7 +214,11 @@ class Candidate(object):
     This object represents a measurement "candidate" to be fed into a Wall Clock Client's
     algorithm. It is calculated from a :class:`WCMessage` received as a response from a
     Wall Clock server.
-
+    
+    This object requires that response comes from a Wall Clock Client that
+    measured the *parent* of the clock that will be used to model the wall
+    clock locally.
+    
     **Initialisation takes the following parameters:**
     
     :param WCMessage msg: Response message received from server
@@ -252,7 +267,7 @@ class Candidate(object):
 
     def calcCorrelationFor(self, clock, localMaxFreqErrorPpm=None):
         r"""\
-        Calculates the :class:`~dvbcss.clock.Correlation` for a
+        Calculates and returns the :class:`~dvbcss.clock.Correlation` for a
         :class:`~dvbcss.clock.CorrelatedClock` that is equivalent to this candidate.
         
         The returned correlation can then be applied to the clock to model the time
@@ -264,21 +279,24 @@ class Candidate(object):
         
         :returns: :class:`~dvbcss.clock.Correlation` representing this `candidate`, and that can be used with the :class:`~dvbcss.clock.CorrelatedClock`.
         
-        The parameters of the correlation are calculated as follows:
+        .. note::
+            The parameters of the correlation are calculated by this function
+            as follows:
+            
+            * **parentTicks** = (t1' + t4') / 2
+            * **childTicks** = (t2' + t3') / 2
+            * **initialError** = precision + ( rtt/2 + mfeC * (t4 - t1) + mfeS * (t3 - t2) ) / 10\ :sup:`9`
+            * **errorGrowthRate** = mfeC + mfeS
+            
+            Where:
+            
+            * **t1**, **t2**, **t3** and **t4** are in units of nanoseconds
+            * **t1'** and **t4'** are the same as t1 and t4 but converted to ticks of the parent of the specified clock
+            * **t2'** and **t3'** are the same as t2 and t3 but converted to ticks of the specified clock
+            * **mfeC** is the clock's :func:`~dvbcss.clock.ClockBase.getRootMaxFreqError`, converted from ppm to a fraction by dividing by 10\ :sup:`6`
+            * **mfeS** is the max freq error reported by the server, converted from ppm to a fraction by dividing by 10\ :sup:`6`
         
-        * **parentTicks** = (t1' + t4') / 2
-        * **childTicks** = (t2' + t3') / 2
-        * **initialError** = precision + ( rtt/2 + mfeC * (t4 - t1) + mfeS * (t3 - t2) ) / 10\ :sup:`9`
-        * **errorGrowthRate** = mfeC + mfeS
-        
-        Where:
-        
-        * **t1**, **t2**, **t3** and **t4** are in units of nanoseconds
-        * **t1'** and **t4'** are the same as t1 and t4 but converted to ticks of the parent of the specified clock
-        * **t2'** and **t3'** are the same as t2 and t3 but converted to ticks of the specified clock
-        * **mfeC** is the clock's :func:`~dvbcss.clock.ClockBase.getRootMaxFreqError`, converted from ppm to a fraction by dividing by 10\ :sup:`6`
-        * **mfeS** is the max freq error reported by the server, converted from ppm to a fraction by dividing by 10\ :sup:`6
-        
+        .. versionadded:: 0.4
         """
         # convert to units of the clock
         t1 = clock.getParent().nanosToTicks(self.t1)
@@ -296,7 +314,7 @@ class Candidate(object):
             parentTicks = (t1+t4)/2.0,
             childTicks = (t2+t3)/2.0,
             initialError = 
-                self.precision +  # does not include local clock precision since this is already accounted for
+                self.precision +  # server precision. does not include local clock precision since this is already accounted for
                 ( self.rtt/2.0 + 
                   mfeC*(self.t4-self.t1) + 
                   mfeS*(self.t3-self.t2)

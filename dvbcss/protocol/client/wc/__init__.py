@@ -26,24 +26,6 @@ Using a Wall Clock Client
 Recommended simplest use is to instantiate a :class:`~dvbcss.protocol.client.wc.WallClockClient` and provide it with an
 instance of the :class:`~dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate` algorithm to control how it updates a clock.
 
-
-:class:`WallClockClient` is used by providing it with an object implementing the clock
-synchronisation :ref:`algorithm <algorithms>`. The Wall Clock client handles the
-protocol interaction (sending the requests and parsing the responses) at the times
-specified by the algorithm and passes the results of each request-response measurement
-(known as a 'candidate') to the algorithm. The algorithm then adjusts the clock.
-
-
-The type of Clock class that can be used for the wall clock will depend on the algorithm.
-Some algorithms require that the tick rate of the clock be 1 tick per nanosecond (tick rate = 1000000000).
-The WallClockClient class does not require this, but it is recommended to use this tick rate.
-
-The measurement process involves taking a reading from the local clock when
-the request is about to be sent, and when the response is received. This measurement
-is taken from the *parent* of the clock you provide. The candidate represents the
-relationship between that (parent) clock and the Wall Clock of the server.
-
-
 A simple example that connects to a wall clock server at 192.168.0.115 port 6677 and sends requests once per second:
 
 .. code-block:: python
@@ -66,9 +48,32 @@ A simple example that connects to a wall clock server at 192.168.0.115 port 6677
     # wall clock client is now running in the background
 
 
-After the :func:`~WallClockClient.start` method is called, the WallClockClient runs in a separate thread and execution continues.
+After the :func:`~WallClockClient.start` method is called, the WallClockClient
+runs in a separate thread and execution continues.
 
+:class:`WallClockClient` is used by providing it with an object implementing the clock
+synchronisation :ref:`algorithm <algorithms>`. The Wall Clock client handles the
+protocol interaction (sending the requests and parsing the responses) at the times
+specified by the algorithm and passes the results of each request-response measurement
+(a :class:`~dvbcss.protocol.wc.Candidate`) to the algorithm. The algorithm then
+adjusts the clock.
 
+.. image:: wc-client-clock-model.png
+       :width: 384pt
+       :align: center
+       
+The measurement process involves taking a reading from the local clock when
+the request is about to be sent, and when the response is received. This measurement
+is taken from the *parent* of the clock you provide. The candidate represents
+a possible relationship between that (parent) clock and the Wall Clock of the
+server given the results of the request-response measurement. The algorithm
+processes this and makes a decision as to the :class:`~dvbcss.clock.Correlation`
+that is to be used.
+
+Although the WallClockClient class does not require the tickrate of the
+Wall Clock to be 1 tick per nanosecond, it is recommended to set it as such.
+This is because the next step (using the CSS-TS protocol) assumes a Wall Clock
+ticking at this rate.
 
 """
 
@@ -208,6 +213,11 @@ class WallClockClient(UdpRequestResponseClient):
     represent the relationship between the parent of the provided clock and the
     server's Wall Clock.
     
+    The algorithm is then expected to set the :class:`dvbcss.clock.Correlation`
+    of the clock object such that it becomes an estimate of the server's
+    Wall Clock.
+        
+    It is recommended to use the :class:`~dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate` algorithm.
     """
     def __init__(self, (bindaddr,bindport), (dstaddr,dstport), wallClock, wcAlgorithm):
         """\
@@ -217,8 +227,6 @@ class WallClockClient(UdpRequestResponseClient):
         :param (dstaddr,dstport): (:class:`str`, :class:`int`) A tuple containing the IP address (as a string) and port (as an int) of the Wall Clock server
         :param wallClock: (:mod:`~dvbcss.clock`) The local clock that will be controlled to be a Wall Clock. Measurements will be taken from its parent and candidates provided to the algorithm will represent the relationship between that (parent) clock and the server's wall clock.
         :param wcAlgorithm: (:ref:`algorithm <algorithms>`) The algorithm for the client to use to update the clock.
-        
-        It is recommended to use the :class:`~dvbcss.protocol.client.wc.algorithm.LowestDispersionCandidate` algorithm.
         """
         self.algorithm = wcAlgorithm #: (read only) The :ref:`algorithm <algorithms>` object being used with this WallClockClient
         algGenerator = self.algorithm.algorithm()

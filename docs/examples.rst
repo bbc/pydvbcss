@@ -79,12 +79,16 @@ the client.
 
 First start the server:
 
+.. code-block:: shell
+
     $ python examples/CIIServer.py
 
 The server listens on 127.0.0.1 on port 7681 and accepts WebSocket connections to `ws://<ip>:<port>/cii`.
 
 Leave it running in the background and connect using the client and see how
 the CII data is pushed by the server whenever it changes:
+
+.. code-block:: shell
 
     $ python examples/CIIClient.py ws:/127.0.0.1:7681/cii
 

@@ -27,16 +27,6 @@ Algorithms
 .. automodule:: dvbcss.protocol.client.wc.algorithm._filterpredict
    :noindex:
 
-Functions
----------
-
-Filter and Prediction algorithm creator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: dvbcss.protocol.client.wc.algorithm.FilterAndPredict
-
-
-
 Classes
 -------
 
@@ -84,20 +74,20 @@ Predictors
    :members:
    :inherited-members:
 
+Functions
+---------
 
-General helper classes
-~~~~~~~~~~~~~~~~~~~~~~
+Filter and Prediction algorithm creator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Calculating correlation from a Candidate
-''''''''''''''''''''''''''''''''''''''''
-
-.. autofunction:: dvbcss.protocol.client.wc.algorithm.calcCorrelationFor
-   :members:
-   :inherited-members:
+.. autofunction:: dvbcss.protocol.client.wc.algorithm.FilterAndPredict
 
 Candidate quality calculator
-''''''''''''''''''''''''''''
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This function is used internally by the :class:`~dvbcss.protocol.client.wc.WallClockClient` class.
+
 .. autofunction:: dvbcss.protocol.client.wc.algorithm.calcQuality
+
+
 

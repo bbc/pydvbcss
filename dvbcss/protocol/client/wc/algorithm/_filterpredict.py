@@ -27,13 +27,14 @@ Use the :func:`~dvbcss.protocol.client.wc.algorithm.FilterAndPredict` function t
 and a Predictor into an algorithm that can be used with a :class:`~dvbcss.protocol.client.wc.WallClockClient`.
 
 When using this algorithm, you provide a :class:`~dvbcss.clock.CorrelatedClock` object to it, whose parent is the
-clock given to the :class:`~dvbcss.protocol.client.wc.WallClockClient.
+clock given to the :class:`~dvbcss.protocol.client.wc.WallClockClient`.
 
 This algorithm controls the :class:`~dvbcss.clock.CorrelatedClock` object by settings its
-:data:`~dvbcss.clock.CorrelatedClock.correlation` property to (0,offset) where `offset` is provided by the
+:data:`~dvbcss.clock.CorrelatedClock.correlation` property to that returned by the
 predictor. The parent of this clock is the clock used by the :class:`~dvbcss.protocol.client.wc.WallClockClient`
-in generating the measurement candidates. So the job of the predictor is always to estimate the current absolute
-offset between that clock and the wall clock of the server.
+in generating the measurement candidates. So the job of the predictor is to
+determine the best correlation for modelling the relationship between that
+(parent) clock and the wall clock of the server.
     
 
 Here is a simple example that uses a simple predictor and a round-trip-time threshold filter:
@@ -58,10 +59,8 @@ Here is a simple example that uses a simple predictor and a round-trip-time thre
     wc_client=WallClockClient(bind, server, wallClock, algorithm)
     wc_client.start()
 
-.. note:: The Clock object given to the algorithm must be :mod:`~dvbcss.clock.CorrelatedClock`
-          whose parent is the clock object provided to the WallClockClient object.
-          
-          Both clocks must have the same tick rate.
+The Clock object given to the algorithm must be :mod:`~dvbcss.clock.CorrelatedClock`
+whose parent is the clock object provided to the WallClockClient object.
 
 
 Round-trip time threshold Filter
@@ -81,7 +80,7 @@ Simple Predictor
 ^^^^^^^^^^^^^^^^
 
 The :class:`~dvbcss.protocol.client.wc.algorithm.PredictSimple` class is a simple predictor that uses the candidate
-most recently provided to it and uses the offset calculated by that candidate as the prediction.
+most recently provided to it and directly transforms that into a :class:`dvbcss.clock.Correlation`.
 
 
 Writing your own Filter
@@ -105,19 +104,19 @@ You can write your own Predictor by creating a class with the following methods 
     .. method:: .addCandidate(self, candidate)
       
         :param candidate: A (:class:`dict`)  containing two :class:`~dvbcss.protocol.wc.Candidate` objects
-            representing the result of the measurement in units of ticks (dict key `"ticks"`) and units
-            of nanoseconds (dict key `"nanos"`):
+            representing the result of the measurement in units of of nanoseconds.
       
       This method is called whenever a measurement candidate resulting from a request-response measurement
       survives the filtering process.
       
-  .. method:: .predictOffset(self)
+  .. method:: .predictCorrelation(self)
   
-      This method must return the difference between the clock used and the server wall clock. The clock used
-      by the client is a fixed clock. The difference therefore represents the difference between that clock and
-      the Wall Clock on the server.
-  
-      :return: The offset (in ticks) between the client clock and the wall clock
+      :return: A :class:`~dvbcss.clock.Correlation`
+      
+      The returned Correlation must represent the relationship between the
+      clock and its parent, such that the clock becomes an estimate of the
+      server's Wall Clock. This must be in the correct units (tick rate)
+      for the clock and its parent.
 
 
 
@@ -167,7 +166,7 @@ class FilterLowestDispersionCandidate(object):
     """
     def __init__(self, clock):
         """\
-        :param clock: A :class:`~dvbcss.clock.TunableClock` object representing that will be adjusted to match the Wall Clock.
+        :param clock: A :class:`~dvbcss.clock.CorrelatedClock` object representing that will be adjusted to match the Wall Clock.
         """
         self.clock = clock
         self.clock.correlation = clock.correlation.butWith(initialError=float("+inf"))
@@ -189,19 +188,21 @@ class FilterAndPredict(object):
     :param repeatSecs: (:class:`float`) The rate at which Wall Clock protocol requests are to be sent (in seconds).
     :param timeoutSecs: (:class:`float`) The timeout on waiting for responses to requests (in seconds).
     :param filters: (:class:`list` of Filters) A list of zero, one or more Filters
-    :param predictor: (Predictor) The Predictor to use, or None to default to :class:`PredictSimple``clock`
+    :param predictor: (Predictor) The Predictor to use, or None to default to :class:`PredictSimple`
     
     This algorithm controls the :class:`~dvbcss.clock.CorrelatedClock` object by settings its
-    :data:`~dvbcss.clock.CorrelatedClock.correlation` property to (0,offset) where `offset` is provided by the
-    predictor. The parent of this clock is the clock used by the :class:`~dvbcss.protocol.client.wc.WallClockClient`
+    :data:`~dvbcss.clock.CorrelatedClock.correlation` property to that provided by the
+    predictor.
+    
+    The parent of this `clock` is the clock used by the :class:`~dvbcss.protocol.client.wc.WallClockClient`
     in generating the measurement candidates. So the job of the predictor is always to estimate the 
     :class:`~dvbcss.clock.Correlation` needed by the `clock`.
     
     Requests are made at the repetition rate specified. If a response is received within the timeout period it
     is then it is transformed into a measurement candidate and passed to the filters.
     Filters are applied in the order you list them. If a candidate survives filtering, then it is passed to the
-    predictor. Every time a candidate is provided to the predictor, the offset returned by the predictor replaces
-    the previous offset.
+    predictor. Every time a candidate is provided to the predictor, the correlation returned by the predictor replaces
+    the previous correlation.
     
     .. note:: The Clock object must be :mod:`~dvbcss.clock.CorrelatedClock` whose parent is the clock object
               that is measured when generating the candidates.

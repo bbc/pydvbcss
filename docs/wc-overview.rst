@@ -27,12 +27,12 @@ server (usually from the information received via the
 :doc:`CSS-CII protocol <cii>`).
 
 1. The client sends a Wall Clock protocol "request" message to the server.
-   
+
 2. The server sends back a Wall Clock protocol "response" message to the client.
 
 3. If the server is able to more accurately measure when it sent a message
-*after* it has done so, then it can optionally send a "follow-up response" with
-this information.
+   *after* it has done so, then it can optionally send a "follow-up response"
+   with this information.
 
 The client repeats this process as often as it needs to.
 
@@ -41,7 +41,7 @@ Synchronising the wall clock
 
 The client notes the time at which the request is sent and the response received,
 and by the server including the times at which it received the request and
-sent its response. Using this information the client can estimate the difference
+sent its response. Using this information the client can estimate the relationship
 between the time of its clock and that of the server. It can also calculate
 an error bound on this (known as dispersion):
 
@@ -49,7 +49,12 @@ an error bound on this (known as dispersion):
        :width: 128pt
        :align: center
     
-Estimated offset = (( *t3* + *t2* ) - ( *t4* + *t1* )) / 2
+Relationship expressed as an estimated offset:
+ * Offset between local clock and server wall clock is (( *t3* + *t2* ) - ( *t4* + *t1* )) / 2
+ 
+Relationship expressed as a correlation:
+ * When local clock is ( *t1* + *t4* )/2
+ * ... the server wall clock is estimated to be ( *t2* + *t3* )/2
  
 The `DVB specification (part 2) <http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1>`_
 contains an annex that goes into more detail on the
