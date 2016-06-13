@@ -19,6 +19,7 @@ import dvbcss.monotonic_time as time
 import logging
 
 from dvbcss.clock import Correlation, CorrelatedClock
+import warnings
 
 class LowestDispersionCandidate(object):
     """\
@@ -160,3 +161,26 @@ class LowestDispersionCandidate(object):
         return answer
             
             
+            
+class DispersionCalculator(object):
+    """\
+    This is a legacy class from v0.3 and earlier and will be deprecated in the future.
+    """
+    def __init__(self, clock, localPrecisionSecs, localMaxFreqErrorPpm):
+        super(DispersionCalculator,self).__init__()
+        warnings.warn("DispersionCalculator class is deprecated. Use Candidate.calcCorrelationFor() and Correlation.dispersionAtTime() instead.", DeprecationWarning)
+        self.clock = clock
+        self.precision = localPrecisionSecs
+        self.maxFreqError = localMaxFreqErrorPpm
+        
+    def calc(self, candidate):
+        return 1000000000*(candidate.precision + self.precision) \
+             + ( candidate.maxFreqError*(candidate.t3-candidate.t2)    \
+               + self.maxFreqError*(candidate.t4-candidate.t1)
+               + (candidate.maxFreqError+self.maxFreqError)*(self.clock.nanos - candidate.t4) \
+               ) / 1000000 + \
+               candidate.rtt/2
+               
+    def getGrowthRate(self, candidate):
+        return (candidate.maxFreqError+self.maxFreqError) / 1000000.0
+        

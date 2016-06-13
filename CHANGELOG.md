@@ -40,8 +40,10 @@ not work and will need to be updated.
   
   * Predictors should return a `Correlation` instead of an adjustment value.
   
-* `DispersionCalculator` has been removed.
-  Instead use the `calcCorrelationFor` function of a `Candidate` object
+* `DispersionCalculator` is being deprecated. It still exists, but you should
+  stop using it and instead use `Candidate.calcCorrelationFor` function to 
+  create a correlation which you then put into a `CorrelatedClock` and call
+  the `dispersionAtTime` function.
   
 Examples of old way (0.3.x and earlier):
   
@@ -82,6 +84,7 @@ Equivalent new way (0.4 and later):
 * API change: `TunableClock` reimplemented as subclass of `CorrelatedClock`
 * API change: `WallClockClient`, `WallClockServer` initialisation arguments - precision and maxfreqerror now optional. Now, by default, taken from the clock.
 * API change: Wall clock client algorithms (dispersion, filtering, prediction) changed to update a CorrelatedClock and to measure the parent of the clock representing the wall clock. Review the documentation to understand how to update any algorithms you might have implemented.
+* API change: `DispersionCalculator` class deprecated (but still available). Use `Candidate.calcCorrelationFor` and `CorrelatedClock.dispersionAtTime` instead.
 * Tests: Updated to reflect changes.
 * Docs: Updated to reflect changes.
 * Improvement: Support for monotonic clock on Android.
