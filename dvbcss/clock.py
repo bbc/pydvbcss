@@ -940,6 +940,10 @@ class Correlation(object):
         else:
             return False
 
+    def __ne__(self, obj):
+        return not self.__eq__(obj)
+        
+
 @dvbcss._inheritDocs(ClockBase)
 class CorrelatedClock(ClockBase):
     r"""\

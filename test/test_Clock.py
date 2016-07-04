@@ -178,10 +178,16 @@ class Test_Correlation(unittest.TestCase):
         self.assertEqual(Correlation(1,2,3,4), Correlation(1,2,3,4))
         self.assertEqual(Correlation(1,2,0,0), Correlation(1,2))
         self.assertNotEqual(Correlation(1,2), Correlation(1,2,3,4))
-        self.assertNotEqual(Correlation(9,2,3,4), Correlation(9,2,3,4))
-        self.assertNotEqual(Correlation(1,9,3,4), Correlation(1,9,3,4))
-        self.assertNotEqual(Correlation(1,2,9,4), Correlation(1,2,9,4))
-        self.assertNotEqual(Correlation(1,2,3,9), Correlation(1,2,3,9))
+        self.assertNotEqual(Correlation(9,2,3,4), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(1,9,3,4), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(1,2,9,4), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(1,2,3,9), Correlation(1,2,3,4))
+
+        self.assertFalse(Correlation(1,2,3,4) == Correlation(1,9,3,4))
+        self.assertTrue(Correlation(1,2,3,4) != Correlation(1,9,3,4))
+        
+        self.assertFalse(Correlation(1,2,3,4) != Correlation(1,2,3,4))
+        self.assertTrue(Correlation(1,2,3,4) == Correlation(1,2,3,4))
         
     def test_tupleEquivEquality(self):
         """Correlations can be compared with 2-tuples for equality of the parentTicks and childTicks"""
