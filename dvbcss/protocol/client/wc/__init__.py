@@ -62,13 +62,15 @@ adjusts the clock.
        :width: 384pt
        :align: center
        
-The measurement process involves taking a reading from the local clock when
-the request is about to be sent, and when the response is received. This measurement
-is taken from the *parent* of the clock you provide. The candidate represents
-a possible relationship between that (parent) clock and the Wall Clock of the
-server given the results of the request-response measurement. The algorithm
-processes this and makes a decision as to the :class:`~dvbcss.clock.Correlation`
-that is to be used.
+.. versionchanged:: 0.4
+
+    The measurement process involves taking a reading from the local clock when
+    the request is about to be sent, and when the response is received. This measurement
+    is taken from the *parent* of the clock you provide. The candidate represents
+    a possible relationship between that (parent) clock and the Wall Clock of the
+    server given the results of the request-response measurement. The algorithm
+    processes this and makes a decision as to the :class:`~dvbcss.clock.Correlation`
+    that is to be used.
 
 Although the WallClockClient class does not require the tickrate of the
 Wall Clock to be 1 tick per nanosecond, it is recommended to set it as such.
@@ -227,6 +229,12 @@ class WallClockClient(UdpRequestResponseClient):
         :param (dstaddr,dstport): (:class:`str`, :class:`int`) A tuple containing the IP address (as a string) and port (as an int) of the Wall Clock server
         :param wallClock: (:mod:`~dvbcss.clock`) The local clock that will be controlled to be a Wall Clock. Measurements will be taken from its parent and candidates provided to the algorithm will represent the relationship between that (parent) clock and the server's wall clock.
         :param wcAlgorithm: (:ref:`algorithm <algorithms>`) The algorithm for the client to use to update the clock.
+        
+        .. versionchanged: 0.4
+        
+           The `clock` provided should be a :class:`~dvbcss.clock.CorrelatedClock`, Although
+           :class:`~dvbcss.clock.TunableClock` should still work becuase it is a subclass of
+           :class:`~dvbcss.clock.CorrelatedClock`.
         """
         self.algorithm = wcAlgorithm #: (read only) The :ref:`algorithm <algorithms>` object being used with this WallClockClient
         algGenerator = self.algorithm.algorithm()

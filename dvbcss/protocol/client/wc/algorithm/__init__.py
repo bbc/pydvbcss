@@ -52,8 +52,10 @@ An algorithm is an object that has the following method:
     The yield must pass a timeout in seconds. This is the maximum amount of time the Wall Clock client will
     wait for a response to its request before timing out.
     
-    The yield statement will return either :class:`None` or a :class:`~dvbcss.protocol.wc.Candidate` object representing
-    the result of the measurement.
+    .. versionchanged:: 0.4
+
+        The yield statement will return either :class:`None` or a :class:`~dvbcss.protocol.wc.Candidate` object representing
+        the result of the measurement.
     
     The algorithm can then use the Candidate object in its algorithm for estimating the wall clock (and in
     the case of most practical implementations: adjusting a :mod:`~dvbcss.clock` object).

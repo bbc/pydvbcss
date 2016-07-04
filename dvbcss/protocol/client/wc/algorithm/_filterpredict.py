@@ -26,15 +26,16 @@ There is also a simple modular framework for building up an algorithm out of two
 Use the :func:`~dvbcss.protocol.client.wc.algorithm.FilterAndPredict` function to compose zero, one or more Filters,
 and a Predictor into an algorithm that can be used with a :class:`~dvbcss.protocol.client.wc.WallClockClient`.
 
-When using this algorithm, you provide a :class:`~dvbcss.clock.CorrelatedClock` object to it, whose parent is the
-clock given to the :class:`~dvbcss.protocol.client.wc.WallClockClient`.
+.. versionchanged:: 0.4
 
-This algorithm controls the :class:`~dvbcss.clock.CorrelatedClock` object by settings its
-:data:`~dvbcss.clock.CorrelatedClock.correlation` property to that returned by the
-predictor. The parent of this clock is the clock used by the :class:`~dvbcss.protocol.client.wc.WallClockClient`
-in generating the measurement candidates. So the job of the predictor is to
-determine the best correlation for modelling the relationship between that
-(parent) clock and the wall clock of the server.
+    When using this algorithm, you provide a :class:`~dvbcss.clock.CorrelatedClock` object to it, whose parent is the
+    clock given to the :class:`~dvbcss.protocol.client.wc.WallClockClient`.
+    This algorithm controls the :class:`~dvbcss.clock.CorrelatedClock` object by settings its
+    :data:`~dvbcss.clock.CorrelatedClock.correlation` property to that returned by the
+    predictor. The parent of this clock is the clock used by the :class:`~dvbcss.protocol.client.wc.WallClockClient`
+    in generating the measurement candidates. So the job of the predictor is to
+    determine the best correlation for modelling the relationship between that
+    (parent) clock and the wall clock of the server.
     
 
 Here is a simple example that uses a simple predictor and a round-trip-time threshold filter:

@@ -30,7 +30,7 @@ Classes
 
 .. autoclass:: TSClientClockController
    :members:
-   :exclude-members: connected, timelineAvailable, latestCt, earliestClock, latestClock
+   :exclude-members: connected, latestCt, earliestClock, latestClock
    :inherited-members:
       
    .. autoinstanceattribute:: connected
@@ -39,9 +39,6 @@ Classes
    .. autoinstanceattribute:: latestCt
       :annotation:
    
-   .. autoinstanceattribute:: timelineAvailable
-      :annotation:
-      
    .. autoinstanceattribute:: earliestClock
       :annotation:
 

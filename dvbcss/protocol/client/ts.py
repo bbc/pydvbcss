@@ -400,7 +400,11 @@ class TSClientClockController(object):
     @property
     def timelineAvailable(self):
         """\
-        (:class:`bool`) True if the most recently received Control Timestamp indicates that the timeline is available
+        (:class:`bool`) True if the most recently received Control Timestamp indicates that the timeline is available.
+        
+        .. versionchanged:: 0.4
+        
+           It is now recommended to not use this method. Instead, use the :func:`~dvbcss.clock.ClockBase.isAvailable` method of a :mod:`~dvbcss.clock` instead.
         """
         return self.latestCt is not None and self.latestCt.timestamp.contentTime is not None
         

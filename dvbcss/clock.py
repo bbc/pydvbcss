@@ -525,6 +525,8 @@ class ClockBase(object):
     def getRoot(self):
         """\
         :return: The root clock for this clock (or itself it has no parent).
+        
+        .. versionadded:: 0.4
         """
         p=self
         p2=p.getParent()
@@ -539,6 +541,8 @@ class ClockBase(object):
         
         :param t: Tick value of the root clock.
         :returns: Corresponding tick value of this clock.
+        
+        .. versionadded:: 0.4
         """
         p=self.getParent()
         if p is None:
@@ -553,6 +557,8 @@ class ClockBase(object):
         
         :param t: Tick value for this clock.
         :returns: Corresponding tick value of the root clock.
+        
+        .. versionadded:: 0.4
         """
         p=self.getParent()
         if p is None:
@@ -605,6 +611,8 @@ class ClockBase(object):
         Retrieve the ancestry of this clock as a list.
         
         :returns: A list of clocks, starting with this clock, and proceeding to its parent, then its parent's parent etc, ending at the root clock.
+        
+        .. versionadded:: 0.4
         """
         ancestry = [self]
         for c in ancestry:
@@ -792,12 +800,18 @@ class SysClock(ClockBase):
         SysClock is always available, and so availability cannot be set.
         
         :raise NotImplementedError: Always raised.
+        
+        .. versionadded:: 0.4
         """
         raise NotImplementedError("Changing availability is not supported for this clock.")
 
     def _errorAtTime(self, t):
         """\
         :returns: The precision of the clock
+        
+        The precision that is returned was measured using :func:`measurePrecision` during initialisation.
+        
+        .. versionadded:: 0.4
         """
         return self._precision
 
@@ -1067,6 +1081,8 @@ class CorrelatedClock(ClockBase):
         
         :param newCorrelation: A :class:`Correlation` representing the new correlation. Or a tuple `(parentTicks, selfTicks)` representing the correlation.
         :param newSpeed: New speed as a :class:`float`. 
+        
+        .. versionadded:: 0.4
         """
         if isinstance(newCorrelation, tuple):
             newCorrelation = Correlation(*newCorrelation)
