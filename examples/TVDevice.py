@@ -112,7 +112,7 @@ if __name__ == '__main__':
     cherrypy.config.update({"server.socket_port":args.ws_port})
     cherrypy.config.update({"engine.autoreload.on":False})
 
-    wcServer = WallClockServer(wallClock, bindaddr=args.wc_addr, bindport=args.wc_port)
+    wcServer = WallClockServer(wallClock, None, None, bindaddr=args.wc_addr, bindport=args.wc_port)
 
     ciiServer = CIIServer(maxConnectionsAllowed=5, enabled=True)
     tsServer  = TSServer(CONTENT_ID, wallClock, maxConnectionsAllowed=10, enabled=True)

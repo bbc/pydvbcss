@@ -67,7 +67,7 @@ if __name__ == '__main__':
         print "----"
 
     clock=SysClock(maxFreqErrorPpm=args.maxFreqError)
-    wc_server=WallClockServer(clock, args.wc_addr, args.wc_port, followup=args.followup)
+    wc_server=WallClockServer(clock, None, None, args.wc_addr, args.wc_port, followup=args.followup)
     wc_server.start()
     
     while True:

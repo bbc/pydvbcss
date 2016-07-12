@@ -190,7 +190,7 @@ if __name__ == '__main__':
     tsServer.attachTimelineSource(slowTemiTimeline)
 
     # also start a wallclock server
-    wc_server=WallClockServer(wallClock, args.wc_addr, args.wc_port, followup=False)
+    wc_server=WallClockServer(wallClock, None, None, args.wc_addr, args.wc_port, followup=False)
     wc_server.start()
 
     # now we will loop, periodically making the "sporadic" timeline available and unavailable

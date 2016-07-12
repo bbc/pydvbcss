@@ -164,7 +164,7 @@ class WallClockServerHandler(object):
     
     """
     
-    def __init__(self, wallClock, precisionSecs, maxFreqErrorPpm, followup=False, **kwargs):
+    def __init__(self, wallClock, precisionSecs=None, maxFreqErrorPpm=None, followup=False, **kwargs):
         """\
         
         :param dvbcss.clock.ClockBase wallClock: The clock to be used as the wall clock for protocol interactions
