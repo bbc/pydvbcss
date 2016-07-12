@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # 
-#     http://www.apache.org/licenses/LICENSE-2.0
+#	  http://www.apache.org/licenses/LICENSE-2.0
 # 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -148,7 +148,7 @@ def timeMicros():
 @_expose
 def sleep(secs):
 	"""\
-	Sleep for specified number of second and fractions of seconds (as a float).  The precision is operating system dependent.
+	Sleep for specified number of second and fractions of seconds (as a float).	 The precision is operating system dependent.
 	
 	:throws TimeoutError: if the underlying system call used to sleep reported a timeout (OS dependent behaviour)
 	:throws InterruptedException: if a signal or other interruption is received while sleeping (OS dependent behaviour)
@@ -183,7 +183,12 @@ def _Darwin_init():
 	"""
 	import ctypes
 	
-	libc = ctypes.CDLL('libc.dylib', use_errno=True)
+	try:
+		libc = ctypes.CDLL('libc.dylib', use_errno=True)
+	except OSError:
+		# We may be running afoul of OSX 10.11 System Integrity Protection.
+		# Try by full and real pathname
+		libc = ctypes.CDLL('/usr/lib/libSystem.dylib', use_errno=True)
 	mach_absolute_time = libc.mach_absolute_time
 	mach_timebase_info = libc.mach_timebase_info
 	nanosleep		   = libc.nanosleep
@@ -358,7 +363,7 @@ def _Windows_init():
 	wfso.restype = DWORD
 	closeHandle.restype = BOOL
 	
-    
+	
 	freq = (ctypes.c_int64(0))
 
 	if not qpf(ctypes.pointer(freq)):
