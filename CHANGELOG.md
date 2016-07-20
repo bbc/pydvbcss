@@ -79,6 +79,7 @@ Equivalent new way (0.4 and later):
 
 #### Summary of changes:
 
+* API addition: can setParent() on CorrelatedClock, RangeCorrelatedClock and TunableClock.
 * API change: All clock objects modified to be able to track error values and calculate dispersions and clock `availability`
 * API change: `CorrelatedClock` class modified to use a `Correlation` object instead of a tuple.
 * API change: `TunableClock` reimplemented as subclass of `CorrelatedClock`

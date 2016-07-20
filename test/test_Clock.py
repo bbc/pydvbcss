@@ -103,6 +103,11 @@ class Test_SysClock(unittest.TestCase):
         newNow = now + sysClock.tickRate * 1000
         self.assertAlmostEquals(0.000001, sysClock.dispersionAtTime(newNow), delta=0.0000001)
 
+    def test_cannotSetParent(self):
+        sysClock = self.newSysClock(tickRate=1000000000)
+        sysClock2 = self.newSysClock(tickRate=1000000000)
+        self.assertRaises(NotImplementedError, lambda : sysClock.setParent(sysClock2))
+
 class Test_ClockBase(unittest.TestCase):
     
     def test_dependents(self):
@@ -437,6 +442,31 @@ class Test_CorrelatedClock(unittest.TestCase):
         b.speed = 0.0
         self.assertEquals(0.005, b.quantifyChange( Correlation(0, 5), 0.0))
 
+    def test_setParent(self):
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        c = CorrelatedClock(a, 1000, correlation=Correlation(10,0))
+        d = MockDependent()
+        b.bind(d)
+        
+        d.assertNotNotified()
+        b.setParent(c)
+        d.assertNotificationsEqual([b])
+        self.assertEquals(b.getParent(), c)
+        
+    def test_setParentNoChangeNoNotify(self):
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        c = CorrelatedClock(a, 1000, correlation=Correlation(10,0))
+        d = MockDependent()
+        b.bind(d)
+
+        d.assertNotNotified()
+        b.setParent(a)
+        d.assertNotNotified()
+        self.assertEquals(b.getParent(), a)
+        
+
 class Test_RangeCorrelatedClock(unittest.TestCase):
     
     def setUp(self):
@@ -490,6 +520,31 @@ class Test_RangeCorrelatedClock(unittest.TestCase):
         self.assertEqual(Correlation(100,2000), c.correlation1)
         self.assertEqual(Correlation(200,2110), c.correlation2)
         self.assertEqual(c.ticks, 2110)
+
+    def test_setParent(self):
+        a = self.newSysClock(tickRate=1000)
+        b = RangeCorrelatedClock(a, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        c = RangeCorrelatedClock(a, 1000, correlation1=(200,1000), correlation2=(300,1110))
+        d = MockDependent()
+        b.bind(d)
+        
+        d.assertNotNotified()
+        b.setParent(c)
+        d.assertNotificationsEqual([b])
+        self.assertEquals(b.getParent(), c)
+        
+    def test_setParentNoChangeNoNotify(self):
+        a = self.newSysClock(tickRate=1000)
+        b = RangeCorrelatedClock(a, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        c = RangeCorrelatedClock(a, 1000, correlation1=(200,1000), correlation2=(300,1110))
+        d = MockDependent()
+        b.bind(d)
+
+        d.assertNotNotified()
+        b.setParent(a)
+        d.assertNotNotified()
+        self.assertEquals(b.getParent(), a)
+        
       
 class Test_TunableClock(unittest.TestCase):
     

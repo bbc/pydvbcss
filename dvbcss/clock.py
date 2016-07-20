@@ -400,7 +400,7 @@ class ClockBase(object):
         
         |stub-method|
         """
-        raise NotImplemented
+        raise NotImplementedError()
         
     @property
     def speed(self):
@@ -436,7 +436,7 @@ class ClockBase(object):
         
         |stub-method|
         """
-        raise NotImplemented
+        raise NotImplementedError()
     
     @property
     def nanos(self):
@@ -520,7 +520,7 @@ class ClockBase(object):
         
         |stub-method|
         """
-        raise NotImplemented
+        raise NotImplementedError()
         
     def getRoot(self):
         """\
@@ -633,7 +633,7 @@ class ClockBase(object):
         
         :throws StopIteration: if this clock has no parent
         """
-        raise NotImplemented
+        raise NotImplementedError()
     
     def fromParentTicks(self, ticks):
         """\
@@ -647,7 +647,7 @@ class ClockBase(object):
         
         :throws StopIteration: if this clock has no parent
         """
-        raise NotImplemented
+        raise NotImplementedError()
     
     def getParent(self):
         """\
@@ -655,7 +655,16 @@ class ClockBase(object):
 
         :returns: :class:`ClockBase` representing the immediate parent of this clock, or None if it is a root clock.
         """
-        raise NotImplemented
+        raise NotImplementedError()
+        
+    def setParent(self,newParent):
+        """\
+        |stub-method|
+        
+        Change the parent of this clock (if supported). Will generate a notification of
+        change.
+        """
+        raise NotImplementedError()
         
     def clockDiff(self, otherClock):
         """\
@@ -717,7 +726,7 @@ class ClockBase(object):
 
         .. versionadded:: 0.4
         """
-        raise NotImplemented
+        raise NotImplementedError()
 
     def getRootMaxFreqError(self):
         """\
@@ -734,7 +743,7 @@ class ClockBase(object):
         """
         root = self.getRoot()
         if root == self:
-            raise NotImplemented
+            raise NotImplementedError()
         else:
             return self.getRoot().getRootMaxFreqError()
 
@@ -1112,6 +1121,16 @@ class CorrelatedClock(ClockBase):
     
     def getParent(self):
         return self._parent
+        
+    def setParent(self,newParent):
+        if self._parent != newParent:
+            if self._parent:
+                self._parent.unbind(self)
+                self._parent = None
+            self._parent = newParent
+            if self._parent:
+                self._parent.bind(self)
+            self.notify(self)
     
     def quantifyChange(self, newCorrelation, newSpeed):
         """\
@@ -1357,6 +1376,16 @@ class RangeCorrelatedClock(ClockBase):
     def getParent(self):
         return self._parent
 
+    def setParent(self,newParent):
+        if self._parent != newParent:
+            if self._parent:
+                self._parent.unbind(self)
+                self._parent = None
+            self._parent = newParent
+            if self._parent:
+                self._parent.bind(self)
+            self.notify(self)
+    
     def _errorAtTime(self, t):
         pt = self.toParentTicks(t)
         deltaSecs1 = (pt - self._correlation1.parentTicks) / self._parent.tickRate
