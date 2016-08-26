@@ -151,7 +151,7 @@ class WSServerBase(object):
         Handler class for new connections. Should be provided as a configuration argument to cherrypy.
         """
 
-        self.connectionsRemaining = maxConnectionsAllowed
+        self.maxConnectionsAllowed = maxConnectionsAllowed
         self._connections={} #: dict mapping WebSocket objects to connection data. Connection data is for use by subclasses to store data specific to each individual connection.
         self.enabled = enabled
 
@@ -240,7 +240,6 @@ class WSServerBase(object):
         with self._lock:
             self.log.debug("Adding websocket connection "+webSock.id())
             if webSock not in self._connections:
-                self.connectionsRemaining -= 1
                 self._connections[webSock] = self.getDefaultConnectionData()
                 try:
                     self.onClientConnect(webSock)
@@ -258,7 +257,6 @@ class WSServerBase(object):
         with self._lock:
             self.log.debug("Removing websocket connection "+webSock.id())
             if webSock in self._connections:
-                self.connectionsRemaining += 1
                 conn=self._connections[webSock]
                 del self._connections[webSock]
                 self.onClientDisconnect(webSock, conn)
@@ -305,7 +303,7 @@ class WSServerBase(object):
                 :return: True only if the connection limit of the parent server has not yet been reached. Otherwise False.
                 """
                 serverSelf.log.debug("Checking concurrent connection allocation")
-                return serverSelf.connectionsRemaining > 0
+                return serverSelf.maxConnectionsAllowed < 0 or serverSelf.maxConnectionsAllowed > len(serverSelf._connections)
 
             def opened(self):
                 # cant process sensibly now because websocket upgrade is complete
