@@ -33,7 +33,7 @@ if __name__ == '__main__':
     
     import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... @UnusedImport
 
-    from dvbcss.clock import SysClock, TunableClock, CorrelatedClock
+    from dvbcss.clock import SysClock, TunableClock, CorrelatedClock, Correlation
     from dvbcss.task import sleepUntil, runAt
     
     import logging
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         
     def threadrun():
         # separate thread in which we'll use sleepUntil on a clock that uses tClock as its parent
-        cClock = CorrelatedClock(tClock, tickRate=10, correlation=(tClock.ticks, 0))
+        cClock = CorrelatedClock(tClock, tickRate=10, correlation=Correlation(tClock.ticks, 0))
         for i in range(0, 10):
             sleepUntil(cClock, i * 10)
             print "Tick", cClock.ticks

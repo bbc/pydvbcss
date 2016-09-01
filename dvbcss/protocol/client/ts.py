@@ -49,7 +49,8 @@ This should therefore be used in conjunction with a
 The :class:`~TSClientClockController` object maintains the connection and automatically adjusts the
 :data:`~dvbcss.clock.CorrelatedClock.correlation` of the clock to synchronise it, using the information in the
 Control Timestamps received from the server.
-It also adjust the :func:`~dvbcss.clock.CorrelatedClock.tickRate` to match speed changes of the timeline.
+It adjusts the :func:`~dvbcss.clock.CorrelatedClock.speed` to match speed changes of the timeline.
+It also sets the availability of the clock to reflect the availability of the timeline.
 
 You can set a minimum threshold for how much the timing must change before the the timeline clock will be adjusted.
 
@@ -100,8 +101,10 @@ A simple example:
     
     for i in range(0,60):
         time.sleep(1)
-        print "Timeline available?", client.timelineAvailable
-        print "Timeline currently at tick value = ", timelineClock.ticks
+        print "Timeline available?", timelineClock.isAvailable()
+        if timelineClock.isAvailable():
+            print "Timeline currently at tick value = ", timelineClock.ticks
+            print "         ... and moving at speed = ", timelineClock.speed
         
     client.disconnect()
 
@@ -163,6 +166,7 @@ from dvbcss.protocol.ts import SetupData
 from dvbcss.protocol.ts import ControlTimestamp, AptEptLpt, Timestamp
 from dvbcss.protocol.client import WrappedWebSocket
 from dvbcss.protocol.client import ConnectionError
+from dvbcss.clock import CorrelatedClock, Correlation
 
 
 
@@ -355,8 +359,8 @@ class TSClientClockController(object):
     * :data:`connected` (read only) is the client connected?
     * :data:`timelineAvailable` (read only) is the timeline available?
     * :data:`latestCt` (read only) is the most recently received :class:`~dvbcss.protocol.ts.ControlTimestamp` message
-    * :data:`earliestClock` (read/write) earliest possible presentation timing, or :class:`None`
-    * :data:`latestClock` (read/write) latest possible presentation timing, or :class:`None`
+    * :data:`earliestClock` (read/write) A clock object representing earliest possible presentation timing, or :class:`None`
+    * :data:`latestClock` (read/write) A clock object representing latest possible presentation timing, or :class:`None`
     """
     def __init__(self, tsUrl, contentIdStem, timelineSelector, timelineClock, correlationChangeThresholdSecs=0.0001, earliestClock=None, latestClock=None):
         """\
@@ -384,16 +388,25 @@ class TSClientClockController(object):
         
         self.timelineClock = timelineClock
 
-        self.timelineAvailable = False #: (:class:`bool`) True if the most recently received Control Timestamp indicates that the timeline is available
         self.connected = False #: (:class:`bool`) True if currently connected to the server, otherwise False.
         
-        self._changeThresholdNanos = int(correlationChangeThresholdSecs * 1000000000)
+        self._changeThreshold = correlationChangeThresholdSecs
         
         self.latestCt = None #: (:class:`~dvbcss.protocol.ts.ControlTimestamp`) A copy of the most recently received Control Timestamp.
         
         self.earliestClock = earliestClock #: :data:`None` or a :class:`~dvbcss.clock.CorrelatedClock` correlated to the WallClock representing the earliest possible presentation timing.
         self.latestClock   = latestClock #: :data:`None` or a :class:`~dvbcss.clock.CorrelatedClock` correlated to the WallClock representing the latest possible presentation timing.
         
+    @property
+    def timelineAvailable(self):
+        """\
+        (:class:`bool`) True if the most recently received Control Timestamp indicates that the timeline is available.
+        
+        .. versionchanged:: 0.4
+        
+           It is now recommended to not use this method. Instead, use the :func:`~dvbcss.clock.ClockBase.isAvailable` method of a :mod:`~dvbcss.clock` instead.
+        """
+        return self.latestCt is not None and self.latestCt.timestamp.contentTime is not None
         
     def onConnected(self):
         """\
@@ -473,8 +486,8 @@ class TSClientClockController(object):
         
     def _onConnectionClose(self, code, reason=None):
         self.connected=False
-        if self.timelineAvailable:
-            self.timelineAvailable=False
+        if self.timelineClock.isAvailable():
+            self.timelineClock.setAvailability(False)
             self.onTimelineUnavailable(self)
         self.onDisconnected()
     
@@ -485,73 +498,80 @@ class TSClientClockController(object):
     def _onControlTimestamp(self, ct):
         self.latestCt = ct
         self.log.debug("New Control Timestamp: "+str(ct))
-        
-        # if has become unavailable, notify and do nothing more
+
         available = ct.timestamp.contentTime is not None
-        if not available:
-            if self.timelineAvailable:
-                self.log.debug("Timeline has become unavailable.")
-                self.timelineAvailable = False
-                self.onTimelineUnavailable()
-            return
+        availChanged = bool(available) != bool(self.timelineClock.isAvailable())
         
-        newSpeed = float(ct.timelineSpeedMultiplier)
-        newCorrelation = (ct.timestamp.wallClockTime, ct.timestamp.contentTime)
-
-        # check if the correlation has change sufficiently, or if the timelinespeed has changed.
-        speedHasChanged = newSpeed != self.timelineClock.speed
-
-        if speedHasChanged:
-            self.log.debug("Speed of timeline has changed.")
-            self.timelineClock.speed = newSpeed
-
-        # now we have updated the speed (we can now check if the correlation has substantively changed)
-        wcTime = self.timelineClock.toParentTicks(ct.timestamp.contentTime)
-        correlationDelta = wcTime - ct.timestamp.wallClockTime
-        correlationHasChanged = abs(correlationDelta) >= self._changeThresholdNanos
-
-        if correlationHasChanged:
-            self.log.debug("Correlation has changed by more than threshold amount")
-            self.timelineClock.correlation = newCorrelation
-
-        # if either has changed, then send a notification
-        # we will also only update the timeline clock if the change is noticeable
+        # only extract new corelation and and compare to existing clock 
+        # if the control timestamp indicates that the timeline is actually available
         
-        if correlationHasChanged or speedHasChanged:
-            self.onTimingChange(speedChanged=speedHasChanged)    
-        
-        # if has become available, notify after changes
         if available:
-            if not self.timelineAvailable:
+            speed = float(ct.timelineSpeedMultiplier)
+            corr = Correlation(ct.timestamp.wallClockTime, ct.timestamp.contentTime)
+            corrSpeedChanged = self.timelineClock.isChangeSignificant(corr, speed, self._changeThreshold)
+            speedChanged = self.timelineClock.speed != speed
+        else:
+            corrSpeedChanged = False
+
+        # update correlation and speed, then update availability, to
+        # ensure a correlation is not changed immediately *after* the clock
+        # becomes available. Better it happens before, so downstream processing
+        # can ignore while unavailable.
+
+        if corrSpeedChanged:
+            self.timelineClock.setCorrelationAndSpeed(corr, speed)
+        
+        if availChanged:
+            self.timelineClock.setAvailability(available)
+
+        # notification calls
+        if available and corrSpeedChanged:
+            self.log.debug("Speed has changed and/or correlation has changed by more than threshold amount")
+            self.onTimingChange(speedChanged=speedChanged)
+
+        if availChanged:
+            if available:
                 self.log.debug("Timeline has become available.")
-                self.timelineAvailable = True
                 self.onTimelineAvailable()
+            else:
+                self.log.debug("Timeline has become unavailable.")
+                self.onTimelineUnavailable()
+        
                 
     def sendAptEptLpt(self, includeApt=True):
         """\
         Sends an Actual, Earliest and Latest presentation timestamp to the CSS-TS server.
         
-        * The EPT is derived from the :data:`earliestClock` property, if it is not None.
-        * The LPT is derived from the :data:`latestClock` property, if it is not None.
-        * The APT is only included if the includeApt argument is True (default=True).
+        * The EPT is derived from the :data:`earliestClock` property, if it is not None and it is a clock that is available.
+        * The LPT is derived from the :data:`latestClock` property, if it is not None and it is a clock that is available.
+        * The APT is only included if the includeApt argument is True (default=True) and it is a clock that is available.
         
         :param includeApt: (:class:`bool`) Set to False if the Actual Presentation Timestamp is *not* to be included in the message (default=True)
         """
         ael = AptEptLpt()
         now = self.timelineClock.ticks
 
-        if self.earliestClock is not None:
-            ael.earliest = Timestamp(contentTime = self.earliestClock.correlation[1], wallClockTime = self.earliestClock.correlation[0])
+        if self.earliestClock is not None and self.earliestClock.isAvailable():
+            ael.earliest = Timestamp( \
+                contentTime   = self.earliestClock.correlation.childTicks,
+                wallClockTime = self.earliestClock.correlation.parentTicks \
+            )
         else:
             ael.earliest = Timestamp(contentTime = now, wallClockTime = float("-inf"))
         
-        if self.latestClock is not None:
-            ael.latest = Timestamp(contentTime = self.latestClock.correlation[1], wallClockTime = self.latestClock.correlation[0])
+        if self.latestClock is not None and self.earliestClock.isAvailable():
+            ael.latest = Timestamp( \
+                contentTime   = self.latestClock.correlation.childTicks,
+                wallClockTime = self.latestClock.correlation.parentTicks \
+            )
         else:
             ael.latest = Timestamp(contentTime = now, wallClockTime = float("+inf"))
     
-        if includeApt:
-            ael.actual = Timestamp(contentTime = self.timelineClock.correlation[1], wallClockTime = self.timelineClock.correlation[0])
+        if includeApt and self.timelineClock.isAvailable():
+            ael.actual = Timestamp( \
+                contentTime   = self.timelineClock.correlation.childTicks,
+                wallClockTime = self.timelineClock.correlation.parentTicks \
+            )
         
         self._conn.sendTimestamp(ael)
                     
@@ -561,12 +581,11 @@ class TSClientClockController(object):
         """
         if self.latestCt is None:
             return "Nothing received from TV yet."
-        speed = self.latestCt.timelineSpeedMultiplier
+        speed = self.timelineClock.speed
         pos = float(self.timelineClock.ticks) / float(self.timelineClock.tickRate)
-        if speed is None:
-            speed = float("NaN")
+        available = self.timelineClock.isAvailable()
         text="Status: "
-        if self.timelineAvailable:
+        if available:
             text += "AVAILABLE.    "
             text += "  Speed = %5.2f  Timeline position = %10.3f secs" % (speed,pos)
         else:

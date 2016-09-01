@@ -64,4 +64,11 @@ Classes
    :members:
    :inherited-members:
 
+**Correlation** - represents a Correlation
+''''''''''''''''''''''''''''''''''''''''''
+
+.. autoclass:: dvbcss.clock.Correlation
+   :members:
+   :inherited-members:
+
    

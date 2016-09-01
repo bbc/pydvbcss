@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     from dvbcss.clock import SysClock
     from dvbcss.clock import CorrelatedClock
-    from dvbcss.clock import TunableClock
+    from dvbcss.clock import Correlation
     from dvbcss.protocol.client.wc import WallClockClient
     from dvbcss.protocol.client.wc.algorithm import LowestDispersionCandidate
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-q","--quiet",dest="quiet",action="store_true",default=False,help="Suppress extraneous output during runtime. Overrides loglevel option")
     parser.add_argument("--loglevel",dest="loglevel",action="store",type=dvbcss.util.parse_logLevel, nargs=1, help="Set logging level to one of: critical, error, warning, info, debug. Default=info",default=[logging.INFO])
-    parser.add_argument("--wcloglevel",dest="wcloglevel",action="store",type=dvbcss.util.parse_logLevel, nargs=1, help="Set logging level for the wall clock client to one of: critical, error, warning, info, debug. Default=info",default=[logging.INFO])
+    parser.add_argument("--wcloglevel",dest="wcloglevel",action="store",type=dvbcss.util.parse_logLevel, nargs=1, help="Set logging level for the wall clock client to one of: critical, error, warning, info, debug. Default=warn",default=[logging.WARN])
     parser.add_argument("tsUrl", action="store", type=dvbcss.util.wsUrl_str, nargs=1, help="ws:// URL of CSS-TS end point")
     parser.add_argument("wcUrl", action="store", type=dvbcss.util.udpUrl_str, nargs=1, help="udp://<host>:<port> URL of CSS-WC end point")
     parser.add_argument("contentIdStem", action="store", type=str, nargs=1, help="contentIdStem")
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     logging.getLogger("dvbcss.protocol.client.wc").setLevel(args.wcloglevel[0])
 
     sysclock=SysClock()
-    wallClock=TunableClock(sysclock,tickRate=1000000000) # nanos
+    wallClock=CorrelatedClock(sysclock,tickRate=1000000000) # nanos
     
     algorithm = LowestDispersionCandidate(wallClock,repeatSecs=1,timeoutSecs=0.5)
     
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     wc_client.start()
     
     timelineClock = CorrelatedClock(wallClock, timelineFreq)
+    timelineClock.setAvailability(False)
 
     print "Connecting, requesting timeline for:"
     print "   Any contentId beginning with:",contentIdStem

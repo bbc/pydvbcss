@@ -34,6 +34,7 @@
     
     * "`urn:dvb:css:timeline:pts`" ... a PTS timeline
     * "`urn:dvb:css:timelime:temi:1:1`" ... a TEMI timeline ticking at 1kHz
+    * "`urn:dvb:css:timelime:temi:1:5`" ... a TEMI timeline ticking at 1kHz, that toggles availability every 10 seconds
     * "`urn:dvb:css:timelime:temi:1:2`" ... the same, but it takes 10 seconds for the server to begin providing this timeline after a client first requests it
     * "`urn:pydvbcss:sporadic`" ... a meaningless timeline whose availability toggles every 10 seconds.
     
@@ -53,7 +54,7 @@ if __name__ == '__main__':
 
     import dvbcss.monotonic_time as time
     import cherrypy
-    from dvbcss.clock import SysClock, CorrelatedClock, measurePrecision
+    from dvbcss.clock import SysClock, CorrelatedClock, Correlation
     from dvbcss.protocol.server.ts import TSServer, SimpleTimelineSource, SimpleClockTimelineSource
     from dvbcss.protocol.ts import ControlTimestamp, Timestamp
     from ws4py.server.cherrypyserver import WebSocketPlugin
@@ -166,8 +167,10 @@ if __name__ == '__main__':
     # create clocks to represent the timelines
     # PTS timeline clock is based on wall clock
     # TEMI timeline clock is tied to the PTS timeline clock, and so will be affected by speed changes of the PTS timeline clock
-    ptsClock=CorrelatedClock(parentClock=wallClock, tickRate=90000, correlation=(wallClock.ticks,0))
-    temiClock=CorrelatedClock(parentClock=ptsClock, tickRate=1000, correlation=(ptsClock.ticks, 0))
+    # The second TEMI clock is the same as the first but will be made to appear and disappear every few seconds
+    ptsClock=CorrelatedClock(parentClock=wallClock, tickRate=90000, correlation=Correlation(wallClock.ticks,0))
+    temiClock=CorrelatedClock(parentClock=ptsClock, tickRate=1000, correlation=Correlation(ptsClock.ticks, 0))
+    sporadicTemiClock=CorrelatedClock(parentClock=ptsClock, tickRate=1000, correlation=Correlation(ptsClock.ticks, 0))
     
     # create a fixed Control Timestamp for the "sporadic" timeline
     ct = ControlTimestamp(Timestamp(wallClock.ticks, wallClock.ticks), timelineSpeedMultiplier=1.0)
@@ -176,18 +179,18 @@ if __name__ == '__main__':
     ptsTimeline  = SimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:pts", wallClock=wallClock, clock=ptsClock)
     temiTimeline = SimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:temi:1:1", wallClock=wallClock, clock=temiClock, speedSource=ptsClock)
     sporadicTimeline = SimpleTimelineSource(timelineSelector="urn:pydvbcss:sporadic", controlTimestamp = ct)
+    sporadicTemiTimeline = SimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:temi:1:5", wallClock=wallClock, clock=sporadicTemiClock, speedSource=ptsClock)
     slowTemiTimeline = SlowToRespondSimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:temi:1:2", wallClock=wallClock, clock=temiClock, speedSource=ptsClock)
 
     # attach them to the server (thereby making those timelines "available")    
     tsServer.attachTimelineSource(ptsTimeline)
     tsServer.attachTimelineSource(temiTimeline)
+    tsServer.attachTimelineSource(sporadicTemiTimeline)
     tsServer.attachTimelineSource(sporadicTimeline)
     tsServer.attachTimelineSource(slowTemiTimeline)
 
     # also start a wallclock server
-    precisionSecs=measurePrecision(wallClock)
-    maxFreqError=500
-    wc_server=WallClockServer(wallClock, precisionSecs, maxFreqError, args.wc_addr, args.wc_port, followup=False)
+    wc_server=WallClockServer(wallClock, None, None, args.wc_addr, args.wc_port, followup=False)
     wc_server.start()
 
     # now we will loop, periodically making the "sporadic" timeline available and unavailable
@@ -197,9 +200,9 @@ if __name__ == '__main__':
 
     def tweakPtsClock():
         """Adjust the timing of the PTS clock by a random amount in the range +/- 1/20th of a second"""
-        parentTicks, ptsClockTicks = ptsClock.correlation
+        ptsClockTicks = ptsClock.correlation.childTicks
         adjustment = random.randrange(-90000/20, +90000/20)
-        ptsClock.correlation = ( parentTicks, ptsClockTicks + adjustment )
+        ptsClock.correlation = ptsClock.correlation.butWith(childTicks = ptsClockTicks + adjustment )
 
     def pausePtsClock():
         """Pauses the PTS clock and adjusts the correlation to make it as if it paused at the current tick value"""
@@ -208,7 +211,7 @@ if __name__ == '__main__':
 
     def unpausePtsClock():
         """Unpauses the PTS clock and adjusts the correlation so the ticks continue to increase form this point forward."""
-        ptsClock.correlation = ( ptsClock.getParent().ticks, ptsClock.correlation[1] )
+        ptsClock.correlation = ptsClock.correlation.butWith(parentTicks=ptsClock.getParent().ticks)
         ptsClock.speed = 1.0
 
 
@@ -224,6 +227,7 @@ if __name__ == '__main__':
         
             time.sleep(5)
             tsServer.removeTimelineSource(sporadicTimeline)
+            sporadicTemiClock.setAvailability(True);
             tsServer.updateAllClients()
             print "Made timeline "+sporadicTimeline._timelineSelector+" unavailable."
             
@@ -234,6 +238,7 @@ if __name__ == '__main__':
             print "PTS clock at %f (units of seconds)" % (float(ptsClock.ticks)/ptsClock.tickRate)
 
             time.sleep(5)
+            sporadicTemiClock.setAvailability(False);
             tsServer.attachTimelineSource(sporadicTimeline)
             tsServer.updateAllClients()
             print "Made timeline "+sporadicTimeline._timelineSelector+" available."

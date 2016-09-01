@@ -44,6 +44,7 @@ class MockTime(object):
         self.oldTimeFunc = None
         self.oldSleepFunc = None
         self.sleepEvents = []
+        self._incrStep = 0
         
     @property
     def timeNow(self):
@@ -54,12 +55,7 @@ class MockTime(object):
         a call to the mocked :func:`sleep` function is due to wake (unblock)
         and return then this will take place.
         """
-        return self._timeNow
-        
-    @timeNow.setter
-    def timeNow(self, newValue):
-        self._timeNow = newValue
-        
+        # process any pending wakeups for this time
         # go through list of pending sleeps and wake any up that need to be,
         # deleting them on the way.
         i=0
@@ -70,6 +66,32 @@ class MockTime(object):
                 del self.sleepEvents[i]
             else:
                 i=i+1
+        
+        t = self._timeNow
+        
+        # do auto increment (if enabled)
+        if self._incrStep != 0:
+            self._incrCountdown -= 1
+            if self._incrCountdown == 0:
+                self._incrCountdown = self._incrInterval
+                self._timeNow += self._incrStep
+                
+        return t
+        
+    @timeNow.setter
+    def timeNow(self, newValue):
+        self._timeNow = newValue
+        # trigger reading the time to cause any sleeps that need to be woken 
+        # to be processed
+        _ = self.timeNow
+        
+    def enableAutoIncrementBy(self, step, numReadsBetweenIncrements=1):
+        self._incrStep = step
+        self._incrInterval = numReadsBetweenIncrements
+        self._incrCountdown = self._incrInterval
+        
+    def disableAutoIncrement(self):
+        self._incrStep = 0
     
     def flush(self):
         """\
@@ -323,7 +345,30 @@ class Test_mock_time(unittest.TestCase):
         self.assertFalse(a.isAlive())    
         self.assertFalse(b.isAlive())    
         self.assertFalse(c.isAlive())
+        
+    def testIncrInterval(self):
+        """\
+        Mock time can be auto incremented
+        """
+        import dvbcss.monotonic_time as monotonic_time
+    
+        mockUnderTest = MockTime()
+        mockUnderTest.install(monotonic_time)
+        
+        try:
+            mockUnderTest.timeNow = 5
             
+            # no auto increment by Default
+            for i in range(0,10000):
+                self.assertEquals(5, monotonic_time.time())
+                
+            mockUnderTest.enableAutoIncrementBy(0.1, numReadsBetweenIncrements=5)
+            for i in range(0,100):
+                for j in range(0,5):
+                    self.assertAlmostEquals(5 + i*0.1, monotonic_time.time(), delta=0.0001)
+            
+        finally:
+            mockUnderTest.uninstall()
 
             
 if __name__ == "__main__":

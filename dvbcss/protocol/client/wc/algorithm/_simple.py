@@ -35,7 +35,7 @@ class MostRecent(object):
         """\
         *Initialisation takes the following parameters:*
         
-        :param clock: A :class:`~dvbcss.clock.TunableClock` object representing that will be adjusted to match the Wall Clock.
+        :param clock: A :class:`~dvbcss.clock.CorrelatedClock` object representing that will be adjusted to match the Wall Clock.
         :param repeatSecs: (:class:`float`) The rate at which Wall Clock protocol requests are to be sent (in seconds).
         :param timeoutSecs: (:class:`float`) The timeout on waiting for responses to requests (in seconds).
         """
@@ -45,20 +45,11 @@ class MostRecent(object):
         self.timeoutSecs = timeoutSecs
     
     def algorithm(self):
-        cumulativeOffset=None
         while True:
             candidate=(yield self.timeoutSecs)
             if candidate is not None:
-                candidate=candidate["ticks"]
-                # act on it
                 self.log.info("Candidate: "+str(candidate)+"\n")
-                self.clock.adjustTicks(candidate.offset)
-                if cumulativeOffset is None:
-                    # ignore first time
-                    cumulativeOffset=0
-                else:
-                    cumulativeOffset+=candidate.offset
-    #            ob.log.write("CSS-WC: Cumulative offset = %d\n" % cumulativeOffset)
+                self.clock.correlation = candidate.calcCorrelationFor(self.clock, 500) # guess as to local max freq error
                 time.sleep(self.repeatSecs)
             else:
                 self.log.debug("Response timeout\n")

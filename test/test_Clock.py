@@ -20,12 +20,10 @@ import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... 
 
 import dvbcss.monotonic_time as time
 
-from dvbcss.clock import ClockBase, SysClock, CorrelatedClock, TunableClock, NoCommonClock, RangeCorrelatedClock
+from dvbcss.clock import ClockBase, SysClock, CorrelatedClock, TunableClock, NoCommonClock, RangeCorrelatedClock, Correlation
 
 from mock_time import MockTime
 from mock_dependent import MockDependent
-
-
 
 class Test_SysClock(unittest.TestCase):
 
@@ -36,10 +34,16 @@ class Test_SysClock(unittest.TestCase):
     def tearDown(self):
         self.mockTime.uninstall()
 
+    def newSysClock(self, *args, **kwargs):
+        self.mockTime.enableAutoIncrementBy(0.000001, numReadsBetweenIncrements=1)
+        sysClock = SysClock(*args, **kwargs)
+        self.mockTime.disableAutoIncrement()
+        return sysClock
+
     def test_ticks(self):
         mockTime = self.mockTime
 
-        sysClock = SysClock()
+        sysClock = self.newSysClock()
         
         mockTime.timeNow = 1234.5678
         self.assertAlmostEqual(sysClock.ticks, 1234.5678*1000000, places=5)
@@ -48,24 +52,61 @@ class Test_SysClock(unittest.TestCase):
         self.assertAlmostEqual(sysClock.ticks, 19445.325*1000000, places=5)
 
     def test_tickRate(self):
-        sysClock = SysClock()
+        sysClock = self.newSysClock()
         self.assertEqual(sysClock.tickRate, 1000000)
         
     def test_calcWhen(self):
-        sysClock = SysClock()
+        sysClock = self.newSysClock()
         self.assertAlmostEqual(sysClock.calcWhen(91248752), 91248752/1000000.0, places=5)
 
     def test_toParentTicks(self):
-        sysClock = SysClock()
+        sysClock = self.newSysClock()
         self.assertRaises(StopIteration, lambda : sysClock.toParentTicks(10))
 
     def test_fromParentTicks(self):
-        sysClock = SysClock()
+        sysClock = self.newSysClock()
         self.assertRaises(StopIteration, lambda : sysClock.fromParentTicks(10))
 
     def test_getParent(self):
-        sysClock = SysClock()
+        sysClock = self.newSysClock()
         self.assertEqual(sysClock.getParent(), None)
+        
+    def test_available(self):
+        sysClock = self.newSysClock()
+        self.assertTrue(sysClock.isAvailable())
+        
+    def test_cannotChangeAvailability(self):
+        sysClock = self.newSysClock()
+        self.assertRaises(NotImplementedError, sysClock.setAvailability, True)
+        self.assertRaises(NotImplementedError, sysClock.setAvailability, False)
+
+    def test_getRootReturnsSelf(self):
+        sysClock = self.newSysClock()
+        self.assertEquals(sysClock, sysClock.getRoot())
+
+    def test_ancestry(self):
+        sysClock = self.newSysClock()
+        self.assertEquals([sysClock], sysClock.getAncestry())
+
+    def test_toFromRootTicks(self):
+        sysClock = self.newSysClock()
+        self.assertEquals(12345, sysClock.toRootTicks(12345))
+        self.assertEquals(12345, sysClock.fromRootTicks(12345))
+        
+    def test_dispersion(self):
+        """Dispersion should equal precision irrespective of time value"""
+        sysClock = self.newSysClock(tickRate=1000000000)
+        
+        now = sysClock.ticks
+        self.assertAlmostEquals(0.000001, sysClock.dispersionAtTime(now), delta=0.0000001)
+
+        newNow = now + sysClock.tickRate * 1000
+        self.assertAlmostEquals(0.000001, sysClock.dispersionAtTime(newNow), delta=0.0000001)
+
+    def test_cannotSetParent(self):
+        sysClock = self.newSysClock(tickRate=1000000000)
+        sysClock2 = self.newSysClock(tickRate=1000000000)
+        self.assertRaises(NotImplementedError, lambda : sysClock.setParent(sysClock2))
 
 class Test_ClockBase(unittest.TestCase):
     
@@ -93,6 +134,107 @@ class Test_ClockBase(unittest.TestCase):
         b = ClockBase()
         self.assertEquals(b.speed, 1.0, "Speed is 1.0")
         
+
+class Test_Correlation(unittest.TestCase):
+    def test_createNeedsTwoArguments(self):
+        self.assertRaises(TypeError, Correlation)
+        self.assertRaises(TypeError, Correlation, 1)
+        Correlation(1,2)
+        
+    def test_createTwoArgsZeroError(self):
+        c = Correlation(1,2)
+        self.assertEquals(1, c.parentTicks)
+        self.assertEquals(2, c.childTicks)
+        self.assertEquals(0, c.initialError)
+        self.assertEquals(0, c.errorGrowthRate)
+        
+    def test_createWithErr(self):
+        c = Correlation(1,2,3,4)
+        self.assertEquals(1, c.parentTicks)
+        self.assertEquals(2, c.childTicks)
+        self.assertEquals(3, c.initialError)
+        self.assertEquals(4, c.errorGrowthRate)
+        
+    def test_immutable(self):
+        c = Correlation(1,2,3,4)
+        try:
+            c.parentTicks = 5
+            self.fail(msg="Assignment of parentTicks property")
+        except:
+            pass
+        try:
+            c.childTicks = 5
+            self.fail(msg="Assignment of childTicks property")
+        except:
+            pass
+        try:
+            c.initialError = 5
+            self.fail(msg="Assignment of initialError property")
+        except:
+            pass
+        try:
+            c.errorGrowthRate = 5
+            self.fail(msg="Assignment of errorGrowthRate property")
+        except:
+            pass
+        
+    def test_equality(self):
+        """Correlations can be compared for equivalence using the equality operator"""
+        self.assertEqual(Correlation(1,2,3,4), Correlation(1,2,3,4))
+        self.assertEqual(Correlation(1,2,0,0), Correlation(1,2))
+        self.assertNotEqual(Correlation(1,2), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(9,2,3,4), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(1,9,3,4), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(1,2,9,4), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(1,2,3,9), Correlation(1,2,3,4))
+
+        self.assertFalse(Correlation(1,2,3,4) == Correlation(1,9,3,4))
+        self.assertTrue(Correlation(1,2,3,4) != Correlation(1,9,3,4))
+        
+        self.assertFalse(Correlation(1,2,3,4) != Correlation(1,2,3,4))
+        self.assertTrue(Correlation(1,2,3,4) == Correlation(1,2,3,4))
+        
+    def test_tupleEquivEquality(self):
+        """Correlations can be compared with 2-tuples for equality of the parentTicks and childTicks"""
+        self.assertEqual(Correlation(1,2,3,4), (1,2))
+        self.assertEqual((1,2), Correlation(1,2,3,4))
+        self.assertNotEqual(Correlation(9,2,3,4), (1,2))
+        self.assertNotEqual(Correlation(1,9,3,4), (1,2))
+        self.assertNotEqual((1,2), Correlation(9,2,3,4))
+        self.assertNotEqual((1,2), Correlation(1,9,3,4))
+        
+    def test_mutate(self):
+        c=Correlation(1,2,3,4)
+
+        c2 = c.butWith()
+        self.assertEquals(c2, Correlation(1,2,3,4))
+
+        c3 = c.butWith(parentTicks=7)
+        self.assertEquals(c3, Correlation(7,2,3,4))
+
+        c4 = c.butWith(childTicks=99)
+        self.assertEquals(c4, Correlation(1,99,3,4))
+
+        c5 = c.butWith(initialError=888)
+        self.assertEquals(c5, Correlation(1,2,888,4))
+
+        c6 = c.butWith(errorGrowthRate=1000)
+        self.assertEquals(c6, Correlation(1,2,3,1000))
+
+    def test_tupleStyleUnpacking(self):
+        """A correlation can be unpacked as if it is a 2-tuple by assignment-unpacking"""
+        c = Correlation(1,2,3,4)
+        x,y = c
+        self.assertEquals(1,x)
+        self.assertEquals(2,y)
+        
+    def test_tuppleStyleIndexing(self):
+        """A correlation can be unpacked as if it is a 2-tuple by indexing"""
+        c = Correlation(1,2,3,4)
+        self.assertEquals(1,c[0])
+        self.assertEquals(2,c[1])
+        self.assertRaises(IndexError, lambda: c[2])
+
         
 class Test_CorrelatedClock(unittest.TestCase):
     
@@ -103,20 +245,27 @@ class Test_CorrelatedClock(unittest.TestCase):
     def tearDown(self):
         self.mockTime.uninstall()
 
+    def newSysClock(self, *args, **kwargs):
+        self.mockTime.enableAutoIncrementBy(0.000001, numReadsBetweenIncrements=1)
+        sysClock = SysClock(*args, **kwargs)
+        self.mockTime.disableAutoIncrement()
+        return sysClock
+
     def test_correlationAndFreqPropertiesInitialised(self):
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(0,300))
-        self.assertEqual(c.correlation, (0,300))
+        b = self.newSysClock()
+        c = CorrelatedClock(b, 1000, correlation=Correlation(0,300))
+        self.assertEqual(c.correlation, Correlation(0,300))
         self.assertEqual(c.tickRate, 1000)
         
     
     def test_ticking(self):
         mockTime = self.mockTime
 
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(0,300))
+        c = CorrelatedClock(b, 1000, correlation=Correlation(0,300))
         self.assertAlmostEqual(c.ticks, 5020.8*1000 + 300, places=5)
         
         mockTime.timeNow += 22.7
@@ -125,20 +274,35 @@ class Test_CorrelatedClock(unittest.TestCase):
     def test_changeCorrelation(self):
         mockTime = self.mockTime
 
+        b = self.newSysClock()
         mockTime.timeNow = 5020.8
+        c = CorrelatedClock(b, 1000, correlation=Correlation(0,300))
+        self.assertAlmostEqual(c.ticks, 5020.8*1000 + 300, places=5)
         
-        b = SysClock()
+        c.correlation = Correlation(50000,320)
+        self.assertEqual(c.correlation, Correlation(50000,320))
+        self.assertAlmostEqual(c.ticks, (int(5020.8*1000000) - 50000) / 1000 + 320, places=5)
+        
+    def test_changeCorrelationToTuple(self):
+        mockTime = self.mockTime
+
+        b = self.newSysClock()
+        mockTime.timeNow = 5020.8
         c = CorrelatedClock(b, 1000, correlation=(0,300))
         self.assertAlmostEqual(c.ticks, 5020.8*1000 + 300, places=5)
         
         c.correlation = (50000,320)
-        self.assertEqual(c.correlation, (50000,320))
+        self.assertEqual(c.correlation, Correlation(50000,320))
         self.assertAlmostEqual(c.ticks, (int(5020.8*1000000) - 50000) / 1000 + 320, places=5)
+        
+        c.setCorrelationAndSpeed((50000, 400), 1.0)
+        self.assertEqual(c.correlation, Correlation(50000,400))
+        self.assertAlmostEqual(c.ticks, (int(5020.8*1000000) - 50000) / 1000 + 400, places=5)
         
     def test_changeCorrelationNotifies(self):
         """Check a change to the correlation propagates notifications to dependents of this clock"""
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(0,300))
+        b = self.newSysClock()
+        c = CorrelatedClock(b, 1000, correlation=Correlation(0,300))
         cc = CorrelatedClock(c, 50)
         
         d1 = MockDependent()
@@ -149,7 +313,7 @@ class Test_CorrelatedClock(unittest.TestCase):
         c.bind(d2)
         cc.bind(d3)
         
-        c.correlation = (50,20)
+        c.correlation = Correlation(50,20)
         
         d1.assertNotNotified()
         d2.assertNotificationsEqual([c])
@@ -157,8 +321,8 @@ class Test_CorrelatedClock(unittest.TestCase):
         
     def test_changeSpeedeNotifies(self):
         """Check a change to the correlation propagates notifications to dependents of this clock"""
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(0,300))
+        b = self.newSysClock()
+        c = CorrelatedClock(b, 1000, correlation=Correlation(0,300))
         cc = CorrelatedClock(c, 50)
         
         d1 = MockDependent()
@@ -178,10 +342,11 @@ class Test_CorrelatedClock(unittest.TestCase):
     def test_changeFreq(self):
         mockTime = self.mockTime
 
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(50,300))
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         self.assertAlmostEqual(c.ticks, (5020.8*1000000 - 50)/(1000000/1000) + 300, places=5)
         
         self.assertEqual(c.tickRate, 1000)
@@ -192,10 +357,11 @@ class Test_CorrelatedClock(unittest.TestCase):
     def test_changeFreqNotifies(self):
         mockTime = self.mockTime
 
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(50,300))
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         cc = CorrelatedClock(c, 50)
         
         d1 = MockDependent()
@@ -213,34 +379,108 @@ class Test_CorrelatedClock(unittest.TestCase):
         d3.assertNotificationsEqual([cc])
       
     def test_rebase(self):
-        b = SysClock(tickRate=1000)
-        c = CorrelatedClock(b, 1000, correlation=(50,300))
+        b = self.newSysClock(tickRate = 1000)
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         c.rebaseCorrelationAtTicks(400)
-        self.assertEquals(c.correlation, (150,400))
+        self.assertEquals(c.correlation, Correlation(150,400))
       
     def test_toParentTicks(self):
         mockTime = self.mockTime
 
+        b = self.newSysClock(tickRate=2000000)
+
         mockTime.timeNow = 1000.0
         
-        b = SysClock(tickRate=2000000)
-        c = CorrelatedClock(b, 1000, correlation=(50,300))
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         self.assertAlmostEqual(c.toParentTicks(400), 50 + (400-300)*2000, places=5 )
         
     def test_fromParentTicks(self):
         mockTime = self.mockTime
 
+        b = self.newSysClock(tickRate=2000000)
+
         mockTime.timeNow = 1000.0
         
-        b = SysClock(tickRate=2000000)
-        c = CorrelatedClock(b, 1000, correlation=(50,300))
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         self.assertAlmostEqual(c.fromParentTicks(50 + (400-300)*2000), 400, places=5 )
       
     def test_getParent(self):
-        b = SysClock()
-        c = CorrelatedClock(b, 1000, correlation=(50,300))
+        b = self.newSysClock()
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         self.assertEqual(c.getParent(), b)
 
+    def test_getRoot(self):
+        a = self.newSysClock()
+        b = CorrelatedClock(a, 1000)
+        c = CorrelatedClock(b, 2000)
+        d = CorrelatedClock(c, 3000)
+        
+        self.assertEquals(a.getRoot(), a)
+        self.assertEquals(b.getRoot(), a)
+        self.assertEquals(c.getRoot(), a)
+        self.assertEquals(d.getRoot(), a)
+
+    def test_setCorrelationAndSpeed(self):
+        a = self.newSysClock(tickRate=1000000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        b.speed = 1.0
+        
+        db = MockDependent()
+        b.bind(db)
+        
+        b.setCorrelationAndSpeed(Correlation(5,0),2)
+        db.assertNotificationsEqual([b])
+        self.assertEqual(b.toParentTicks(10), 5005)
+
+    def test_quantifyChange(self):
+        a = self.newSysClock()
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        
+        self.assertEquals(float('inf'), b.quantifyChange( Correlation(0,0), 1.01))        
+        self.assertEquals(1.0, b.quantifyChange( Correlation(0, 1000), 1.0))
+        
+        b.speed = 0.0
+        self.assertEquals(0.005, b.quantifyChange( Correlation(0, 5), 0.0))
+
+    def test_setParent(self):
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        c = CorrelatedClock(a, 1000, correlation=Correlation(10,0))
+        d = MockDependent()
+        b.bind(d)
+        
+        d.assertNotNotified()
+        b.setParent(c)
+        d.assertNotificationsEqual([b])
+        self.assertEquals(b.getParent(), c)
+        
+    def test_setParentNoChangeNoNotify(self):
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        c = CorrelatedClock(a, 1000, correlation=Correlation(10,0))
+        d = MockDependent()
+        b.bind(d)
+
+        d.assertNotNotified()
+        b.setParent(a)
+        d.assertNotNotified()
+        self.assertEquals(b.getParent(), a)
+        
+    def test_dispersionCalcForZeroError(self):
+        """With zero error contribution, the dispersion at different times is the same as for the parent clock"""
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        self.assertEquals(a.dispersionAtTime(10), b.dispersionAtTime(10))
+        self.assertEquals(a.dispersionAtTime(20), b.dispersionAtTime(20))
+        
+    def test_dispersionCalcForError(self):
+        """With non-zero error contribution, the dispersion at different times is additional to that of the parent clock, both before and after the correlation time"""
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0, 0, 0.5, 0.1))
+        self.assertEquals(a.dispersionAtTime(10) + 0.5 + 0.1*10/1000, b.dispersionAtTime(10))
+        self.assertEquals(a.dispersionAtTime(20) + 0.5 + 0.1*20/1000, b.dispersionAtTime(20))
+        self.assertEquals(a.dispersionAtTime(-10) + 0.5 + 0.1*10/1000, b.dispersionAtTime(-10))
+        
 
 class Test_RangeCorrelatedClock(unittest.TestCase):
     
@@ -251,13 +491,19 @@ class Test_RangeCorrelatedClock(unittest.TestCase):
     def tearDown(self):
         self.mockTime.uninstall()
 
+    def newSysClock(self, *args, **kwargs):
+        self.mockTime.enableAutoIncrementBy(0.000001, numReadsBetweenIncrements=1)
+        sysClock = SysClock(*args, **kwargs)
+        self.mockTime.disableAutoIncrement()
+        return sysClock
+
     def test_rangeConversion(self):
-        mockTime=MockTime()
-        mockTime.install()
+        mockTime = self.mockTime
         
+        b = self.newSysClock(tickRate=1000)
+
         mockTime.timeNow = 0.0
-        b = SysClock(tickRate=1000)
-        c = RangeCorrelatedClock(b, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        c = RangeCorrelatedClock(b, 1000, correlation1=Correlation(100,1000), correlation2=Correlation(200,1110))
         
         mockTime.timeNow = b.calcWhen(100)
         self.assertEqual(c.ticks, 1000)
@@ -267,6 +513,52 @@ class Test_RangeCorrelatedClock(unittest.TestCase):
 
         mockTime.timeNow = b.calcWhen(150)
         self.assertEqual(c.ticks, 1055)
+        
+    def test_withTuples(self):
+        mockTime = self.mockTime
+        
+        b = self.newSysClock(tickRate=1000)
+
+        mockTime.timeNow = 0.0
+        c = RangeCorrelatedClock(b, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        self.assertEqual(Correlation(100,1000), c.correlation1)
+        self.assertEqual(Correlation(200,1110), c.correlation2)
+        
+        mockTime.timeNow = b.calcWhen(100)
+        self.assertEqual(c.ticks, 1000)
+       
+        mockTime.timeNow = b.calcWhen(200)
+        self.assertEqual(c.ticks, 1110)
+
+        c.correlation1 = (100, 2000)
+        c.correlation2 = (200, 2110)
+        self.assertEqual(Correlation(100,2000), c.correlation1)
+        self.assertEqual(Correlation(200,2110), c.correlation2)
+        self.assertEqual(c.ticks, 2110)
+
+    def test_setParent(self):
+        a = self.newSysClock(tickRate=1000)
+        b = RangeCorrelatedClock(a, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        c = RangeCorrelatedClock(a, 1000, correlation1=(200,1000), correlation2=(300,1110))
+        d = MockDependent()
+        b.bind(d)
+        
+        d.assertNotNotified()
+        b.setParent(c)
+        d.assertNotificationsEqual([b])
+        self.assertEquals(b.getParent(), c)
+        
+    def test_setParentNoChangeNoNotify(self):
+        a = self.newSysClock(tickRate=1000)
+        b = RangeCorrelatedClock(a, 1000, correlation1=(100,1000), correlation2=(200,1110))
+        c = RangeCorrelatedClock(a, 1000, correlation1=(200,1000), correlation2=(300,1110))
+        d = MockDependent()
+        b.bind(d)
+
+        d.assertNotNotified()
+        b.setParent(a)
+        d.assertNotNotified()
+        self.assertEquals(b.getParent(), a)
         
       
 class Test_TunableClock(unittest.TestCase):
@@ -278,12 +570,19 @@ class Test_TunableClock(unittest.TestCase):
     def tearDown(self):
         self.mockTime.uninstall()
 
+    def newSysClock(self, *args, **kwargs):
+        self.mockTime.enableAutoIncrementBy(0.000001, numReadsBetweenIncrements=1)
+        sysClock = SysClock(*args, **kwargs)
+        self.mockTime.disableAutoIncrement()
+        return sysClock
+
     def test_tickRateAndTicksInitialised(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
         c = TunableClock(b, tickRate=1000, ticks=5)
         self.assertEqual(c.ticks, 5)
         self.assertEqual(c.tickRate, 1000)
@@ -292,9 +591,10 @@ class Test_TunableClock(unittest.TestCase):
     def test_ticking(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
         c = TunableClock(b, tickRate=1000, ticks=5)
 
         mockTime.timeNow += 100.2
@@ -303,9 +603,10 @@ class Test_TunableClock(unittest.TestCase):
     def test_slewFromMomentApplied(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
         c = TunableClock(b, tickRate=1000, ticks=5)
 
         mockTime.timeNow += 100.2
@@ -321,9 +622,10 @@ class Test_TunableClock(unittest.TestCase):
     def test_adjustTicks(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
         c = TunableClock(b, tickRate=1000, ticks=5)
 
         mockTime.timeNow += 100.2
@@ -335,9 +637,10 @@ class Test_TunableClock(unittest.TestCase):
     def test_slewNotifiesDependents(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock()
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock()
         c = TunableClock(b, tickRate=1000, ticks=5)
         cc = TunableClock(c, tickRate=100)
         
@@ -362,9 +665,10 @@ class Test_TunableClock(unittest.TestCase):
     def test_toParentTicks(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock(tickRate=1000000)
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock(tickRate=1000000)
         c = TunableClock(b, tickRate=1000, ticks=5)
         c.slew=50
         
@@ -373,18 +677,53 @@ class Test_TunableClock(unittest.TestCase):
     def test_fromParentTicks(self):
         mockTime = self.mockTime
         
+        b = self.newSysClock(tickRate=1000000)
+
         mockTime.timeNow = 5020.8
         
-        b = SysClock(tickRate=1000000)
         c = TunableClock(b, tickRate=1000, ticks=5)
         c.slew=50
         
         self.assertAlmostEqual(c.fromParentTicks(b.ticks + 1000000*50.0/1.050), 5+1000*50, places=5)
 
     def test_getParent(self):
-        b = SysClock()
+        b = self.newSysClock()
         c = TunableClock(b, tickRate=1000, ticks=5)
         self.assertEqual(c.getParent(), b)
+
+    def test_errorInitiallyZero(self):
+        """Initially, the contribution to error/dispersion is zero and does not grow"""
+        b = self.newSysClock()
+        c = TunableClock(b, tickRate=1000, ticks=5)
+        
+        t = b.ticks
+        parentDisp = b.dispersionAtTime(t)
+        thisDisp = c.dispersionAtTime(c.fromParentTicks(t))
+        self.assertEqual(0, parentDisp - thisDisp)
+        
+        thisDispLater = c.dispersionAtTime(c.fromParentTicks(t+1000000))
+        self.assertEqual(thisDisp, thisDispLater)
+
+    def test_errorSettable(self):
+        mockTime = self.mockTime
+        
+        b = self.newSysClock(tickRate=1000)
+        c = TunableClock(b, tickRate=1000, ticks=5)
+
+        sysClockErr = b.dispersionAtTime(0) # will be constant
+
+        mockTime.timeNow = 1000
+        c.setError(0.1, growthRate = 0.01) # 0.1, increasing by 0.01 every second
+        self.assertAlmostEquals(0.1 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+        
+        mockTime.timeNow += 5
+        self.assertAlmostEquals(0.15 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+
+        c.setError(0.2, growthRate = 0.001) # 0.2, increasing by 0.001 every second
+        self.assertAlmostEquals(0.2 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+        
+        mockTime.timeNow += 5
+        self.assertAlmostEquals(0.205 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
 
 
 class Test_HierarchyTickConversions(unittest.TestCase):
@@ -399,13 +738,19 @@ class Test_HierarchyTickConversions(unittest.TestCase):
     def tearDown(self):
         self.mockTime.uninstall()
 
+    def newSysClock(self, *args, **kwargs):
+        self.mockTime.enableAutoIncrementBy(0.000001, numReadsBetweenIncrements=1)
+        sysClock = SysClock(*args, **kwargs)
+        self.mockTime.disableAutoIncrement()
+        return sysClock
+
     def test_noCommonAncestor(self):
-        a = SysClock()
-        b = SysClock()
-        a1 = CorrelatedClock(a, tickRate=1000, correlation=(0,0))
-        b1 = CorrelatedClock(b, tickRate=1000, correlation=(0,0))
-        a2 = CorrelatedClock(a1, tickRate=1000, correlation=(0,0))
-        b2 = CorrelatedClock(b1, tickRate=1000, correlation=(0,0))
+        a = self.newSysClock()
+        b = self.newSysClock()
+        a1 = CorrelatedClock(a, tickRate=1000, correlation=Correlation(0,0))
+        b1 = CorrelatedClock(b, tickRate=1000, correlation=Correlation(0,0))
+        a2 = CorrelatedClock(a1, tickRate=1000, correlation=Correlation(0,0))
+        b2 = CorrelatedClock(b1, tickRate=1000, correlation=Correlation(0,0))
         
         self.assertRaises(NoCommonClock, lambda:a.toOtherClockTicks(b, 5))
         self.assertRaises(NoCommonClock, lambda:a.toOtherClockTicks(b1, 5))
@@ -432,34 +777,34 @@ class Test_HierarchyTickConversions(unittest.TestCase):
         self.assertRaises(NoCommonClock, lambda:b2.toOtherClockTicks(a2, 5))
         
     def test_immediateParent(self):
-        a = SysClock(tickRate=1000000)
-        a1 = CorrelatedClock(a, tickRate=100, correlation=(50,0))
-        a2 = CorrelatedClock(a1, tickRate=78, correlation=(28,999))
+        a = self.newSysClock(tickRate=1000000)
+        a1 = CorrelatedClock(a, tickRate=100, correlation=Correlation(50,0))
+        a2 = CorrelatedClock(a1, tickRate=78, correlation=Correlation(28,999))
         self.assertEquals(a1.toOtherClockTicks(a, 500), a1.toParentTicks(500)) 
         self.assertEquals(a2.toOtherClockTicks(a1, 500), a2.toParentTicks(500)) 
         
     def test_distantParent(self):
-        a = SysClock(tickRate=1000000)
-        a1 = CorrelatedClock(a, tickRate=100, correlation=(50,0))
-        a2 = CorrelatedClock(a1, tickRate=78, correlation=(28,999))
+        a = self.newSysClock(tickRate=1000000)
+        a1 = CorrelatedClock(a, tickRate=100, correlation=Correlation(50,0))
+        a2 = CorrelatedClock(a1, tickRate=78, correlation=Correlation(28,999))
         self.assertEquals(a2.toOtherClockTicks(a, 500), a1.toParentTicks(a2.toParentTicks(500))) 
 
     def test_distantParentMidHierarchy(self):
-        a = SysClock(tickRate=1000000)
-        a1 = CorrelatedClock(a, tickRate=100, correlation=(50,0))
-        a2 = CorrelatedClock(a1, tickRate=78, correlation=(28,999))
-        a3 = CorrelatedClock(a2, tickRate=178, correlation=(5,1003))
-        a4 = CorrelatedClock(a3, tickRate=28, correlation=(17,9))
+        a = self.newSysClock(tickRate=1000000)
+        a1 = CorrelatedClock(a, tickRate=100, correlation=Correlation(50,0))
+        a2 = CorrelatedClock(a1, tickRate=78, correlation=Correlation(28,999))
+        a3 = CorrelatedClock(a2, tickRate=178, correlation=Correlation(5,1003))
+        a4 = CorrelatedClock(a3, tickRate=28, correlation=Correlation(17,9))
         self.assertEquals(a3.toOtherClockTicks(a1, 500), a2.toParentTicks(a3.toParentTicks(500)))
 
     def test_differentBranches(self):
-        a = SysClock(tickRate=1000000)
-        a1 = CorrelatedClock(a, tickRate=100, correlation=(50,0))
-        a2 = CorrelatedClock(a1, tickRate=78, correlation=(28,999))
-        a3 = CorrelatedClock(a2, tickRate=178, correlation=(5,1003))
-        a4 = CorrelatedClock(a3, tickRate=28, correlation=(17,9))
-        b3 = CorrelatedClock(a2, tickRate=1000, correlation=(10,20))
-        b4 = CorrelatedClock(b3, tickRate=2000, correlation=(15,90))
+        a = self.newSysClock(tickRate=1000000)
+        a1 = CorrelatedClock(a, tickRate=100, correlation=Correlation(50,0))
+        a2 = CorrelatedClock(a1, tickRate=78, correlation=Correlation(28,999))
+        a3 = CorrelatedClock(a2, tickRate=178, correlation=Correlation(5,1003))
+        a4 = CorrelatedClock(a3, tickRate=28, correlation=Correlation(17,9))
+        b3 = CorrelatedClock(a2, tickRate=1000, correlation=Correlation(10,20))
+        b4 = CorrelatedClock(b3, tickRate=2000, correlation=Correlation(15,90))
         
         v = a4.toParentTicks(500)
         v = a3.toParentTicks(v)
@@ -471,15 +816,16 @@ class Test_HierarchyTickConversions(unittest.TestCase):
     def test_speedChangePropagates(self):
         mockTime = self.mockTime
         
+        a = self.newSysClock(tickRate=1000)
+
         mockTime.timeNow = 5
         
-        a = SysClock(tickRate=1000)
-        a1 = CorrelatedClock(a, tickRate=1000, correlation=(50,0))
-        a2 = CorrelatedClock(a1, tickRate=100, correlation=(28,999))
-        a3 = CorrelatedClock(a2, tickRate=50, correlation=(5,1003))
-        a4 = CorrelatedClock(a3, tickRate=25, correlation=(1000,9))
-        b3 = CorrelatedClock(a2, tickRate=1000, correlation=(500,20))
-        b4 = CorrelatedClock(b3, tickRate=2000, correlation=(15,90))
+        a1 = CorrelatedClock(a, tickRate=1000, correlation=Correlation(50,0))
+        a2 = CorrelatedClock(a1, tickRate=100, correlation=Correlation(28,999))
+        a3 = CorrelatedClock(a2, tickRate=50, correlation=Correlation(5,1003))
+        a4 = CorrelatedClock(a3, tickRate=25, correlation=Correlation(1000,9))
+        b3 = CorrelatedClock(a2, tickRate=1000, correlation=Correlation(500,20))
+        b4 = CorrelatedClock(b3, tickRate=2000, correlation=Correlation(15,90))
         
         at1, a1t1, a2t1, a3t1, a4t1, b3t1, b4t1 = [x.ticks for x in [a,a1,a2,a3,a4,b3,b4]]
         a3.speed = 0.5
@@ -510,6 +856,81 @@ class Test_HierarchyTickConversions(unittest.TestCase):
         self.assertEquals(a4t2, 10.5)        # a4 is speed zero, a3.ticks is 3 ticks from correlation point for a4, translating to 1.5 ticks from a4 correlation point at its tickRate
         self.assertEquals(b3t2, b3t1 + 1000) # b3 still advances
         self.assertEquals(b4t2, b4t1 + 2000) # b4 is paused
+        
+    def test_availabilityPropagation(self):
+        a = self.newSysClock()
+        b = CorrelatedClock(a, 1000)
+        c = CorrelatedClock(b, 2000)
+        d = CorrelatedClock(c, 3000)
+        
+        da = MockDependent()
+        db = MockDependent()
+        dc = MockDependent()
+        dd = MockDependent()
+
+        a.bind(da)
+        b.bind(db)
+        c.bind(dc)
+        d.bind(dd)
+        
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertTrue(c.isAvailable())
+        self.assertTrue(d.isAvailable())
+
+        c.setAvailability(False)
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertFalse(c.isAvailable())
+        self.assertFalse(d.isAvailable())
+        da.assertNotNotified()
+        db.assertNotNotified()
+        dc.assertNotificationsEqual([c])
+        dd.assertNotificationsEqual([d])
+
+        d.setAvailability(False)
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertFalse(c.isAvailable())
+        self.assertFalse(d.isAvailable())
+        da.assertNotNotified()
+        db.assertNotNotified()
+        dc.assertNotNotified()
+        dd.assertNotNotified()
+
+        c.setAvailability(True)
+        self.assertTrue(a.isAvailable())
+        self.assertTrue(b.isAvailable())
+        self.assertTrue(c.isAvailable())
+        self.assertFalse(d.isAvailable())
+        da.assertNotNotified()
+        db.assertNotNotified()
+        dc.assertNotificationsEqual([c])
+        dd.assertNotificationsEqual([d])
+
+    def test_clockDiff(self):
+        a = self.newSysClock()
+        self.mockTime.timeNow = 1
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        c = CorrelatedClock(b, 2000, correlation=Correlation(0,0))
+        d = CorrelatedClock(c, 3000, correlation=Correlation(0,0))
+        e = RangeCorrelatedClock(d, 1000, Correlation(5,0), Correlation(15005,5000))
+    
+        self.assertEquals(float('inf'), b.clockDiff(c))
+        self.assertEquals(float('inf'), b.clockDiff(d))
+        self.assertAlmostEquals(0.001666667, b.clockDiff(e), delta=0.000001)
+        
+        self.mockTime.timeNow += 10000000
+        
+        self.assertEquals(float('inf'), b.clockDiff(c))
+        self.assertEquals(float('inf'), b.clockDiff(d))
+        self.assertAlmostEquals(0.001666667, b.clockDiff(e), delta=0.000001)
+        
+        c.tickRate = 1000
+        self.assertEquals(0, b.clockDiff(c))
+
+        c.speed = 1.01
+        self.assertEquals(float('inf'), b.clockDiff(c))
         
 if __name__ == "__main__":
     unittest.main()

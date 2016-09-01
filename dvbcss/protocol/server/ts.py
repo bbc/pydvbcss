@@ -120,12 +120,13 @@ For example, we might create a Timeline Source to represent ticking of a PTS tim
 .. code-block:: python
 
     from dvbcss.protocol.server.ts import SimpleClockTimelineSource
+    from dvbcss.clock import Correlation
     
     ptsClock = CorrelatedClock(parentClock=wallClock, tickRate=90000)
     ptsTimelineSrc = SimpleClockTimelineSource(timelineSelector="urn:dvb:css:timeline:pts", wallClock=wallClock, clock=ptsClock)
     
     # set that ptsClock to start counting from zero starting NOW:
-    ptsClock.correlation = (wallClock.ticks, 0)
+    ptsClock.correlation = Correlation(wallClock.ticks, 0)
 
 When we want that timeline to become available to connected clients we add it to the TS Server:
 
@@ -140,16 +141,24 @@ to ensure Control Timestamp messages are sent immediately to all connected clien
 Any new client connections or existing connections, that ask for that timeline (using the timeline selector and matching the content id)
 will have the timeline made available to them.
 
-If at some point the relationship between PTS and wall clock changes, then we must instruct the TS Server to send new Control Timestamps out if needed:
+If at some point the relationship between PTS and wall clock changes, or the
+clock availability changes, then we must instruct the TS Server to send new Control Timestamps out if needed:
 
 .. code-block:: python
 
     # lets reset the pts timeline position to zero again
-    ptsClock.correlation = (wallClock.ticks, 0)
-    
+    ptsClock.correlation = Correlation(wallClock.ticks, 0)
     tsServer.updateAllClients()
     
-When we want to make the timeline unavailable, we detatch it from the TS Server:
+When we want to make the timeline unavailable, we can simply update the availability
+of the clock:
+
+.. code-block:: python
+
+    ptsClock.setAvailability(False)
+    tsServer.updateAllClients()
+
+Or if we wish to stop more permanently, we can instead detatch the timeline source from the TS Server:
 
 .. code-block:: python
 
@@ -219,13 +228,14 @@ the WallClock to be passed to it. It can serve different tick rates to different
 
     from dvbcss.protocol.server.ts import TimelineSource
     from dvbcss.protocol.ts import ControlTimestamp, Timestamp
+    from dvbcss.clock import Correlation
     import re
 
     class PretendTimelineSource(TimelineSource):
         def __init__(self, wallClock):
             super(PretendTimelineSource,self).__init__()
             self.wallClock = wallClock
-            self.correlation = None
+            self.correlation = Correlation(0,0)
                     
         def recognisesTimelineSelector(self, timelineSelector):
             return re.match("^urn:pretend-timeline:([0-9]+)$", timelineSelector)
@@ -239,13 +249,13 @@ the WallClock to be passed to it. It can serve different tick rates to different
                 return ControlTimestamp(Timestamp(None, self.wallClock.ticks), None)
             else:
                 tickRate = int(match.group(1))
-                contentTime = tickRate * self.correlation[1]
-                wallClockTime = self.correlation[0]
+                contentTime = tickRate * self.correlation.childTicks
+                wallClockTime = self.correlation.parentTicks
                 speed = 1
                 return ControlTimestamp(Timestamp(contentTime, wallClockTime), speed)
     
         def setTimelinePositionNow(self, timelineSecondsNow):
-            self.correlation = (self.wallClock.nanos, timelineSecondsNow)
+            self.correlation = Correlation(self.wallClock.nanos, timelineSecondsNow)
 
 The base class also has stub methods to support notification of when a sink is attached
 to the timeline source and also methods to notify of when a particular timeline selector
@@ -503,7 +513,8 @@ class TSServer(WSServerBase):
 
 def ciMatchesStem(ci, stem):
     """\
-    Checks if a content identifier stem matches a content identifier.
+    Checks if a content identifier stem matches a content identifier. A match is when the content identifier
+    starts with the stem and is the same length as the stem, or longer.
     
     :param ci: Content identifier
     :type ci: :class:`str` or :data:`~dvbcss.protocol.OMIT`
@@ -727,6 +738,8 @@ class SimpleClockTimelineSource(TimelineSource):
     speed property of this clock (e.g. in situations where a single clock represents timeline progress but there
     are multiple clocks as children of that to represent the timeline on different scales - e.g. PTS, TEMI etc).
     
+    The availability of the clock is mapped to whether the timeline is available.
+    
     SimpleClockTimelineSource generates its correlation by observing the current tick value of the wallClock and the provided
     clock whenever a ControlTimestamp needs to be provided.
     """
@@ -788,7 +801,10 @@ class SimpleClockTimelineSource(TimelineSource):
     def getControlTimestamp(self, timelineSelector):
         if self._changed:
             self._changed=False
-            self._latestCt = ControlTimestamp(Timestamp(self._clock.ticks, self._wallClock.ticks), timelineSpeedMultiplier=self._speedSource.speed)
+            if self._clock.isAvailable():
+                self._latestCt = ControlTimestamp(Timestamp(self._clock.ticks, self._wallClock.ticks), timelineSpeedMultiplier=self._speedSource.speed)
+            else:
+                self._latestCt = ControlTimestamp(Timestamp(None, self._wallClock.ticks), None)
         return self._latestCt
         
         

@@ -2,9 +2,97 @@
 
 ## Latest
 
+This release contains a significant internal upgrade to the `dvbcss.clock`
+module with minor knock-on effects on other packages - particularly wall clock
+client and server code and algorithms. The changes have been implemented to
+be mostly backwardly compatible, so existing code should continue to work. The
+only exception will be any custom wall clock client algorithms.
+
+Clock objects can now calculate **dispersion** (error bounds). Clocks can also
+track clock **availability** (mirroring the concept of timeline availability).
+
+Wall clock client algorithms have been switched from measuring and adjusting
+the same clock (representing the wall clock) to instead measuring its parent
+and setting the correlation. Any custom wall clock client algorithms will
+not work and will need to be updated.
+
+#### How to 'upgrade' existing code
+
+* Use a `CorrelatedClock` instead of a `TunableClock` to model a wall clock.
+  and set the "maximum frequency error" when initialising the `SysClock`
+  instead of passing it to a `WallClockClient` or `WallClockServer`.
+  
+* Use a `Correlation` object instead of a tuple (parentT,childT) to represent
+  correlations for a `CorrelatedClock`
+  
+* Control and check timeline availability of clock objects instead of setting
+  or querying the availability of the TS protocol server or client.
+  
+* Update any custom algorithms you might have created for wall clock clients.
+
+  * `Candidate` objects now represent the relationship between the **parent**
+    of the local wall clock (instead of the local wall clock itself)
+    and the server's wall clock.`
+  
+  * Algorithms and Filters now receive a single `Candidate` object in units of
+    nanoseconds. They no longer receive a `Candidate` converted to units of
+    clock ticks.
+  
+  * Predictors should return a `Correlation` instead of an adjustment value.
+  
+* `DispersionCalculator` is being deprecated. It still exists, but you should
+  stop using it and instead use `Candidate.calcCorrelationFor` function to 
+  create a correlation which you then put into a `CorrelatedClock` and call
+  the `dispersionAtTime` function.
+  
+Examples of old way (0.3.x and earlier):
+  
+    s = SysClock()
+    wallClock = TunableClock(s, tickRate=1000000000)
+
+    algorithm = LowestDispersionCandidate(wallClock,repeatSecs=1,timeoutSecs=0.5, localMaxFreqErrorPpm=500)
+    wc_client=WallClockClient(bind, dest, wallClock, algorithm)
+    wc_client.start()
+
+    timeline = CorrelatedClock(wallClock, tickRate=1000, (10,20))
+
+    timeline.correlation = ( timeline.correlation[0], timeline.correlation[1] + 50)
+
+    ts = TSClientClockController(tsUrl, contentIdStem, timelineSelector, timeline)
+    print ts.available
+
+Equivalent new way (0.4 and later):
+  
+    s=SysClock(maxFreqErrorPpm=500)
+    wallClock=CorrelatedClock(s,tickRate=1000000000)
+
+    algorithm = LowestDispersionCandidate(wallClock,repeatSecs=1,timeoutSecs=0.5)
+    wc_client=WallClockClient(bind, dest, wallClock, algorithm)
+    wc_client.start()
+
+    timeline = CorrelatedClock(wallClock, tickRate=1000, Correlation(10,20))
+
+    timeline.correlation = timeline.correlation.butWith(childTicks=timeline.childTicks + 50)
+
+    ts = TSClientClockController(tsUrl, contentIdStem, timelineSelector, timeline)
+    print timeline.isAvailable()
+
+#### Summary of changes:
+
+* API addition: can setParent() on CorrelatedClock, RangeCorrelatedClock and TunableClock.
+* API change: All clock objects modified to be able to track error values and calculate dispersions and clock `availability`
+* API change: `CorrelatedClock` class modified to use a `Correlation` object instead of a tuple.
+* API change: `TunableClock` reimplemented as subclass of `CorrelatedClock`
+* API change: `WallClockClient`, `WallClockServer` initialisation arguments - precision and maxfreqerror now optional. Now, by default, taken from the clock.
+* API change: Wall clock client algorithms (dispersion, filtering, prediction) changed to update a CorrelatedClock and to measure the parent of the clock representing the wall clock. Review the documentation to understand how to update any algorithms you might have implemented.
+* API change: `DispersionCalculator` class deprecated (but still available). Use `Candidate.calcCorrelationFor` and `CorrelatedClock.dispersionAtTime` instead.
+* Tests: Updated to reflect changes.
+* Docs: Updated to reflect changes.
 * Improvement: Support for monotonic clock on Android.
   [P-R #5](https://github.com/bbc/pydvbcss/pull/5) by [Jack Jansen](https://github.com/jackjansen) (03 May 2016)
 * Bugfix: `clock.getEffectiveSpeed()` stuck in infinite loop.
+* Docs: Now correctly links to github source for correct branch/version.
+* Docs: Improvements to setup/release process to format PyPI description correctly (by converting to ReStructuredText)
 
 ## 0.3.3 : Bugfixes and thread safety improvements (20 Apr 2016)
 

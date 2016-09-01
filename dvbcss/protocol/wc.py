@@ -17,9 +17,16 @@
 r"""\
 The :class:`WCMessage` class represents a CSS-WC protocol message.
 
-The :class:`Candidate` class represents a measurement "candidate"
-for use by a Wall Clock Client algorithm and is calculated from a :class:`WCMessage`
-that represents a Wall Clock protocol response message received from a server.
+The :class:`Candidate` class represents the measurement resulting from a
+request-response exchange of messages with a server. This is a "candidate"
+that could be used to update the client's estimate of the Wall Clock and is
+therefore used by a Wall Clock Client algorithm. A candidate is calculated
+from a :class:`WCMessage` that represents a Wall Clock protocol response
+message received from a server.
+
+A candidate can calculate the correlation needed to set a
+:class:`~dvbcss.clock.CorrelatedClock` to model the server's Wall Clock.
+
 
 Example usage
 -------------
@@ -53,11 +60,21 @@ Processing a received response message at a Wall Clock Client:
     >>> c.rtt
     459734573
     
+Creating a correlation to configure a :class:``dvbcss.clock.CorrelatedClock`
+representing the client estimate of the server's wall clock:
+
+.. code-block:: python
+
+    >>> corr = c.calcCorrelationFor(wallClock, localMaxFreqErrorPpm=wallClock.getRootMaxFreqError())
+    >>> wallClock.correlation = corr
+
 """
 import logging
 
 import struct
 import math
+
+from dvbcss.clock import Correlation
 
 class WCMessage(object):
 
@@ -197,7 +214,11 @@ class Candidate(object):
     This object represents a measurement "candidate" to be fed into a Wall Clock Client's
     algorithm. It is calculated from a :class:`WCMessage` received as a response from a
     Wall Clock server.
-
+    
+    This object requires that response comes from a Wall Clock Client that
+    measured the *parent* of the clock that will be used to model the wall
+    clock locally.
+    
     **Initialisation takes the following parameters:**
     
     :param WCMessage msg: Response message received from server
@@ -218,13 +239,12 @@ class Candidate(object):
     It also calculates and provides, as properties, the round-trip time (:data:`rtt`)
     and clock offset estimate (:data:`offset`) based on this measurement.
     
-    By default the data is preserved in nanoseconds. However you may use the :func:`toTicks`
-    method to create a new version of the Candidate object using units of ticks matching
-    a :mod:`~dvbcss.clock` object you provide.
-
-    The exceptions are precision which is measured in seconds, and
-    maximum frequency error which is measured in ppm
+    All data is in units of nanoseconds, except for precision which is measured
+    in seconds, and maximum frequency error which is measured in ppm.
     
+    A helper function :func:`calcCorrelationFor` makes it easy to calculate the
+    :class:`~dvbcss.clock.Correlation` needed to take this measurment candidate
+    and use it to control a :class:`~dvbcss.clock.CorrelatedClock`.
     """
     
     def __init__(self, msg, nanosRx):
@@ -232,44 +252,93 @@ class Candidate(object):
         self.log=logging.getLogger("dvbcss.protocol.wc.Candidate")
         if msg.msgtype not in WCMessage.TYPE_ANY_RESPONSE:
             raise ValueError("Cannot create a candidate from a non-response message")
-        self.t1 = msg.originateNanos #: (read only) The time "t1" at which the request was sent in the request-response measurement (nanoseconds, or clock ticks)
-        self.t2 = msg.receiveNanos   #: (read only) The time "t2" at which the request was received in the request-response measurement (nanoseconds, or clock ticks)
-        self.t3 = msg.transmitNanos  #: (read only) The time "t3" at which the response was sent in the request-response measurement (nanoseconds, or clock ticks)
-        self.t4 = nanosRx            #: (read only) The time "t4" at which the response was received in the request-response measurement (nanoseconds, or clock ticks)
-        self.offset = ((self.t3+self.t2)-(self.t4+self.t1))/2 #: (read only) Server<->client clock offset (nanoseconds, or clock ticks)
-        self.rtt = (self.t4-self.t1)-(self.t3-self.t2) #: (read only) Round trip time (nanoseconds, or clock ticks)
+        self.t1 = msg.originateNanos #: (read only) The time "t1" at which the request was sent in the request-response measurement (nanoseconds)
+        self.t2 = msg.receiveNanos   #: (read only) The time "t2" at which the request was received in the request-response measurement (nanoseconds)
+        self.t3 = msg.transmitNanos  #: (read only) The time "t3" at which the response was sent in the request-response measurement (nanoseconds)
+        self.t4 = nanosRx            #: (read only) The time "t4" at which the response was received in the request-response measurement (nanoseconds)
+        self.offset = ((self.t3+self.t2)-(self.t4+self.t1))/2 #: (read only) Server<->client clock offset (nanoseconds)
+        self.rtt = (self.t4-self.t1)-(self.t3-self.t2) #: (read only) Round trip time (nanoseconds)
         self.precision = msg.getPrecision()  #: (read only) The precision reported by the server in its response (units of factions of a second)
         self.maxFreqError = msg.getMaxFreqError() #: (read only) The maximum frequency error reported by the server in its response (units of ppm)
         self.msg = msg #: (read only :class:`WCMessage`) The response message from which this candidate was derived
-        self.isNanos=True   #: (read only :class:`bool`) True if this candidate object is in units of nanoseconds for t1, t2, t3, t4, offset and rtt
         
     def __str__(self):
-        if self.isNanos:
-            units="nanos"
-        else:
-            units="ticks"
-        return "Candidate(%s): offset=%20d, rtt=%20d, t1=%20d, t2=%20d, t3=%20d, t4=%20d" % (units,self.offset, self.rtt, self.t1, self.t2, self.t3, self.t4)
+        return "Candidate: offset=%20d, rtt=%20d, t1=%20d, t2=%20d, t3=%20d, t4=%20d" % (self.offset, self.rtt, self.t1, self.t2, self.t3, self.t4)
+
+    def calcCorrelationFor(self, clock, localMaxFreqErrorPpm=None):
+        r"""\
+        Calculates and returns the :class:`~dvbcss.clock.Correlation` for a
+        :class:`~dvbcss.clock.CorrelatedClock` that is equivalent to this candidate.
+        
+        The returned correlation can then be applied to the clock to model the time
+        at the server. This includes the error bounds information needed to
+        enable the clock to correctly calculate dispersion.
+
+        :param clock: :class:`~dvbcss.clock.CorrelatedClock` that will model the server clock. Its parent must be the one that was measured for `t1` and `t4` this candidate.
+        :param localMaxFreqErrorPpm: Optional. By defeault the :func:`~dvbcss.clock.ClockBase.getRootMaxFreqError` of the `clock` is used. Provide this value to override that.
+        
+        :returns: :class:`~dvbcss.clock.Correlation` representing this `candidate`, and that can be used with the :class:`~dvbcss.clock.CorrelatedClock`.
+        
+        .. note::
+            The parameters of the correlation are calculated by this function
+            as follows:
+            
+            * **parentTicks** = (t1' + t4') / 2
+            * **childTicks** = (t2' + t3') / 2
+            * **initialError** = precision + ( rtt/2 + mfeC * (t4 - t1) + mfeS * (t3 - t2) ) / 10\ :sup:`9`
+            * **errorGrowthRate** = mfeC + mfeS
+            
+            Where:
+            
+            * **t1**, **t2**, **t3** and **t4** are in units of nanoseconds
+            * **t1'** and **t4'** are the same as t1 and t4 but converted to ticks of the parent of the specified clock
+            * **t2'** and **t3'** are the same as t2 and t3 but converted to ticks of the specified clock
+            * **mfeC** is the clock's :func:`~dvbcss.clock.ClockBase.getRootMaxFreqError`, converted from ppm to a fraction by dividing by 10\ :sup:`6`
+            * **mfeS** is the max freq error reported by the server, converted from ppm to a fraction by dividing by 10\ :sup:`6`
+        
+        .. versionadded:: 0.4
+        """
+        # convert to units of the clock
+        t1 = clock.getParent().nanosToTicks(self.t1)
+        t4 = clock.getParent().nanosToTicks(self.t4)
+        t2 = clock.nanosToTicks(self.t2)
+        t3 = clock.nanosToTicks(self.t3)
+        
+        if localMaxFreqErrorPpm is None:
+            localMaxFreqErrorPpm = clock.getRootMaxFreqError()
+            
+        mfeC = localMaxFreqErrorPpm/1000000.0   # ppm to fraction
+        mfeS = self.maxFreqError/1000000.0   # ppm to fraction
+        
+        return Correlation(
+            parentTicks = (t1+t4)/2.0,
+            childTicks = (t2+t3)/2.0,
+            initialError = 
+                self.precision +  # server precision. does not include local clock precision since this is already accounted for
+                ( self.rtt/2.0 + 
+                  mfeC*(self.t4-self.t1) + 
+                  mfeS*(self.t3-self.t2)
+                ) / 1000000000.0,    # nanos to seconds
+            errorGrowthRate = (mfeC+mfeS)
+        )
 
     def toTicks(self,clock):
         """\
         Returns a new Candidate object the same as this one but whose measurements have been converted to match the timescale of a clock.
 
-        `t1`, `t2`, `t3`, `t4`, rtt and `offset` of the returned object are converted to units of ticks matching the clock.
-        But `precision` and `maxFreqError` remain unchanged.
-        
-        :param dvbcss.clock clock: Clock whose :func:`~dvbcss.clock.ClockBase.nanosToTicks` function will be used to create the new candidate object
-        
-        :returns: a copy of this candidate where the units have been converted to 'ticks' according to the tick rate of the supplied clock.
-        """
-        copy=Candidate(self.msg,self.t4)
-        copy.isNanos=False
-        if self.isNanos:
-            copy.t1=clock.nanosToTicks(self.t1)
-            copy.t2=clock.nanosToTicks(self.t2)
-            copy.t3=clock.nanosToTicks(self.t3)
-            copy.t4=clock.nanosToTicks(self.t4)
-            copy.offset = clock.nanosToTicks(self.offset)
-            copy.rtt = clock.nanosToTicks(self.rtt)
-        return copy
+        :raises NotImplementedError: This function has been deprecated.
 
+        .. warning::
+            .. deprecated:: 0.4
+            
+               This function has been deprecated because of the architectural
+               change to taking taking readings from a different clock to the
+               one that is adjusted.
+               
+               Use :func:`calcCorrelationFor` instead as this will perform the
+               necessary conversion to clock tick rate units as well as creating
+               the correlation needed to configure that clock.
+        """
+        raise NotImplementedError("This method has been deprecated in v0.4")
+        
 __all__ = [ "WCMessage", "Candidate" ]

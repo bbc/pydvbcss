@@ -28,21 +28,28 @@ The client is assumed to already know the WebSocket URL for the CSS-CII server
 (for example: because the TV chooses to advertise it via a network service
 discovery mechanism).
 
-1. The client connects to the CSS-TS server. Either this is refused via an HTTP status code response,
-or it is accepted.
+1. The client connects to the CSS-TS server. Either this is refused via an HTTP
+   status code response, or it is accepted.
 
 2. The server immediately responds with a first CII state update message. This
-contains (at minimum) all properties whose values are not null.
+   contains (at minimum) all properties whose values are not `null`.
 
 3. The server can re-send the CII state update message as often as it wishes.
-At minimum it will do so when one or more of the properties have changed value.
-The server will, at minimum, include the properties that have changed, but could
-also include others in the message.
+   At minimum it will do so when one or more of the properties have changed
+   value. The server will, at minimum, include the properties that have changed,
+   but could also include others in the message.
 
 This protocol is a state update mechanism. The client is locally
 mirroring the state of the TV by remembering the most recent values received
-for each of the properties. When a message is received it updates that local
-state and can react to any changes if it needs to.
+for each of the properties.
+
+At the start, the client assumes all properties have the value `null`. Then,
+when a message is received the client updates its mirror of the TV state:
+
+* If a property is included in the message (even if its value is `null`),
+  then this is the new value for that property.
+    
+* If a property is not included in the message, then its value has not changed. 
 
 Any messages sent by the client are ignored by the server.
 

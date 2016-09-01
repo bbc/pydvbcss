@@ -1,13 +1,13 @@
 # Python DVB Companion Screen Synchronisation protocol library
 
 [![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)](https://travis-ci.org/bbc/pydvbcss)
-[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
-[![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
-[![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss)
+[![Docs Status (stable)](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
+[![Docs Status (latest)](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
+[![Latest PyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss)
 
-* **[How to install](#install)**
-* **[Read the documentation](#docs)**
-* **[Run the examples](#run-examples)**
+* **[How to install](#install-the-code)**
+* **[Read the documentation](#read-the-documentation)**
+* **[Run the examples](#run-the-examples)**
 
 **pydvbcss** is a set of Python 2.7 libraries that implement some of the
 protocols defined in the DVB CSS specification (published as [ETSI 103-286 part 2](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1)).
@@ -27,7 +27,7 @@ integration into consumer products.
 The code does not implement media playback functionality and this is not a planned
 feature.
 
-_The DVB CSS specification was formerly published as ["DVB Bluebook A167-2"](https://www.dvb.org/search/results/keywords/A167). This is deprecated in favour of the [ETSI spec](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1)._
+The DVB CSS specification was formerly published as [DVB Bluebook A167-2](https://www.dvb.org/search/results/keywords/A167). This is deprecated in favour of the [ETSI spec](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1).
 
 ## Getting started
 
@@ -39,17 +39,19 @@ for server implementations.  The steps below describe how to install these.
 successfully on Microsoft Windows 7 and Ubuntu 14.04.
 
 
-<a name="docs"></a>
-### Read the Documentation (online)
+
+### Read the Documentation
 
 The docs for the library can be read online on readthedocs.org:
-   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=stable) **Docs for latest stable release**](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
-   * [![Documentation Status](https://readthedocs.org/projects/pydvbcss/badge/?version=latest) Docs for latest commits to master](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
+
+   * [![Docs Status (stable)](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable) [Docs for current stable release](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
+   
+   * [![Docs Status (latest)](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.io/en/latest/?badge=latest) [Docs for latest commits to master release](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
 
 Links are also available from those pages through to documentation for earlier releases.
 
 
-<a name="install"></a>
+
 ### Install the code ...
 
 *On Mac OS X and Linux you may need to run one or more of the commands as root.*
@@ -63,7 +65,7 @@ release package from the Python Package Index (PyPI) using
 
     $ pip install pydvbcss
 
-   * [![Latest pyPI package](https://img.shields.io/pypi/v/pydvbcss.svg) See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
+   * [![Latest PyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss) [See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
 
 #### From Github or a release tarball _(library and examples)_
 
@@ -98,7 +100,8 @@ Run it via setup.py:
 This checks some timing sensitive implementation issues, so ensure you are not
 running any CPU intensive tasks at the time.
 
-<a name="run-examples"></a>
+
+
 ### Run the examples
 
 There is a set of examples demonstrating simple servers and clients for the
