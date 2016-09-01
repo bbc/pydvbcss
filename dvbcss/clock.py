@@ -1174,7 +1174,7 @@ class CorrelatedClock(ClockBase):
 
     def _errorAtTime(self, t):
         pt = self.toParentTicks(t)
-        deltaSecs = (pt - self._correlation.parentTicks) / self._parent.tickRate
+        deltaSecs = abs(pt - self._correlation.parentTicks) / self._parent.tickRate
         return self._correlation.initialError + deltaSecs * self._correlation.errorGrowthRate
 
 

@@ -466,6 +466,21 @@ class Test_CorrelatedClock(unittest.TestCase):
         d.assertNotNotified()
         self.assertEquals(b.getParent(), a)
         
+    def test_dispersionCalcForZeroError(self):
+        """With zero error contribution, the dispersion at different times is the same as for the parent clock"""
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0,0))
+        self.assertEquals(a.dispersionAtTime(10), b.dispersionAtTime(10))
+        self.assertEquals(a.dispersionAtTime(20), b.dispersionAtTime(20))
+        
+    def test_dispersionCalcForError(self):
+        """With non-zero error contribution, the dispersion at different times is additional to that of the parent clock, both before and after the correlation time"""
+        a = self.newSysClock(tickRate=1000)
+        b = CorrelatedClock(a, 1000, correlation=Correlation(0, 0, 0.5, 0.1))
+        self.assertEquals(a.dispersionAtTime(10) + 0.5 + 0.1*10/1000, b.dispersionAtTime(10))
+        self.assertEquals(a.dispersionAtTime(20) + 0.5 + 0.1*20/1000, b.dispersionAtTime(20))
+        self.assertEquals(a.dispersionAtTime(-10) + 0.5 + 0.1*10/1000, b.dispersionAtTime(-10))
+        
 
 class Test_RangeCorrelatedClock(unittest.TestCase):
     
