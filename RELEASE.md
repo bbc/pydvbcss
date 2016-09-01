@@ -35,27 +35,33 @@ The is in the [`CHANGELOG.md`](CHANGELOG.md) file. Ensure it mentions any notewo
 
 ##### Update README
 
-In ['README.md'](README.md) change references to the "master" branch to the name
-of release branch that will be used in the next step (which will be the
-release version number). The places this occurs includes:
+Ensure the README reflects any changes.
 
-   * the Travis CI build status image link at the beginning.
 
 
 #### 3. Create release branch 
 
 Create the branch, naming it after the release version number (just the number).
 
+#### 4. Update VERSION and `README.md` for the release branch
+
 In the branch, now modify (and commit) the VERSION file, changing "latest" to "release".
 
+In ['README.md'](README.md) change references to the "master" branch to the name
+of release branch that will be used in the next step (which will be the
+release version number). The places this occurs includes:
 
-#### 4. Create a new release on GitHub based on the new branch
+   * the Travis CI build status image link at the beginning.
+   * The "stable" docs links at the beginning and in the docs section. Rewrite them to be named after the version number
+
+
+#### 5. Create a new release on GitHub based on the new branch
 
 Put a shorter summary of the new changelog items into the release notes. Make the tag name the version number
 - the same as the branch name.
 
 
-#### 5. Check documentation builds
+#### 6. Check documentation builds
 
 _The old process of manually building and pushing to gh-pages is deprecated._
 
@@ -64,7 +70,7 @@ has built correctly and is classified as the "stable" build, here: https://readt
 
 
 
-#### 6. Upload new package to python package index
+#### 7. Upload new package to python package index
 
 The process originally followed to register and setup first time was [this one](http://peterdowns.com/posts/first-time-with-pypi.html).
 
@@ -126,7 +132,12 @@ Update VERSION to mark as "release" within the branch
        .. change "latest" to "release"
     $ git add VERSION
     $ git commit -m "Version marked as release."
-    
+
+Update README.md to change:
+
+* travis CI build status to be specific for this version branch
+* "stable" docs links to point to this version branch specifically.
+
 Push branch up to github (and set local repository to track the upstream branch on origin):
 
     $ git push -u origin 'X.Y.Z'
