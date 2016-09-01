@@ -2,6 +2,10 @@
 
 ## Latest
 
+* ...
+
+## 0.4.0 : Bugfixes and overhaul of clock object model (new-clock-model)
+
 This release contains a significant internal upgrade to the `dvbcss.clock`
 module with minor knock-on effects on other packages - particularly wall clock
 client and server code and algorithms. The changes have been implemented to
