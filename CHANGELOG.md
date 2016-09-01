@@ -1,9 +1,5 @@
 # Change Log
 
-## Latest
-
-* ...
-
 ## 0.4.0 : Bugfixes and overhaul of clock object model (new-clock-model)
 
 This release contains a significant internal upgrade to the `dvbcss.clock`
