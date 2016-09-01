@@ -79,7 +79,8 @@ Equivalent new way (0.4 and later):
 
 #### Summary of changes:
 
-* API addition: can setParent() on CorrelatedClock, RangeCorrelatedClock and TunableClock.
+Main changes in new clock model ([da846a9](https://github.com/bbc/pydvbcss/commit/da846a96ec8dd3e23b4a3e363fd98d1c495cc8c5)):
+* API addition: can setParent() on `CorrelatedClock`, `RangeCorrelatedClock` and `TunableClock`.
 * API change: All clock objects modified to be able to track error values and calculate dispersions and clock `availability`
 * API change: `CorrelatedClock` class modified to use a `Correlation` object instead of a tuple.
 * API change: `TunableClock` reimplemented as subclass of `CorrelatedClock`
@@ -88,9 +89,15 @@ Equivalent new way (0.4 and later):
 * API change: `DispersionCalculator` class deprecated (but still available). Use `Candidate.calcCorrelationFor` and `CorrelatedClock.dispersionAtTime` instead.
 * Tests: Updated to reflect changes.
 * Docs: Updated to reflect changes.
+
+Other improvements/bugfixes:
+* Bugfix: Tracking of number of connections to CSS-CII and CSS-TS had a leak ([4c76042](https://github.com/bbc/pydvbcss/commit/4c76042d2e6c69f2c38682468738ba8cca02b5d1))
+* API addition: `setParent()` on `CorrelatedClock` ([d4576d7](https://github.com/bbc/pydvbcss/commit/d4576d7440e8e9f5ced4e73fa182edc05442b1b8))
+* Bugfix: NotImplemented exception used incorrectly ([d4576d7](https://github.com/bbc/pydvbcss/commit/d4576d7440e8e9f5ced4e73fa182edc05442b1b8))
+* Bugfix: Workaround for OSX 10.11 SIP for monotonic clock module ([P-R #6](https://github.com/bbc/pydvbcss/pull/6) and [P-R #7](https://github.com/bbc/pydvbcss/pull/7))
 * Improvement: Support for monotonic clock on Android.
-  [P-R #5](https://github.com/bbc/pydvbcss/pull/5) by [Jack Jansen](https://github.com/jackjansen) (03 May 2016)
-* Bugfix: `clock.getEffectiveSpeed()` stuck in infinite loop.
+  ([P-R #5](https://github.com/bbc/pydvbcss/pull/5) by [Jack Jansen](https://github.com/jackjansen))
+* Bugfix: `clock.getEffectiveSpeed()` stuck in infinite loop. ([ceb3f33](https://github.com/bbc/pydvbcss/commit/ceb3f33edb7b94359ecb2cac74046b92b2cc5094))
 * Docs: Now correctly links to github source for correct branch/version.
 * Docs: Improvements to setup/release process to format PyPI description correctly (by converting to ReStructuredText)
 
