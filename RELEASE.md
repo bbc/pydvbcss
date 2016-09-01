@@ -130,13 +130,16 @@ Update VERSION to mark as "release" within the branch
 
     $ vi VERSION
        .. change "latest" to "release"
-    $ git add VERSION
-    $ git commit -m "Version marked as release."
 
 Update README.md to change:
 
 * travis CI build status to be specific for this version branch
 * "stable" docs links to point to this version branch specifically.
+
+Commit changes:
+
+    $ git add VERSION README.md
+    $ git commit -m "Version marked as release."
 
 Push branch up to github (and set local repository to track the upstream branch on origin):
 
