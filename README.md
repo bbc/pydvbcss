@@ -65,6 +65,12 @@ release package from the Python Package Index (PyPI) using
 
     $ pip install pydvbcss
 
+Or if upgrading from a previous version:
+
+    $ pip install --upgrade pydvbcss
+
+You can use `pip search pydvbcss` to verify which version is installed.
+
    * [![Latest PyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss) [See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
 
 #### From Github or a release tarball _(library and examples)_
