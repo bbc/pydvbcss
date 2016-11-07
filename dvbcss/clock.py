@@ -516,7 +516,7 @@ class ClockBase(object):
 
     def calcWhen(self, ticksWhen):
         """\
-        :Return: "when" in terms of the underlying clock behind the root clock implementation (e.g. :func:`monotonic_time.time` in the case of :class:`SysClock`)
+        :Return: "when" in terms of the underlying clock behind the root clock implementation (e.g. :func:`monotonic_time.time` in the case of :class:`SysClock`). Will return :ref:`nan` if the conversion is not possible (e.g. when current `speed` is zero and `ticksWhen` does not match the current `correlation.childTicks`).
         
         |stub-method|
         """
@@ -555,8 +555,10 @@ class ClockBase(object):
         """\
         Return the time for the root clock corresponding to a given time of this clock.
         
+        Will return :ref:`nan` if the conversion is not possible (e.g. when current `speed` is zero and `ticksWhen` does not match the current `correlation.childTicks`).
+        
         :param t: Tick value for this clock.
-        :returns: Corresponding tick value of the root clock.
+        :returns: Corresponding tick value of the root clock, or :ref:`nan`
         
         .. versionadded:: 0.4
         """
@@ -571,10 +573,12 @@ class ClockBase(object):
         """\
         Converts a tick value for this clock into a tick value corresponding to the timescale of another clock.
         
+        Will return :ref:`nan` if the conversion is not possible (e.g. when current `speed` is zero and `ticksWhen` does not match the current `correlation.childTicks`).
+        
         :param otherClock: A :class:`~dvbcss.clock` object representing another clock.
         :param ticks: A time (tick value) for this clock
         
-        :returns: The tick value of the `otherClock` that represents the same moment in time.
+        :returns: The tick value of the `otherClock` that represents the same moment in time, or :ref:`nan`
         
         :throws NoCommonClock: if there is no common ancestor clock (meaning it is not possible to convert
         """
@@ -1006,11 +1010,12 @@ class CorrelatedClock(ClockBase):
     
     """
     
-    def __init__(self, parentClock, tickRate, correlation=Correlation(0,0), **kwargs):
+    def __init__(self, parentClock, tickRate, correlation=Correlation(0,0), speed=1.0, **kwargs):
         """\
         :param parentClock: The parent clock for this clock.
         :param tickRate: (int) tick rate for this clock (in ticks per second)
         :param correlation: (:class:`Correlation`) or tuple `(parentTicks, selfTicks)`. The intial correlation for this clock.
+        :param speed: Initial speed for this clock.
         
         """
         super(CorrelatedClock,self).__init__(**kwargs)
@@ -1018,7 +1023,7 @@ class CorrelatedClock(ClockBase):
             raise ValueError("Cannot set tickRate to "+repr(tickRate))
         self._freq = tickRate
         self._parent=parentClock
-        self._speed = 1.0
+        self._speed = speed
         if isinstance(correlation, tuple):
             correlation = Correlation(*correlation)
         self._correlation=correlation
@@ -1104,15 +1109,14 @@ class CorrelatedClock(ClockBase):
         self.notify(self)
         
     def calcWhen(self,ticksWhen):
-        if self.speed == 0:
-            refticks=self._correlation.parentTicks   # return any arbitrary position if the speed of this clock is zero (pause)
-        else:
-            refticks=self._correlation.parentTicks + (ticksWhen - self._correlation.childTicks)*self._parent.tickRate/self._freq/self.speed
-        return self._parent.calcWhen(refticks)
+        return self._parent.calcWhen(self.toParentTicks(ticksWhen));
 
     def toParentTicks(self, ticks):
         if self.speed == 0:
-            return self._correlation.parentTicks   # return any arbitrary position if the speed of this clock is zero (pause)
+            if ticks == self._correlation.childTicks:
+                return self._correlation.parentTicks
+            else:
+                return float('nan');       # because not defined if not on the point of correlation. There is no way to map to parent ticks
         else:
             return self._correlation.parentTicks + (ticks - self._correlation.childTicks)*self._parent.tickRate/self._freq/self.speed
 

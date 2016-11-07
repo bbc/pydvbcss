@@ -157,7 +157,8 @@ class _Scheduler(object):
             while not self.addQueue.empty():
                 clock, whenTicks, callBack, args, kwargs = self.addQueue.get_nowait()
                 task = _Task(clock, whenTicks, callBack, args, kwargs)
-                heapq.heappush(self.taskheap, (task.when, task))
+                if not math.isnan(task.when):
+                    heapq.heappush(self.taskheap, (task.when, task))
 
                 if clock not in self.clock_Tasks:
                     self.clock_Tasks[clock] = { task:True }
@@ -171,7 +172,8 @@ class _Scheduler(object):
                 tasksMap=self.clock_Tasks.get(clock, {})
                 for task in tasksMap.keys():
                     newTask=task.regenerateAndDeprecate()
-                    heapq.heappush(self.taskheap,(newTask.when, newTask))
+                    if not math.isnan(newtask.when):
+                        heapq.heappush(self.taskheap,(newTask.when, newTask))
                     tasksMap[newTask] = True
                     del tasksMap[task]
  

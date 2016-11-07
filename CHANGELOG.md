@@ -2,6 +2,8 @@
 
 ## Latest
 
+* Bugfix: fixed semantics on `calcWhen()`, `toParenTicks()` and `toRootTicks()`
+  when clock speed is 0.` ([32256b6](https://github.com/bbc/pydvbcss/commit/32256b6f94ce01466ab4645097672e58a00456cc))
 * ...
 
 ## 0.4.0 : Bugfixes and overhaul of clock object model (new-clock-model)

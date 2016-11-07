@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import unittest
+import math
 
 import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... @UnusedImport
 
@@ -394,6 +395,10 @@ class Test_CorrelatedClock(unittest.TestCase):
         c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         self.assertAlmostEqual(c.toParentTicks(400), 50 + (400-300)*2000, places=5 )
         
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300), speed=0)
+        self.assertEquals(c.toParentTicks(300), 50)
+        self.assertTrue(math.isnan(c.toParentTicks(400)))
+        
     def test_fromParentTicks(self):
         mockTime = self.mockTime
 
@@ -403,6 +408,10 @@ class Test_CorrelatedClock(unittest.TestCase):
         
         c = CorrelatedClock(b, 1000, correlation=Correlation(50,300))
         self.assertAlmostEqual(c.fromParentTicks(50 + (400-300)*2000), 400, places=5 )
+        
+        c = CorrelatedClock(b, 1000, correlation=Correlation(50,300), speed=0)
+        self.assertEquals(c.fromParentTicks(50), 300)
+        self.assertEquals(c.fromParentTicks(100), 300)
       
     def test_getParent(self):
         b = self.newSysClock()

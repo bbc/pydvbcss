@@ -17,6 +17,22 @@ Module: `dvbcss.clock`
    :noindex:
 
 
+.. _nan:
+
+Not a number (nan)
+------------------
+
+"Not a number" value of a `float <https://docs.python.org/2/library/functions.html#float>`_. Check if a value is NaN like this::
+
+    >>> import math
+    >>> math.isnan(nanValue)
+    True
+
+Converting tick values to a parent clock or to the root clock may result in this
+value being returned if one or more of the clocks involved has speed zero.
+
+    
+
 Functions
 ---------
 
