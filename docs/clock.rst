@@ -65,6 +65,13 @@ Classes
 .. autoclass:: dvbcss.clock.CorrelatedClock
    :members:
    :inherited-members:
+   
+**OffsetClock** - A clock that is offset by a fixed amount of root time
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+.. autoclass:: dvbcss.clock.Offset
+   :members:
+   :inherited-members:
 
 **TunableClock** - Clock with dynamically adjustable frequency and tick offset
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

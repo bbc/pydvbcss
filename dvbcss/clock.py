@@ -39,6 +39,7 @@ chains of clocks, each based on their parent and leading back to an underlying c
 The following dependent clocks are provided:
 
 * :class:`CorrelatedClock` **is a fixed tick rate clock where you define the point of correlation between it and its parent.**
+* :class:`OffsetClock` ** is a clock that is the same as its parent but with an offset amount of root time. Useful to calibrate for rendering pipeline delays.
 * :class:`TunableClock` **is a clock that can have its tick count tweaked and its frequency slewed on the fly.**
 * :class:`RangleCorrelatedClock` **is a clock where the relationship to the parent is determined from two points of correlation.**
 
