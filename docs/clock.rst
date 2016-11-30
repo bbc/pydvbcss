@@ -69,7 +69,7 @@ Classes
 **OffsetClock** - A clock that is offset by a fixed amount of root time
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-.. autoclass:: dvbcss.clock.Offset
+.. autoclass:: dvbcss.clock.OffsetClock
    :members:
    :inherited-members:
 
