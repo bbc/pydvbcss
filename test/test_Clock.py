@@ -21,7 +21,7 @@ import _useDvbCssUninstalled  # Enable to run when dvbcss not yet installed ... 
 
 import dvbcss.monotonic_time as time
 
-from dvbcss.clock import ClockBase, SysClock, CorrelatedClock, TunableClock, NoCommonClock, RangeCorrelatedClock, Correlation
+from dvbcss.clock import ClockBase, SysClock, CorrelatedClock, OffsetClock, TunableClock, NoCommonClock, RangeCorrelatedClock, Correlation
 
 from mock_time import MockTime
 from mock_dependent import MockDependent
@@ -733,6 +733,122 @@ class Test_TunableClock(unittest.TestCase):
         
         mockTime.timeNow += 5
         self.assertAlmostEquals(0.205 + sysClockErr, c.dispersionAtTime(c.ticks), delta=0.0000001)
+
+
+class Test_OffsetClock(unittest.TestCase):
+    """\
+    Tests for OffsetClock
+    """
+    
+    def setUp(self):
+        self.root = SysClock() # init before installing mock, so it can do its precision measurement while time still flows
+        self.mockTime = MockTime()
+        self.mockTime.install()
+        self.parent = CorrelatedClock(parentClock=self.root, tickRate=1000)
+        self.altParent = CorrelatedClock(parentClock=self.root, tickRate=50)
+
+    def tearDown(self):
+        self.mockTime.uninstall()
+
+    def test_speedAlways1(self):
+        oc = OffsetClock(parentClock=self.parent)
+        self.assertEquals(oc.speed, 1)
+        self.parent.speed = 2.7
+        self.assertEquals(oc.speed, 1)
+
+    def test_effectiveSpeedSameAsParents(self):
+        oc = OffsetClock(parentClock=self.parent)
+        self.assertEquals(oc.getEffectiveSpeed(), self.parent.getEffectiveSpeed())
+        self.parent.speed = 2.7
+        self.assertEquals(oc.getEffectiveSpeed(), self.parent.getEffectiveSpeed())
+        
+    def test_inheritsTickRateFromParent(self):
+        oc = OffsetClock(parentClock=self.parent)
+        self.assertEquals(oc.tickRate, self.parent.tickRate)
+        self.parent.tickRate = 25
+        self.assertEquals(oc.tickRate, self.parent.tickRate)
+        
+    def test_offsetAppliedAtSpeed1(self):
+        OC_AHEAD_BY=0.050
+        oc = OffsetClock(parentClock=self.parent, offset=OC_AHEAD_BY)
+        self.parent.speed = 1
+        t = oc.ticks
+        # advance time and see if OffsetClock was indeed ahead by OC_AHEAD_BY seconds
+        self.mockTime.timeNow = self.mockTime.timeNow + OC_AHEAD_BY
+        t2 = self.parent.ticks
+        self.assertEquals(t,t2)
+        
+    def test_offsetAppliedAtSpeed0(self):
+        OC_AHEAD_BY=0.098
+        oc = OffsetClock(parentClock=self.parent, offset=OC_AHEAD_BY)
+        self.parent.speed = 0
+        t = oc.ticks
+        # advance time and see if OffsetClock was indeed ahead by OC_AHEAD_BY seconds
+        self.mockTime.timeNow = self.mockTime.timeNow + OC_AHEAD_BY
+        t2 = self.parent.ticks
+        self.assertEquals(t,t2)
+        
+    def test_offsetAppliedAtSpeedGreaterThan1(self):
+        OC_AHEAD_BY=0.02
+        oc = OffsetClock(parentClock=self.parent, offset=OC_AHEAD_BY)
+        self.parent.speed = 2
+        t = oc.ticks
+        # advance time and see if OffsetClock was indeed ahead by OC_AHEAD_BY seconds
+        self.mockTime.timeNow = self.mockTime.timeNow + OC_AHEAD_BY
+        t2 = self.parent.ticks
+        self.assertEquals(t,t2)
+        
+    def test_noOffsetWorks(self):
+        oc = OffsetClock(parentClock=self.parent, offset=0)
+        self.assertEquals(oc.ticks, self.parent.ticks)
+        
+    def test_offsetChangeNewOffsetUsed(self):
+        oc = OffsetClock(parentClock=self.parent, offset=0.040)
+        self.assertEquals(oc.ticks, self.parent.ticks + 40)
+        oc.offset = 0.065
+        self.assertEquals(oc.ticks, self.parent.ticks + 65)
+
+    def test_parentChangedOffsetStillApplied(self):
+        oc = OffsetClock(parentClock=self.parent, offset=0.040)
+        self.assertEquals(oc.getParent(), self.parent) 
+        self.assertEquals(oc.ticks, self.parent.ticks + 40)
+        oc.setParent(self.altParent)
+        self.assertEquals(oc.getParent(), self.altParent) 
+        self.assertEquals(oc.ticks, self.altParent.ticks + 2)
+        
+    def test_parentChangeCausesNotification(self):
+        oc = OffsetClock(parentClock=self.parent, offset=0.040)
+        dep = MockDependent()
+        oc.bind(dep)
+        dep.assertNotNotified()
+        oc.setParent(self.altParent)
+        dep.assertNotificationsEqual([oc])
+        
+    def test_negativeOffsetWorks(self):
+        OC_BEHIND_BY=0.050
+        oc = OffsetClock(parentClock=self.parent, offset=-OC_BEHIND_BY)
+        self.parent.speed = 1
+        t = oc.ticks
+        # regress time and see if OffsetClock was indeed behind by OC_BEHIND_BY seconds
+        self.mockTime.timeNow = self.mockTime.timeNow - OC_BEHIND_BY
+        t2 = self.parent.ticks
+        self.assertEquals(t,t2)
+        
+    def test_toRootTicks(self):
+        OC_AHEAD_BY=0.124
+        oc = OffsetClock(parentClock=self.parent, offset=OC_AHEAD_BY)
+        t = 1285.2
+        rt = oc.toRootTicks(t)
+        rt2 = self.parent.toRootTicks(t)
+        self.assertEquals(rt + OC_AHEAD_BY*self.root.tickRate, rt2)
+        
+    def test_fromRootTicks(self):
+        OC_AHEAD_BY=0.124
+        oc = OffsetClock(parentClock=self.parent, offset=OC_AHEAD_BY)
+        rt = 22849128
+        t = oc.fromRootTicks(rt)
+        t2 = self.parent.fromRootTicks(rt + OC_AHEAD_BY*self.root.tickRate)
+        self.assertEquals(t, t2)
 
 
 class Test_HierarchyTickConversions(unittest.TestCase):

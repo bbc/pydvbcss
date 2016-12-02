@@ -39,6 +39,7 @@ chains of clocks, each based on their parent and leading back to an underlying c
 The following dependent clocks are provided:
 
 * :class:`CorrelatedClock` **is a fixed tick rate clock where you define the point of correlation between it and its parent.**
+* :class:`OffsetClock` ** is a clock that is the same as its parent but with an offset amount of root time. Useful to calibrate for rendering pipeline delays.
 * :class:`TunableClock` **is a clock that can have its tick count tweaked and its frequency slewed on the fly.**
 * :class:`RangleCorrelatedClock` **is a clock where the relationship to the parent is determined from two points of correlation.**
 
@@ -1397,6 +1398,117 @@ class RangeCorrelatedClock(ClockBase):
         deltaSecs2 = (pt - self._correlation2.parentTicks) / self._parent.tickRate
         c2err = self._correlation2.initialError + deltaSecs2 * self._correlation2.errorGrowthRate
         return min(c1err, c2err)
+
+
+@dvbcss._inheritDocs(ClockBase)
+class OffsetClock(ClockBase):
+    r"""\
+    A clock that applies an offset such that reading it is the same as
+    reading its parent, but as if the current time is slightly offset by an
+    amount ahead (+ve offset) or behind (-ve offset). 
+    
+    :class:`OffsetClock` inherits the tick rate of its parent. Its speed is
+    always 1. It takes the effective speed into account when applying the offset,
+    so it should always represent the same amount of time according to the root
+    clock. In practice this means it will be a constant offset amount of real-world
+    time.
+    
+    This can be used to compensate for rendering delays. If it takes N seconds
+    to render some content and display it, then a positive offset of N seconds
+    will mean that the rendering code thinks time is N seconds ahead of where
+    it is. It will then render the correct content that is needed to be displayed
+    in N seconds time.
+    
+    For example: A correlated clock (the "media clock") represents the time
+    position a video player needs to currently be at.
+    
+    The video player has a 40 milisecond (0.040 second) delay between when it renders a frame and the light being emitted by the display. We therefore need the
+    video player to render 40 milliseconds in advance of when the frame is
+    to be displayed. An :class:`OffsetClock` is used to offset time in this
+    way and is passed to the video player:
+    
+    .. code-block:: python
+    
+        mediaClock = CorrelatedClock(...)
+        
+        PLAYER_DELAY_SECS = 0.040
+        oClock = OffsetClock(parent=mediaClock, offset=PLAYER_DELAY_SECS)
+        
+        videoPlayer.syncToClock(oClock)
+        
+    If needed, the offset can be altered at runtime, by setting the :data:`offset`
+    property. For example, perhaps it needs to be changed to a 50 millisecond offset:
+    
+    .. code-block:: python
+    
+        oClock.offset = 0.050
+        
+    Both positive and negative offsets can be used. 
+    """
+
+    def __init__(self, parentClock, offset=0):
+        super(OffsetClock,self).__init__()
+        self._parent = parentClock
+        self._parent.bind(self)
+        self._offset = offset
+
+    @property
+    def ticks(self):
+        return self._parent.ticks + self._offset * self.getEffectiveSpeed() * self.tickRate
+        
+    def __repr__(self):
+        return "OffsetClock(t=%f, offset=%f)" % (self.ticks, self._offset)
+
+    @property
+    def tickRate(self):
+        """\
+        Read the tick rate (in ticks per second) of this clock. The tick rate is always
+        that of the parent clock.
+        """
+        return self._parent.tickRate
+
+    @property
+    def speed(self):
+        """\
+        Read the clock's speed. It is always 1.
+        """
+        return 1
+
+    def getParent(self):
+        return self._parent
+
+    def setParent(self,newParent):
+        if self._parent != newParent:
+            if self._parent:
+                self._parent.unbind(self)
+                self._parent = None
+            self._parent = newParent
+            if self._parent:
+                self._parent.bind(self)
+            self.notify(self)
+
+    def toParentTicks(self, ticks):
+        return ticks - self._offset * self.getEffectiveSpeed() * self.tickRate
+        
+    def fromParentTicks(self, ticks):
+        return ticks + self._offset * self.getEffectiveSpeed() * self.tickRate
+
+    def _errorAtTime(self, t):
+        return 0
+        
+    @property
+    def offset(self):
+        """\
+        Read or change the number of seconds by which this clock is ahead (the offset).
+        """
+        return self._offset
+        
+    @offset.setter
+    def offset(self, newOffset):
+        changed = self._offset != newOffset
+        self._offset = newOffset
+        if changed:
+            self.notify(self)
 
 
 __all__ = [
