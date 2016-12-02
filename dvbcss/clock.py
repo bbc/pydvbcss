@@ -1407,6 +1407,12 @@ class OffsetClock(ClockBase):
     reading its parent, but as if the current time is slightly offset by an
     amount ahead (+ve offset) or behind (-ve offset). 
     
+    :class:`OffsetClock` inherits the tick rate of its parent. Its speed is
+    always 1. It takes the effective speed into account when applying the offset,
+    so it should always represent the same amount of time according to the root
+    clock. In practice this means it will be a constant offset amount of real-world
+    time.
+    
     This can be used to compensate for rendering delays. If it takes N seconds
     to render some content and display it, then a positive offset of N seconds
     will mean that the rendering code thinks time is N seconds ahead of where
@@ -1437,16 +1443,13 @@ class OffsetClock(ClockBase):
     
         oClock.offset = 0.050
         
-    Both positive and negative offsets can be used. The :class:`OffsetClock`
-    class inherits the tick rate and speed of its parent. It takes the effective
-    speed into account when applying the offset, so it should always represent
-    the same amount of time according to the root clock. In practice this means
-    it will be a constant offset amount of real-world time.
+    Both positive and negative offsets can be used. 
     """
 
     def __init__(self, parentClock, offset=0):
         super(OffsetClock,self).__init__()
         self._parent = parentClock
+        self._parent.bind(self)
         self._offset = offset
 
     @property
@@ -1454,7 +1457,7 @@ class OffsetClock(ClockBase):
         return self._parent.ticks + self._offset * self.getEffectiveSpeed() * self.tickRate
         
     def __repr__(self):
-        return "CorrelatedClock(t=%d, freq=%f, correlation=%s) at speed=%f" % (self.ticks, self._freq, str(self._correlation), self.speed)
+        return "OffsetClock(t=%f, offset=%f)" % (self.ticks, self._offset)
 
     @property
     def tickRate(self):
@@ -1463,6 +1466,13 @@ class OffsetClock(ClockBase):
         that of the parent clock.
         """
         return self._parent.tickRate
+
+    @property
+    def speed(self):
+        """\
+        Read the clock's speed. It is always 1.
+        """
+        return 1
 
     def getParent(self):
         return self._parent
@@ -1498,7 +1508,7 @@ class OffsetClock(ClockBase):
         changed = self._offset != newOffset
         self._offset = newOffset
         if changed:
-            self.notify()
+            self.notify(self)
 
 
 __all__ = [
