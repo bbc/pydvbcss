@@ -5,6 +5,7 @@
 * Bugfix: fixed semantics on `calcWhen()`, `toParenTicks()` and `toRootTicks()`
   when clock speed is 0.` ([32256b6](https://github.com/bbc/pydvbcss/commit/32256b6f94ce01466ab4645097672e58a00456cc))
 * API addition: new `OffsetClock` class to make it easy to compensate for rendering  latencies.
+* Temporary fix for bug due to changes in cherrypy ([f8ec3f6](https://github.com/bbc/pydvbcss/commit/f8ec3f665896d8cc90c5963781e00d366c9d8331)). Will be reverted once resolved by dependencies.
 * ...
 
 ## 0.4.0 : Bugfixes and overhaul of clock object model (new-clock-model)
