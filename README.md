@@ -1,4 +1,4 @@
-# Python DVB Companion Screen Synchronisation protocol library
+# Python DVB Companion Screen Synchronisation protocol library and tools
 
 [![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)](https://travis-ci.org/bbc/pydvbcss)
 [![Docs Status (stable)](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
@@ -9,8 +9,9 @@
 * **[Read the documentation](#read-the-documentation)**
 * **[Run the examples](#run-the-examples)**
 
-**pydvbcss** is a set of Python 2.7 libraries that implement some of the
-protocols defined in the DVB CSS specification (published as [ETSI 103-286 part 2](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1)).
+**pydvbcss** is a set of Python 2.7 libraries and command-line tools that implement some of the
+protocols defined in the DVB CSS specification (published as [ETSI 103-286 part 2](http://www.etsi.org/standards-search?search=103+286&page=1&title=1&keywords=1&ed=1&sortby=1))
+and are used for the "inter-device synchronisation" feature in **[HbbTV 2](http://hbbtv.org/resource-library/)**.
 These protocols enable synchronisation of media presentation between a TV
 and Companion devices (mobiles, tablets, etc).
 
@@ -56,9 +57,11 @@ Links are also available from those pages through to documentation for earlier r
 
 *On Mac OS X and Linux you may need to run one or more of the commands as root.*
 
-#### Using PyPi _(core library only, no examples)_
+#### Using PyPi _(core library only, no examples or tools)_
 
-If you ONLY want the library (not the [code examples](#run-examples) ) and
+   * [![Latest PyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss) [See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
+
+If you ONLY want the library (not the [code examples and tools](#run-examples) ) and
 if you don't require the very latest bugfixes, then you can install a recent
 release package from the Python Package Index (PyPI) using
 [pip](https://pip.pypa.io/en/latest/installing.html):
@@ -71,9 +74,7 @@ Or if upgrading from a previous version:
 
 You can use `pip search pydvbcss` to verify which version is installed.
 
-   * [![Latest PyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss) [See the pydvbcss PyPI package page](https://pypi.python.org/pypi/pydvbcss). 
-
-#### From Github or a release tarball _(library and examples)_
+#### From Github or a release tarball _(includes examples and tools)_
 
 The [master branch](https://github.com/BBC/pydvbcss/tree/master) is the latest
 state of the code, including any recent bugfixes. It is mostly stable but
@@ -113,17 +114,43 @@ running any CPU intensive tasks at the time.
 
 
 
-### Run the examples
+### Run the examples and tools
 
-There is a set of examples demonstrating simple servers and clients for the
+There is a set of example and tools demonstrating simple servers and clients for the
 protocols included with the library. See the 
 [quick start guide](https://BBC.github.io/pydvbcss/docs/latest/examples.html) 
 in the documentation to see how to run them.
 
-They demonstrate simple clients and servers. As appropriate, they pretend that
-there is content playing and that it has a progressing timeline.
-These examples serve to demonstrate how to use the library. They are not
-intended as finished and useful tools.
+The clients are useful tools to test a TV implementation is outputting the correect data.
+
+The servers can be modified to simulate a TV that is playing content with an ID
+and timeline(s) that a companion application expects.
+
+#### Example: checking protocols implemented by a TV
+
+Start the content playing on the TV and ensure it is serving the protocols (for HbbTV 2
+TVs this requires an HbbTV application to enable inter-device synchronisation).
+
+Suppose the TV is serving the CII protocol at the URL `ws://192.168.0.57:7681/cii`...
+
+To check the CII protocol:
+
+    $ python examples/CIIClient.py ws://192.168.0.57:7681/cii
+
+Suppose that the messages returned report the URL of the TS protocol endpoint as being `ws://192.168.0.57:7681/ts` and the wall clock protocol as being at `192.168.0.57` port `6677`...
+
+To check the TV's Wall Clock protocol:`
+
+    $ python examples/WallClockClient.py 192.168.0.57 6677
+
+To check the TV reporting a PTS timeline (uses both Wall Clock and TS protocols):
+
+    $ python examples/TSClient.py ws://192.168.0.57:7681/ts \
+        udp://192.168.0.57:6677 \
+        "" \
+        "urn:dvb:css:timeline:pts" \
+        9000
+
 
 ## Super-quick introduction to the protocols
 
