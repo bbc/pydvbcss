@@ -114,7 +114,7 @@ running any CPU intensive tasks at the time.
 
 
 
-### Run the examples and tools
+## Running the examples and tools
 
 There is a set of example and tools demonstrating simple servers and clients for the
 protocols included with the library. See the 
@@ -126,7 +126,7 @@ The clients are useful tools to test a TV implementation is outputting the corre
 The servers can be modified to simulate a TV that is playing content with an ID
 and timeline(s) that a companion application expects.
 
-#### Example: checking protocols implemented by a TV
+### Example: checking protocols implemented by a TV
 
 Start the content playing on the TV and ensure it is serving the protocols (for HbbTV 2
 TVs this requires an HbbTV application to enable inter-device synchronisation).
