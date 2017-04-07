@@ -88,13 +88,8 @@ First you need to install dependencies...
 We recommend using [pip](https://pip.pypa.io/en/latest/installing.html) to install
 dependencies from the Python Package Index [PyPI](https://pypi.python.org/pypi):
 
-    $ pip install 'cherrypy<9.0.0'
-    $ pip install 'ws4py<=0.3.5'
-
-**NOTE: There is a temporary incompatibility between cherrypy, ws4py and
-pydvbcss. Until this is resolved, you should install a *pre 9.0.0 version of
-cherrypy* and *version 0.3.5 of ws4py*. Details of the issue are
-[available here](https://github.com/bbc/pydvbcss/issues/13)**
+    $ pip install 'cherrypy'
+    $ pip install 'ws4py'
 
 Then take (or update) your clone of the repository *master* branch, or
 download and unzip a snapshot release and run the `setup.py` script to

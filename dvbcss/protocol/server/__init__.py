@@ -18,7 +18,7 @@ import cherrypy
 from cherrypy.process import plugins
 from ws4py.websocket import WebSocket
 from ws4py.server.cherrypyserver import WebSocketTool
-from cherrypy.wsgiserver import HTTPConnection
+from cheroot.server import HTTPConnection
 
 import inspect
 import threading

@@ -65,7 +65,7 @@ try:
         
         packages = package_names,
         package_dir = packages,
-        install_requires = [ 'cherrypy<9.0.0', 'ws4py<=0.3.5' ],
+        install_requires = [ 'cherrypy>=10.0.0', 'ws4py>=0.3.6' ],
 
         test_suite = "test.test_all.testSuite",
         
