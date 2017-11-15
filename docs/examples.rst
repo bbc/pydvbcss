@@ -179,19 +179,20 @@ First start the server:
 While we leave it running in the background, we can try to interact with it using the various example
 clients described above.
 
-By default it provides a wall clock server on 127.0.0.1 port 6677
+By default it provides a wall clock server on all interfaces on port 6677
 
 .. code-block:: shell
 
     $ python examples/WallClockClient.py 127.0.0.1 6677
 
-... and a CSS-CII server that can be reached at `ws://127.0.0.1:7681/cii`
+... and a CSS-CII server that can be reached at `ws://{{host}}:7681/cii` where `{{host}}` is any
+interface, including 127.0.0.1.
 
 .. code-block:: shell
 
     $ python examples/CIIClient.py ws:/127.0.0.1:7681/cii
     
-... and a CSS-TS server that can be reached at `ws://127.0.0.1:7681/ts`
+... and a CSS-TS server that can be reached at `ws://{{host}}:7681/ts`
     
 .. code-block:: shell
 

@@ -38,9 +38,12 @@
     
     The PTS and TEMI timelines both start ticking up from zero the moment the server starts.
     
-    By default, this server serves at 127.0.0.1 on port 7681 and provides a CSS-CII service at the
-    URL `ws://127.0.0.1:7681/cii` and a CSS-TS service at the
-    URL `ws://127.0.0.1:7681/ts`. It also provides a wall clock server bound to 0.0.0.0 on UDP port 6677.
+    By default, this server binds to 0.0.0.0 on port 7681 and provides a CSS-CII service at the
+    URL `ws://{host}:7681/cii` and a CSS-TS service at the
+    URL `ws://{host}:7681/ts`. It also provides a wall clock server bound to 0.0.0.0 on UDP port 6677.
+    
+    The CII service will provide URLs for the TS and WC endpoints that match the host name on which the
+    
     Command line options can be used to override these defaults and to reduce the amount of logging output.
     
     Use the ``--help`` command line option for more detailed usage information.
@@ -67,7 +70,7 @@ if __name__ == '__main__':
     import argparse
     import dvbcss.util
     
-    DEFAULT_WS_BIND=("127.0.0.1",7681)
+    DEFAULT_WS_BIND=("0.0.0.0",7681)
     DEFAULT_WC_BIND=("0.0.0.0",6677)
 
     CONTENT_ID = "dvb://233a.1004.1044;363a~20130218T0915Z--PT00H45M"
@@ -114,7 +117,7 @@ if __name__ == '__main__':
 
     wcServer = WallClockServer(wallClock, None, None, bindaddr=args.wc_addr, bindport=args.wc_port)
 
-    ciiServer = CIIServer(maxConnectionsAllowed=5, enabled=True)
+    ciiServer = CIIServer(maxConnectionsAllowed=5, enabled=True, rewriteHostPort=['wcUrl','tsUrl'])
     tsServer  = TSServer(CONTENT_ID, wallClock, maxConnectionsAllowed=10, enabled=True)
 
     class Root(object):
@@ -139,8 +142,8 @@ if __name__ == '__main__':
         contentIdStatus="final",
         presentationStatus=["okay"],
         mrsUrl=OMIT,
-        tsUrl="ws://" + args.ws_addr + ":" + str(args.ws_port) + "/ts",
-        wcUrl="udp://" + args.wc_addr + ":" + str(args.wc_port),
+        tsUrl="ws://{{host}}:{{port}}/ts",  # host & port rewriting has been enabled on the CII server
+        wcUrl="udp://{{host}}:%d" % args.wc_port,    # host & port rewriting has been enabled on the CII server
         teUrl=OMIT,
         timelines = [
             TimelineOption("urn:dvb:css:timeline:pts", unitsPerTick=1, unitsPerSecond=90000),

@@ -120,6 +120,32 @@ However this behaviour can be overridden.
 
 
 
+Intelligently setting the host and port in tsUrl, teUrl and wcUrl properties
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+:class:`CIIServer` has built in support to help in situations where it is difficult to determine the host and port
+to which clients are connecting in order to contact the CII Server, or where CIIServer might be contacted via more than
+one network interface.
+
+At initialisation, pass the optional `rewriteHostPort` argument, setting it to a list of properties for which you want
+it to fix the host/port in URLs. Then within the CII, put `{{host}}` and `{{port}}` in place of the host and port number. The
+CIIServer will then automatically substitute this in the properties you have listed.
+
+For example:
+
+.. code-block:: python
+
+    ciiServer = CIIServer(rewriteHostPort=['tsUrl','wcUrl'])
+    ciiServer.cii = CII(
+        tsUrl='ws://{{host}}:{{port}}/ts',
+        wcUrl='udp://{{host}}:6677'
+    )
+    
+This will be done transparently and individually for each connected client. The `cii` property of the CII server will
+contain the `{{host}}` and `{{port}}` patterns before the substitution takes place.
+
+
+
 What does CIIServer do for you and what does it not?
 ----------------------------------------------------
 
@@ -176,6 +202,10 @@ class CIIServer(WSServerBase):
 
     * :data:`enabled` (read/write) controls whether this server is enabled or not
     * :data:`cii` (read/write) the CII state that is being shared to connected clients
+    
+    To allow for servers serving multiple network interfaces, or where the IP address of the interface is not easy to determine, CII Server can be 
+    asked to automatically substitute the host and port with the one that the client connected to. Specify the list of property names for which this
+    shoud happen as an optional `rewritheostPort` argument when intialising the CIIServer, then use `{{host}}` `{{port}}` within those properties.
     """
     
     connectionIdPrefix = "cii"
@@ -183,17 +213,19 @@ class CIIServer(WSServerBase):
     
     getDefaultConnectionData = lambda self: {  "prevCII" : CII() }  # default state for a new connection - no CII info transferred to client yet
     
-    def __init__(self, maxConnectionsAllowed=-1, enabled=True, initialCII = CII(protocolVersion="1.1")):
+    def __init__(self, maxConnectionsAllowed=-1, enabled=True, initialCII = CII(protocolVersion="1.1"), rewriteHostPort=[]):
         """\
         **Initialisation takes the following parameters:**
         
         :param maxConnectionsAllowed: (int, default=-1) Maximum number of concurrent connections to be allowed, or -1 to allow as many connections as resources allow.
         :param enabled: (bool, default=True) Whether the endpoint is initially enabled (True) or disabled (False)
         :param initialCII: (:class:`dvbcss.protocol.cii.CII`, default=CII(protocolVersion="1.1")) Initial value of CII state.
+        :param rewriteHostPort: (list) List of CII property names for which the sub-string '{{host}}' '{{port}}' will be replaced with the host and port that the client connected to. 
         """
         super(CIIServer,self).__init__(maxConnectionsAllowed=maxConnectionsAllowed, enabled=enabled)
         
         self.cii = initialCII.copy()
+        self._rewriteHostPort = rewriteHostPort[:]
         """\
         A :class:`dvbcss.protocol.cii.CII` message object representing current CII state.
         Set the attributes of this object to update that state.
@@ -201,6 +233,15 @@ class CIIServer(WSServerBase):
         When :func:`updateClients` is called, it is this state that will be sent to connected clients.
         """
     
+    def _customiseCii(self, webSock):
+        cii = self.cii.copy()
+        host = webSock.local_address[0]
+        port = str(webSock.local_address[1])
+        for propName in cii.definedProperties():
+            if propName in self._rewriteHostPort:
+                propVal = getattr(cii,propName).replace("{{host}}", host).replace("{{port}}", port)
+                setattr(cii, propName, propVal)
+        return cii
     
     def updateClients(self, sendOnlyDiff=True,sendIfEmpty=False):
         """\
@@ -231,27 +272,31 @@ class CIIServer(WSServerBase):
             connectionData = connections[webSock]
             prevCII = connectionData["prevCII"]
             
+            # perform rewrite substitutions, if any
+            cii = self._customiseCii(webSock)
+                
             # work out whether we are sending the full CII or a diff
             if sendOnlyDiff:
-                diff = CII.diff(prevCII, self.cii)
+                diff = CII.diff(prevCII, cii)
                 toSend = diff
                 # enforce requirement that contentId must be accompanied by contentIdStatus
                 if diff.contentId != OMIT:
-                    toSend.contentIdStatus = self.cii.contentIdStatus
+                    toSend.contentIdStatus = cii.contentIdStatus
             else:
-                toSend = self.cii
+                toSend = cii
             
             # only send if forced to, or if the mesage to send is not empty (all OMITs)
             if sendIfEmpty or toSend.definedProperties():
                 webSock.send(toSend.pack())
                 
-            connectionData["prevCII"] = self.cii.copy()
+            connectionData["prevCII"] = cii.copy()
 
     def onClientConnect(self, webSock):
         """If you override this method you must call the base class implementation."""
         self.log.info("Sending initial CII message for connection "+webSock.id())
-        webSock.send(self.cii.pack())
-        self.getConnections()[webSock]["prevCII"] = self.cii.copy()
+        cii = self._customiseCii(webSock)
+        webSock.send(cii.pack())
+        self.getConnections()[webSock]["prevCII"] = cii.copy()
     
     def onClientDisconnect(self, webSock, connectionData):
         """If you override this method you must call the base class implementation."""
