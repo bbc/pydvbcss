@@ -4,6 +4,22 @@
 
 * ...
 
+
+## 0.5.0 : CII server improvement and fix for ws4py 0.3.6
+
+This is a minor release containing mostly maintenance fixes arising from
+recent changes to cherrypy/ws4py, some small documentation improvements,
+and an enhancement to CII server support for when bound to multiple
+network interfaces.
+
+* Enhancement: CII server can transparently rewrite `wcUrl`, `tsUrl` and
+  `teUrl` to take account of the network interface the client has connected
+  to - enabling it to work when bound to multiple interfaces.
+  ([#14](https://github.com/bbc/pydvbcss/issues/14))
+* Docs: `README.md` improvements.
+* Switch from temporary to permanent fix due to cherrypy/ws4py bugs that have now been
+  fixed. ([#13](https://github.com/bbc/pydvbcss/issues/13))
+
 ## 0.4.1 : Bugfixes and new clock object type
 
 This is a minor release that includes a temporary workaround for a problem
