@@ -90,11 +90,13 @@ dependencies from the Python Package Index [PyPI](https://pypi.python.org/pypi):
 
     $ pip install -r requirements.txt
 
-**NOTE: There is any incompatibility between cherrypy, ws4py and
-cheroot in recent versions of cherrypy that breaks WebSockets support.
-Until this is resolved, you should only *use versions of cherrypy between
-10.0.0 and 11.0.0 inclusive*. Details of the issue are
-[available here](https://github.com/bbc/pydvbcss/issues/15)**
+**NOTE: There is any incompatibility between `cherrypy`, `ws4py` and
+`cheroot` in recent versions of `cherrypy` that breaks WebSockets support.
+Until this is resolved, you should only *use versions of `cherrypy` between
+10.0.0 and 11.0.0 inclusive* and *`six` version 1.11.0 or greater*.
+ Details of the issue are
+[available here](https://github.com/bbc/pydvbcss/issues/15) and 
+[here](https://github.com/bbc/pydvbcss/issues/16)**
 
 Then take (or update) your clone of the repository *master* branch, or
 download and unzip a snapshot release and run the `setup.py` script to
