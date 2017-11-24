@@ -2,6 +2,10 @@
 
 ## Latest
 
+* ...
+
+# 0.5.1 : Installation bugfixes
+
 This is a minor release containing a temporary workaround for installation
 problems caused by changes to packages this library depends on (cherrypy).
 
