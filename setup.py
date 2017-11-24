@@ -65,7 +65,7 @@ try:
         
         packages = package_names,
         package_dir = packages,
-        install_requires = [ 'cherrypy>=10.0.0', 'ws4py>=0.3.6' ],
+        install_requires = filter(len, [req.strip() for req in open("requirements.txt","r").read().splitlines()]),
 
         test_suite = "test.test_all.testSuite",
         

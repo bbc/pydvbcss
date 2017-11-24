@@ -88,8 +88,7 @@ First you need to install dependencies...
 We recommend using [pip](https://pip.pypa.io/en/latest/installing.html) to install
 dependencies from the Python Package Index [PyPI](https://pypi.python.org/pypi):
 
-    $ pip install 'cherrypy'
-    $ pip install 'ws4py'
+    $ pip install -r requirements.txt
 
 Then take (or update) your clone of the repository *master* branch, or
 download and unzip a snapshot release and run the `setup.py` script to
