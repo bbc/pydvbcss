@@ -2,7 +2,13 @@
 
 ## Latest
 
-* ...
+This is a minor release containing a temporary workaround for installation
+problems caused by changes to packages this library depends on (cherrypy).
+
+* Temporary fix for bug due to changes in cherrypy
+  ([f5bb1b1](https://github.com/bbc/pydvbcss/commit/f5bb1b17653f4b431adadb0ad7f819cd4c444640) and
+   [7ad71e9](https://github.com/bbc/pydvbcss/commit/7ad71e9c96f4732666725455b30767e9daa891cd)).
+  Will be reverted once resolved by dependencies
 
 
 ## 0.5.0 : CII server improvement and fix for ws4py 0.3.6
