@@ -3,3 +3,4 @@ recursive-include test *.py
 include setup.py setup.cfg
 include README.md
 include VERSION
+include requirements.txt
