@@ -1,7 +1,8 @@
 # Python DVB Companion Screen Synchronisation protocol library and tools
 
-[![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=master)](https://travis-ci.org/bbc/pydvbcss)
-[![Docs Status (stable)](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
+[![Build status](https://travis-ci.org/bbc/pydvbcss.svg?branch=0.5.2)](https://travis-ci.org/bbc/pydvbcss)
+[![Docs Status
+(0.5.2)](https://readthedocs.org/projects/pydvbcss/badge/?version=0.5.2)](http://pydvbcss.readthedocs.io/en/0.5.2/?badge=0.5.2)
 [![Docs Status (latest)](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
 [![Latest PyPI package](https://img.shields.io/pypi/v/pydvbcss.svg)](https://pypi.python.org/pypi/pydvbcss)
 
@@ -45,7 +46,7 @@ successfully on Microsoft Windows 7 and Ubuntu 14.04.
 
 The docs for the library can be read online on readthedocs.org:
 
-   * [![Docs Status (stable)](https://readthedocs.org/projects/pydvbcss/badge/?version=stable)](http://pydvbcss.readthedocs.io/en/stable/?badge=stable) [Docs for current stable release](http://pydvbcss.readthedocs.io/en/stable/?badge=stable)
+   * [![Docs Status (0.5.2)](https://readthedocs.org/projects/pydvbcss/badge/?version=0.5.2)](http://pydvbcss.readthedocs.io/en/0.5.2/?badge=0.5.2) [Docs for 0.5.2 release](http://pydvbcss.readthedocs.io/en/0.5.2/?badge=0.5.2)
    
    * [![Docs Status (latest)](https://readthedocs.org/projects/pydvbcss/badge/?version=latest)](http://pydvbcss.readthedocs.io/en/latest/?badge=latest) [Docs for latest commits to master release](http://pydvbcss.readthedocs.io/en/latest/?badge=latest)
 
