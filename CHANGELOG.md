@@ -2,7 +2,15 @@
 
 ## Latest
 
-* ...
+# 0.5.2 : pypi packaging bugfix
+
+This is a minor release that fixes a packaging bug that may cause pydvbcss
+to be unable to install correctly unless CherryPy and ws4py packages are
+already installed.
+
+* Fixed missing `requirements.txt` in pypi package
+  ([c696395](https://github.com/bbc/pydvbcss/commit/c6963955f87e9569b6de689697ad95fe182e1893))
+
 
 # 0.5.1 : Installation bugfixes
 

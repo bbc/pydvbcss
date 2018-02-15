@@ -74,6 +74,9 @@ Or if upgrading from a previous version:
 
 You can use `pip search pydvbcss` to verify which version is installed.
 
+> *See note in the next section about `CherryPy` and `ws4py` dependencies.*
+
+
 #### From Github or a release tarball _(includes examples and tools)_
 
 The [master branch](https://github.com/BBC/pydvbcss/tree/master) is the latest
@@ -90,13 +93,11 @@ dependencies from the Python Package Index [PyPI](https://pypi.python.org/pypi):
 
     $ pip install -r requirements.txt
 
-**NOTE: There is any incompatibility between `cherrypy`, `ws4py` and
-`cheroot` in recent versions of `cherrypy` that breaks WebSockets support.
-Until this is resolved, you should only *use versions of `cherrypy` between
-10.0.0 and 11.0.0 inclusive* and *`six` version 1.11.0 or greater*.
- Details of the issue are
-[available here](https://github.com/bbc/pydvbcss/issues/15) and 
-[here](https://github.com/bbc/pydvbcss/issues/16)**
+> *NOTE: There have been recent incompatibilities between certain versions of
+> `cherrypy`, `ws4py` and `cheroot`. Therefore, `requirements.txt` requires specific
+> (older) versions of these pacakges. You are welcome to try newer versions installing
+> them manually. See [#15](https://github.com/bbc/pydvbcss/issues/15) for background
+> details.*
 
 Then take (or update) your clone of the repository *master* branch, or
 download and unzip a snapshot release and run the `setup.py` script to
